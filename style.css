@@ -240,6 +240,73 @@ a:focus-visible, button:focus-visible{
   margin-bottom: 12px;
 }
 
+/* Próxima parada */
+.next-stop{
+  margin-top: 18px;
+  padding: 20px 22px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+}
+.next-stop-label{
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--lime);
+  margin-bottom: 6px;
+}
+.next-stop-label--live{
+  background: var(--lime);
+  color: var(--black);
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.next-stop-program{
+  font-family: var(--ff-display);
+  font-size: 1.3rem;
+  color: var(--white);
+  margin-bottom: 4px;
+}
+.next-stop-when{
+  font-size: 0.85rem;
+  color: var(--grey);
+  margin-bottom: 14px;
+}
+.next-stop-countdown{
+  display: flex;
+  gap: 10px;
+}
+.cd-unit{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 48px;
+  padding: 8px 6px;
+  background: var(--black-soft);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+}
+.cd-num{
+  font-family: var(--ff-display);
+  font-size: 1.15rem;
+  color: var(--lime);
+  line-height: 1;
+}
+.cd-label{
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--grey-dim);
+}
+
+@media (max-width: 480px){
+  .cd-unit{ min-width: 40px; padding: 6px 4px; }
+  .cd-num{ font-size: 1rem; }
+}
+
 @media (max-width: 900px){
   .hero .wrap{ grid-template-columns: 1fr; }
 }
@@ -375,6 +442,39 @@ section{ padding: 88px 0; }
   .carousel-arrow{ width: 40px; height: 40px; }
 }
 .benefits-note{ margin-top: 32px; font-size: 0.78rem; color: var(--grey-dim); }
+
+.btn-location{
+  margin-top: 24px;
+  display:inline-flex;
+}
+.benefit-distance{
+  display:inline-flex;
+  align-items:center;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--lime);
+  white-space: nowrap;
+}
+
+.partner-cta{
+  display:block;
+  margin-top: 40px;
+  padding: 28px 30px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  background: var(--card);
+  transition: border-color .2s ease, background .2s ease;
+}
+.partner-cta:hover{ border-color: rgba(193,255,0,0.35); background: rgba(193,255,0,0.03); }
+.partner-cta-title{
+  display:block;
+  font-family: var(--ff-display);
+  font-size: 1.15rem;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+.partner-cta-desc{ display:block; color: var(--grey); font-size: 0.92rem; max-width: 620px; }
 
 /* ---------- Asociate ---------- */
 .join{ border-top: 1px solid var(--card-border); }

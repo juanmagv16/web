@@ -28,6 +28,7 @@ YOUTUBE_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stro
 CHEVRON_ICON = '<svg class="chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>'
 ARROW_LEFT_ICON = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>'
 ARROW_RIGHT_ICON = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>'
+PIN_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21s7-6.6 7-12a7 7 0 1 0-14 0c0 5.4 7 12 7 12z"></path><circle cx="12" cy="9" r="2.5"></circle></svg>'
 BACK_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>'
 BURGER_ICON = '''<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <g class="line-open"><path d="M4 6h16M4 12h16M4 18h16"></path></g>
@@ -164,6 +165,8 @@ HOME_BODY = '''  <section class="hero">
             allowfullscreen>
           </iframe>
         </div>
+
+        <div class="next-stop" id="next-stop" aria-live="polite" hidden></div>
       </div>
     </div>
   </section>
@@ -182,24 +185,27 @@ HOME_BODY = '''  <section class="hero">
 # BENEFICIOS (beneficios.html) — grilla tal cual estaba
 # ============================================================
 BENEFIT_CARDS = [
-    # (slug, inicial, nombre, categoria, [perks], ig)
-    ("puntoexe.informatica", ".", ".exe informática", "Tecnología", ["15% de descuento en servicio técnico"], "puntoexe.informatica"),
-    ("carpincho.indumentaria", "C", "Carpincho", "Indumentaria", ["10% de descuento"], "carpincho.indumentaria"),
-    ("casachicha.lp", "C", "Casa Chicha", "Producción cultural", ["10% de descuento en birras", "10% de descuento en talleres (por cupo)"], "casachicha.lp"),
-    ("la_compostera", "L", "La Compostera", "Gastronomía", ["10% de descuento"], "la_compostera"),
-    ("laola.indie", "L", "La Ola Indie", "Eventos", ["15% de descuento en entradas anticipadas"], "laola.indie"),
-    ("libreriamascaro", "M", "Mascaró", "Librería / Editorial", ["10% de descuento"], "libreriamascaro"),
-    ("mundo.semilla", "M", "Mundo Semilla", "Gastronomía", ["10% de descuento en milanesas (acumulable con Cuenta DNI)"], "mundo.semilla"),
-    ("pao.tatt", "P", "Pao tatt", "Tatuajes", ["15% de descuento"], "pao.tatt"),
-    ("refugio62_", "R", "Refugio 62", "Gastronomía", ["10% de descuento en todas las cervezas"], "refugio62_"),
-    ("roots_cooperativa", "R", "Roots Pizza", "Gastronomía", ["10% para la comunidad (acumulable con Cuenta DNI)"], "roots_cooperativa"),
-    ("tatana.ar", "T", "Tatana", "Gastronomía", ["10% de descuento en vermú seleccionados"], "tatana.ar"),
+    # (slug, inicial, nombre, categoria, [perks], ig, ubicacion_o_None)
+    ("puntoexe.informatica", ".", ".exe informática", "Tecnología", ["15% de descuento en servicio técnico"], "puntoexe.informatica", None),
+    ("carpincho.indumentaria", "C", "Carpincho", "Indumentaria", ["10% de descuento"], "carpincho.indumentaria", None),
+    ("casachicha.lp", "C", "Casa Chicha", "Producción cultural", ["10% de descuento en birras", "10% de descuento en talleres (por cupo)"], "casachicha.lp", "15 1404, C. 61 996, B1900 La Plata"),
+    ("imperialitosdelplata", "I", "Imperialitos del Plata", "Gastronomía", ["Sorteo de una docena"], "imperialitosdelplata", "Diag. 78 427, B1904 La Plata"),
+    ("la_compostera", "L", "La Compostera", "Gastronomía", ["10% de descuento"], "la_compostera", "Av. 60 647, B1900 La Plata"),
+    ("laola.indie", "L", "La Ola Indie", "Eventos", ["15% de descuento en entradas anticipadas"], "laola.indie", None),
+    ("libreriamascaro", "M", "Mascaró", "Librería / Editorial", ["10% de descuento"], "libreriamascaro", "33H7+JF La Plata, Provincia de Buenos Aires"),
+    ("munayarena", "M", "Munay Arena", "Gimnasio / Deportes", ["15% de descuento"], "munayarena", "3XXM+3M Gonnet, Provincia de Buenos Aires"),
+    ("mundo.semilla", "M", "Mundo Semilla", "Gastronomía", ["10% de descuento en milanesas (acumulable con Cuenta DNI)"], "mundo.semilla", None),
+    ("pao.tatt", "P", "Pao tatt", "Tatuajes", ["15% de descuento"], "pao.tatt", None),
+    ("refugio62_", "R", "Refugio 62", "Gastronomía", ["10% de descuento en todas las cervezas"], "refugio62_", "33F5+V2 La Plata, Provincia de Buenos Aires"),
+    ("roots_cooperativa", "R", "Roots Pizza", "Gastronomía", ["10% para la comunidad (acumulable con Cuenta DNI)"], "roots_cooperativa", "33H2+JP La Plata, Provincia de Buenos Aires"),
+    ("tatana.ar", "T", "Tatana", "Gastronomía", ["10% de descuento en vermú seleccionados"], "tatana.ar", "33H6+R6 La Plata, Provincia de Buenos Aires"),
 ]
 
 
-def benefit_card_html(slug, initial, name, cat, perks, ig):
+def benefit_card_html(slug, initial, name, cat, perks, ig, ubicacion=None):
     perks_html = "".join("<li>{}</li>".format(p) for p in perks)
-    return '''        <article class="benefit-card">
+    loc_attr = ' data-location="{}"'.format(ubicacion) if ubicacion else ""
+    return '''        <article class="benefit-card"{loc_attr}>
           <div class="benefit-top">
             <div class="benefit-logo mono" data-slug="{slug}" data-name="{name}">{initial}</div>
             <div>
@@ -213,7 +219,7 @@ def benefit_card_html(slug, initial, name, cat, perks, ig):
           <div class="benefit-foot">
             <a class="benefit-ig" href="https://www.instagram.com/{ig}/" target="_blank" rel="noopener">{icon}<span>@{ig}</span></a>
           </div>
-        </article>'''.format(slug=slug, name=name, initial=initial, cat=cat, perks=perks_html, ig=ig, icon=IG_ICON)
+        </article>'''.format(slug=slug, name=name, initial=initial, cat=cat, perks=perks_html, ig=ig, icon=IG_ICON, loc_attr=loc_attr)
 
 
 COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
@@ -235,7 +241,14 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
         <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Ver más beneficios">{arrow_right}</button>
       </div>
 
+      <button class="btn btn-ghost btn-location" id="activate-location" type="button">{pin} Ver qué tan cerca están</button>
+
       <p class="benefits-note">Los descuentos y condiciones de cada beneficio son definidos por cada espacio adherido y pueden cambiar sin aviso previo.</p>
+
+      <a class="partner-cta" href="mailto:laplatasube@gmail.com?subject=Quiero%20sumar%20mi%20comercio%20a%20SUBE">
+        <span class="partner-cta-title">¿Tenés un comercio o espacio en La Plata?</span>
+        <span class="partner-cta-desc">Si querés formar parte de esta red, contactate con nosotros y nuestro equipo comercial te estará respondiendo.</span>
+      </a>
     </div>
   </section>
 
@@ -304,6 +317,7 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
     chevron=CHEVRON_ICON,
     arrow_left=ARROW_LEFT_ICON,
     arrow_right=ARROW_RIGHT_ICON,
+    pin=PIN_ICON,
 )
 
 # ============================================================
@@ -688,6 +702,7 @@ if __name__ == "__main__":
             HOME_BODY,
             depth=0,
             active=None,
+            extra_scripts=["schedule.js", "next-stop.js"],
         ),
     )
     write(
@@ -698,7 +713,7 @@ if __name__ == "__main__":
             COMUNIDAD_BODY,
             depth=0,
             active="comunidad",
-            extra_scripts=["logo-autoload.js", "benefits.js", "carousel.js"],
+            extra_scripts=["logo-autoload.js", "geo.js", "benefits.js", "carousel.js"],
         ),
     )
     write(

@@ -155,7 +155,9 @@
       : "";
 
     return (
-      '<article class="benefit-card">' +
+      '<article class="benefit-card"' +
+      (item.ubicacion ? ' data-location="' + escapeHtml(item.ubicacion) + '"' : "") +
+      ">" +
       '<div class="benefit-top">' +
       logo +
       "<div>" +
@@ -183,6 +185,7 @@
     grid.innerHTML = items.map(cardHTML).join("");
     grid.setAttribute("data-fallback", "false");
     if (window.SubeAutoLogos) window.SubeAutoLogos(grid);
+    if (window.SubeGeo) window.SubeGeo.repaint();
   }
 
   fetch(SHEET_CSV_URL)
@@ -202,6 +205,7 @@
         catCol = -1,
         igCol = -1,
         logoCol = -1,
+        ubicacionCol = -1,
         beneficioCols = [];
 
       for (var h = 0; h < Math.min(rows.length, 6); h++) {
@@ -215,6 +219,7 @@
           catCol = findCol(candidateHeaders, ["rubro", "categoria"]);
           igCol = findCol(candidateHeaders, ["instagram", " ig", "ig "]);
           logoCol = findCol(candidateHeaders, ["logo", "imagen"]);
+          ubicacionCol = findCol(candidateHeaders, ["ubicacion", "direccion", "domicilio"]);
           break;
         }
       }
@@ -253,6 +258,7 @@
           categoria: catCol !== -1 ? (row[catCol] || "").trim() : "",
           ig: igValue,
           logo: logoCol !== -1 ? (row[logoCol] || "").trim() : "",
+          ubicacion: ubicacionCol !== -1 ? (row[ubicacionCol] || "").trim() : "",
           perks: perks,
         });
       }
