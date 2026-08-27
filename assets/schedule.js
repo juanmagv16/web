@@ -399,5 +399,11 @@
     getLastError: function () {
       return ultimoError;
     },
+    // Lista completa de programas activos y válidos (Sheets, o el
+    // fallback local si la hoja no respondió). La usa la grilla de
+    // Programación en Contenidos para no duplicar los horarios en HTML.
+    getAllPrograms: function () {
+      return cachedPrograms ? cachedPrograms.slice() : [];
+    },
   };
 })();

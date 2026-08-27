@@ -381,7 +381,7 @@ CONTENIDOS_BODY = '''  <section class="content">
         <h3>Programación</h3>
       </div>
 
-      <div class="content-schedule">
+      <div class="content-schedule" id="content-schedule">
 
         <div class="schedule-day">
           <h3>Lunes</h3>
@@ -425,7 +425,7 @@ CONTENIDOS_BODY = '''  <section class="content">
           </ul>
         </div>
 
-        <div class="schedule-day">
+        <div class="schedule-day" id="schedule-ondemand-block">
           <h3>On demand</h3>
           <ul class="ondemand-list">
             <li>
@@ -770,6 +770,7 @@ if __name__ == "__main__":
             CONTENIDOS_BODY,
             depth=0,
             active="contenidos",
+            extra_scripts=["schedule.js", "schedule-grid.js"],
         ),
     )
     write(
