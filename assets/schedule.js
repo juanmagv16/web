@@ -234,6 +234,7 @@
     var mejor = null;
     programs.forEach(function (p) {
       var utc = proximaEmisionUTC(p.fecha_referencia_ms, p.frecuencia_dias, p.hora, referenciaHoy);
+      if (!isFinite(utc)) return; // defensivo: no hay próxima emisión calculable, se descarta
       if (mejor === null || utc < mejor.utc) {
         mejor = { programa: p.programa, utc: utc, temporada: p.temporada, dia_semana: p.dia_semana, hora: p.hora };
       }
@@ -258,58 +259,115 @@
     return resultado;
   }
 
-  // ---------- Carga desde Google Sheets ----------
+  // ---------- Copia local de respaldo (fallback) ----------
+  // Última programación validada manualmente en la conversación con SUBE.
+  // Está escrita como CSV, con las mismas columnas exactas que la hoja
+  // real, para que pase por el mismo parseo y las mismas validaciones
+  // que el dato en vivo — cero lógica duplicada. Para actualizarla,
+  // alcanza con editar este texto (no hay que tocar ninguna función).
+  var FALLBACK_CSV =
+    "programa,dia_semana,hora,frecuencia,frecuencia_dias,fecha_referencia,temporada,activo\n" +
+    "Streaming Copa,lunes,18:00,semanal,7,2026-08-24,2026,si\n" +
+    "Marcando la cancha,lunes,19:30,semanal,7,2026-08-24,2026,si\n" +
+    "F@lopa informativa nacional,lunes,21:00,semanal,7,2026-08-24,2026,si\n" +
+    "El amplificador,jueves,18:00,semanal,7,2026-08-27,2026,si\n" +
+    "Estacion freak,jueves,19:30,quincenal,14,2026-09-03,2026,si\n" +
+    "De que viven,jueves,20:00,quincenal,14,2026-08-27,2026,si\n" +
+    "Chicha y limonada,jueves,21:30,semanal,7,2026-08-27,2026,si\n";
+
+  var FETCH_TIMEOUT_MS = 6000; // no bloquea la Home: a los 6s se corta y se usa el fallback
+
+  // fetch() con límite de tiempo, usando AbortController nativo (sin
+  // dependencias externas). Si la hoja tarda más de FETCH_TIMEOUT_MS,
+  // se aborta el pedido y se sigue con el fallback.
+  function fetchConTimeout(url, ms) {
+    var controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+    var timer = controller
+      ? setTimeout(function () {
+          controller.abort();
+        }, ms)
+      : null;
+    return fetch(url, controller ? { signal: controller.signal } : undefined).then(
+      function (res) {
+        if (timer) clearTimeout(timer);
+        return res;
+      },
+      function (err) {
+        if (timer) clearTimeout(timer);
+        throw err;
+      }
+    );
+  }
+
+  // Todo el parseo de un texto CSV de Programación a una lista de
+  // programas válidos, en un solo lugar: lo usan tanto la hoja real
+  // como el fallback, así que cualquier corrección de validación se
+  // escribe una sola vez.
+  function parsearProgramacion(text) {
+    var rows = parseCSV(text);
+    if (rows.length < 2) return [];
+
+    var cols = null;
+    for (var h = 0; h < Math.min(rows.length, 6); h++) {
+      var candidate = rows[h];
+      var progCol = findCol(candidate, ["programa"]);
+      var diaCol = findCol(candidate, ["dia_semana", "dia semana", "diasemana"]);
+      if (progCol !== -1 && diaCol !== -1) {
+        cols = {
+          headerRowIndex: h,
+          programa: progCol,
+          dia_semana: diaCol,
+          hora: findCol(candidate, ["hora"]),
+          frecuencia_dias: (function () {
+            var exact = findColExact(candidate.map(normalizeHeader), ["frecuencia_dias", "frecuencia dias"]);
+            return exact !== -1 ? exact : findCol(candidate, ["frecuencia_dias", "frecuencia dias"]);
+          })(),
+          frecuencia: findColExact(candidate.map(normalizeHeader), ["frecuencia"]),
+          fecha_referencia: findCol(candidate, ["fecha_referencia", "fecha referencia", "referencia"]),
+          temporada: findCol(candidate, ["temporada"]),
+          activo: findCol(candidate, ["activo"]),
+        };
+        break;
+      }
+    }
+    if (!cols || cols.hora === -1 || cols.frecuencia_dias === -1 || cols.fecha_referencia === -1 || cols.activo === -1) {
+      return [];
+    }
+
+    var programas = [];
+    for (var r = cols.headerRowIndex + 1; r < rows.length; r++) {
+      var p = filaAPrograma(rows[r], cols);
+      if (p) programas.push(p);
+    }
+    return programas;
+  }
+
+  // ---------- Carga desde Google Sheets, con fallback automático ----------
+  var ultimaFuente = "ninguna"; // "sheets" | "fallback" | "ninguna"
+  var ultimoError = null;
+
   function cargar() {
-    return fetch(SHEET_CSV_URL)
+    return fetchConTimeout(SHEET_CSV_URL, FETCH_TIMEOUT_MS)
       .then(function (res) {
         if (!res.ok) throw new Error("status " + res.status);
         return res.text();
       })
       .then(function (text) {
-        var rows = parseCSV(text);
-        if (rows.length < 2) return [];
-
-        var cols = null;
-        for (var h = 0; h < Math.min(rows.length, 6); h++) {
-          var candidate = rows[h];
-          var progCol = findCol(candidate, ["programa"]);
-          var diaCol = findCol(candidate, ["dia_semana", "dia semana", "diasemana"]);
-          if (progCol !== -1 && diaCol !== -1) {
-            cols = {
-              headerRowIndex: h,
-              programa: progCol,
-              dia_semana: diaCol,
-              hora: findCol(candidate, ["hora"]),
-              frecuencia_dias: (function () {
-                var exact = findColExact(candidate.map(normalizeHeader), ["frecuencia_dias", "frecuencia dias"]);
-                return exact !== -1 ? exact : findCol(candidate, ["frecuencia_dias", "frecuencia dias"]);
-              })(),
-              frecuencia: findColExact(candidate.map(normalizeHeader), ["frecuencia"]),
-              fecha_referencia: findCol(candidate, ["fecha_referencia", "fecha referencia", "referencia"]),
-              temporada: findCol(candidate, ["temporada"]),
-              activo: findCol(candidate, ["activo"]),
-            };
-            break;
-          }
-        }
-        // Si no reconocemos la fila de encabezados (ej: esta URL trajo otra
-        // pestaña de la planilla), no hay datos que calcular.
-        if (!cols || cols.hora === -1 || cols.frecuencia_dias === -1 || cols.fecha_referencia === -1 || cols.activo === -1) {
-          return [];
-        }
-
-        var programas = [];
-        for (var r = cols.headerRowIndex + 1; r < rows.length; r++) {
-          var p = filaAPrograma(rows[r], cols);
-          if (p) programas.push(p);
-        }
+        var programas = parsearProgramacion(text);
+        // "Datos inválidos" también cuenta como fallo: si la hoja respondió
+        // pero no reconocimos ni un solo programa válido (encabezados
+        // movidos, pestaña equivocada, todo marcado inactivo, etc.), se
+        // considera que la fuente principal no sirvió esta vez.
+        if (!programas.length) throw new Error("la hoja respondió pero sin programas válidos");
+        ultimaFuente = "sheets";
+        ultimoError = null;
         return programas;
       })
-      .catch(function () {
-        // Sin acceso a la planilla (offline, CORS, hoja movida, etc.):
-        // no hay próxima parada calculable, pero el resto del sitio sigue
-        // funcionando con normalidad.
-        return [];
+      .catch(function (err) {
+        ultimoError = String((err && err.message) || err);
+        var fallback = parsearProgramacion(FALLBACK_CSV);
+        ultimaFuente = fallback.length ? "fallback" : "ninguna";
+        return fallback; // puede ser [] si hasta el fallback fallara (no debería)
       });
   }
 
@@ -320,7 +378,8 @@
 
   // ---------- API pública ----------
   window.SubeSchedule = {
-    // Devuelve una Promise que resuelve cuando termina de leer/parsear.
+    // Devuelve una Promise que resuelve cuando termina de leer/parsear
+    // (ya sea desde la hoja o, si hizo falta, desde el fallback).
     ready: loadPromise,
     // { programa, utc, dia_semana, hora, temporada } | null (sin datos válidos)
     getNextStop: function () {
@@ -331,6 +390,14 @@
     getUpcoming: function (n) {
       if (!cachedPrograms || !cachedPrograms.length) return [];
       return calcularProximasEmisiones(cachedPrograms, n || 3);
+    },
+    // "sheets" | "fallback" | "ninguna" — de dónde salió el dato actual.
+    getSource: function () {
+      return ultimaFuente;
+    },
+    // Motivo por el que se recurrió al fallback (null si vino de Sheets).
+    getLastError: function () {
+      return ultimoError;
     },
   };
 })();

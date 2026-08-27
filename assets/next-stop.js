@@ -3,9 +3,11 @@
    ------------------------------------------------------
    No lee ni calcula nada por su cuenta: solo consume
    window.SubeSchedule (assets/schedule.js) y dibuja el
-   resultado. Si no hay datos válidos (planilla caída,
-   sin programas activos, etc.) el bloque simplemente no
-   se muestra — no rompe el resto de la Home.
+   resultado. schedule.js ya se encarga de tener un
+   fallback local si Google Sheets falla, así que acá solo
+   queda cubrir el caso extremo de que ni siquiera el
+   fallback tenga un programa calculable — en ese caso se
+   muestra un mensaje amigable, nunca se deja el bloque vacío.
    ============================================ */
 (function () {
   "use strict";
@@ -119,6 +121,13 @@
     tick(container, stop); // primer pintado inmediato, sin esperar 1s
   }
 
+  function pintarSinDatos(container) {
+    container.hidden = false;
+    container.innerHTML =
+      '<p class="next-stop-label">Próxima parada</p>' +
+      '<p class="next-stop-empty">Estamos preparando la próxima parada.</p>';
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     var container = document.getElementById("next-stop");
     if (!container || !window.SubeSchedule) return;
@@ -126,7 +135,9 @@
     window.SubeSchedule.ready.then(function () {
       var stop = window.SubeSchedule.getNextStop();
       if (!stop) {
-        container.hidden = true; // sin programación válida: no se muestra nada
+        // Ni la hoja ni el fallback local tenían un programa calculable:
+        // igual mostramos algo amigable, nunca dejamos el bloque vacío.
+        pintarSinDatos(container);
         return;
       }
       iniciar(container, stop);

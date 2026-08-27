@@ -171,12 +171,56 @@ HOME_BODY = '''  <section class="hero">
     </div>
   </section>
 
-  <section class="ad-slot">
+  <section class="featured-news">
     <div class="wrap">
-      <a class="ad-slot-box" href="contacto.html">
-        <span class="ad-slot-title">Publicitá acá</span>
-        <span class="ad-slot-desc">Este espacio puede ser tuyo. Escribinos para conocer los formatos disponibles.</span>
-      </a>
+      <div class="section-head">
+        <h2>Noticias destacadas</h2>
+      </div>
+      <div class="news-grid">
+        <a class="news-card" href="noticias.html">
+          <span class="news-tag">Noticia destacada</span>
+          <span class="news-title">¿Dónde está Adorni?</span>
+        </a>
+        <a class="news-card" href="noticias.html">
+          <span class="news-tag">Noticia destacada</span>
+          <span class="news-title">El campeón de la liga amateur platense</span>
+        </a>
+        <a class="news-card" href="noticias.html">
+          <span class="news-tag">Noticia destacada</span>
+          <span class="news-title">¿Dónde se chicha el finde?</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="sponsors">
+    <div class="wrap">
+      <div class="sponsor-slots">
+        <a class="sponsor-slot sponsor-slot--banner" href="contacto.html">
+          <span class="sponsor-slot-label">Banner horizontal</span>
+        </a>
+
+        <div class="sponsor-slot-row">
+          <a class="sponsor-slot sponsor-slot--square" href="contacto.html">
+            <span class="sponsor-slot-label">Cuadrado</span>
+          </a>
+          <a class="sponsor-slot sponsor-slot--square" href="contacto.html">
+            <span class="sponsor-slot-label">Cuadrado</span>
+          </a>
+          <a class="sponsor-slot sponsor-slot--square" href="contacto.html">
+            <span class="sponsor-slot-label">Cuadrado</span>
+          </a>
+        </div>
+
+        <div class="sponsor-slot-row sponsor-slot-row--2">
+          <a class="sponsor-slot sponsor-slot--banner" href="contacto.html">
+            <span class="sponsor-slot-label">Banner horizontal</span>
+          </a>
+          <a class="sponsor-slot sponsor-slot--banner" href="contacto.html">
+            <span class="sponsor-slot-label">Banner horizontal</span>
+          </a>
+        </div>
+      </div>
     </div>
   </section>
 '''.format(list_id=LIVE_PLAYLIST_ID)
