@@ -59,6 +59,7 @@ def nav_links_html(depth, active):
 def header_html(depth, active):
     return '''<header class="site-header">
   <div class="wrap">
+    <div class="header-weather" id="header-weather" aria-live="polite" hidden></div>
     <a href="{u}index.html" class="brand"><img src="{u}assets/logo.png" alt="Sube Canal"></a>
     <nav class="nav-links" id="nav-links">
       {links}
@@ -112,6 +113,7 @@ def page_html(title, description, body, depth, active, extra_scripts=None, body_
 {footer}
 
 <script src="{u}assets/nav.js"></script>
+<script src="{u}assets/weather.js"></script>
 {scripts}
 </body>
 </html>

@@ -125,6 +125,15 @@ a:focus-visible, button:focus-visible{
 }
 .brand{ grid-column: 2; justify-self: center; }
 .brand img{ height: 26px; width:auto; }
+.header-weather{
+  grid-column: 1;
+  justify-self: start;
+  font-family: var(--ff-body);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--grey);
+  white-space: nowrap;
+}
 .nav-links{
   grid-column: 3;
   justify-self: end;
@@ -176,6 +185,7 @@ a:focus-visible, button:focus-visible{
   .nav-links.is-open{ max-height: 320px; }
   .nav-links a{ padding: 16px 24px; border-top: 1px solid var(--card-border); opacity: 1; }
   .nav-toggle{ display:inline-flex; }
+  .header-weather{ display: none; }
 }
 
 /* ---------- Hero ---------- */
