@@ -415,6 +415,11 @@ a:focus-visible, button:focus-visible{
 .sponsor-slot:hover .sponsor-slot-label{ color: var(--lime); }
 
 .sponsor-slot--banner{ width: 100%; height: 110px; }
+/* Banner con imagen cargada: respeta la proporción de la pieza (4:1) */
+.sponsor-slot--image{ height: auto; border: 1px solid var(--card-border); overflow: hidden; background: none; }
+.sponsor-slot--image img{ width: 100%; height: auto; transition: transform .3s ease; }
+.sponsor-slot--image:hover{ background: none; }
+.sponsor-slot--image:hover img{ transform: scale(1.01); }
 
 .sponsor-slot-row{
   display:grid;
@@ -428,6 +433,7 @@ a:focus-visible, button:focus-visible{
   .sponsor-slot-row{ grid-template-columns: 1fr; }
   .sponsor-slot--square{ aspect-ratio: 16 / 9; }
   .sponsor-slot--banner{ height: 90px; }
+  .sponsor-slot--image{ height: auto; }
 }
 
 /* ---------- Section shell ---------- */
