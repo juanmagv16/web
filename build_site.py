@@ -207,11 +207,11 @@ HOME_BODY_TEMPLATE = '''  <section class="hero">
           <a class="sponsor-slot sponsor-slot--square sponsor-slot--image" href="comunidad.html#beneficios">
             <img src="assets/sponsors/paradas-amigas-casa-chicha-carpincho.jpg" alt="Paradas amigas: Casa Chicha, 10% off en birras y talleres; Carpincho, 10% off con cupón exclusivo" width="1080" height="1080" loading="lazy">
           </a>
-          <a class="sponsor-slot sponsor-slot--square" href="contacto.html">
-            <span class="sponsor-slot-label">Cuadrado</span>
+          <a class="sponsor-slot sponsor-slot--square sponsor-slot--image" href="https://www.gba.gob.ar" target="_blank" rel="noopener">
+            <img src="assets/sponsors/publicidad-pba.jpg" alt="Gobierno de la Provincia de Buenos Aires" width="720" height="720" loading="lazy">
           </a>
-          <a class="sponsor-slot sponsor-slot--square" href="contacto.html">
-            <span class="sponsor-slot-label">Cuadrado</span>
+          <a class="sponsor-slot sponsor-slot--square sponsor-slot--image" href="https://www.laplata.gob.ar" target="_blank" rel="noopener">
+            <img src="assets/sponsors/publicidad-municipalidad-la-plata.jpg" alt="La Plata Capital — Municipalidad de La Plata" width="720" height="720" loading="lazy">
           </a>
         </div>
 
