@@ -1,0 +1,9 @@
+titulo: El campeón de la liga amateur platense
+seccion: Deportes
+fecha: 2026-10-19
+destacada: si
+bajada:
+autor:
+imagen:
+epigrafe:
+---

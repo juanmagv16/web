@@ -51,6 +51,10 @@ importante que lo verifiques vos una vez publicado el sitio:
 Mientras tanto, el listado fijo en `index.html` sigue siendo la fuente de
 verdad y se puede editar a mano como siempre.
 
+## Noticias (redacción)
+
+La sección **Noticias** se arma sola a partir de los archivos de texto de la carpeta `redaccion/`: una nota por archivo. Las fotos van en `assets/noticias/`. Cómo escribir y publicar una nota está explicado en [`redaccion/LEEME.md`](redaccion/LEEME.md). Después de agregar o editar una nota hay que regenerar el sitio con `python3 build_site.py`.
+
 ## Cómo publicarlo en GitHub Pages
 
 1. Creá un repositorio nuevo en GitHub (por ejemplo `sube-canal`).

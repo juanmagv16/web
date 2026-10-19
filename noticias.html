@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Noticias · SUBE</title>
-<meta name="description" content="Noticias de SUBE. Próximamente.">
+<meta name="description" content="Noticias de actualidad, coberturas y notas de la redacción de SUBE, desde La Plata.">
 <link rel="icon" href="assets/logo.png">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -16,7 +16,8 @@
     <a href="index.html" class="brand"><img src="assets/logo.png" alt="Sube Canal"></a>
     <nav class="nav-links" id="nav-links">
       <a href="comunidad.html">Comunidad</a>
-      <a href="contenidos.html" class="is-current">Contenidos</a>
+      <a href="contenidos.html">Contenidos</a>
+      <a href="noticias.html" class="is-current">Noticias</a>
       <a href="tienda.html">Tienda</a>
       <a href="contacto.html">Contacto</a>
     </nav>
@@ -30,13 +31,46 @@
 </header>
 
 <main>
-  <section class="soon">
+  <section class="news-page">
     <div class="wrap">
-      <a class="back-link" href="contenidos.html"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>Volver a Contenidos</a>
-      <div class="section-head">
-        <h2>Noticias</h2>
-        <p>Estamos preparando esta sección. Muy pronto vas a poder leer acá coberturas, notas y actualidad hecha por SUBE.</p>
+      <div class="news-page-head">
+        <span class="eyebrow">Redacción SUBE</span>
+        <h1>Noticias</h1>
+        <p>Actualidad, coberturas y notas desde La Plata.</p>
       </div>
+      <div class="news-filters" role="group" aria-label="Filtrar por sección">
+        <button type="button" class="news-chip is-active" data-filter="">Todas</button>
+        <button type="button" class="news-chip" data-filter="agenda">Agenda</button>
+        <button type="button" class="news-chip" data-filter="politica">Política</button>
+        <button type="button" class="news-chip" data-filter="deportes">Deportes</button>
+      </div>
+      <div class="news-list" id="news-list">
+        <a class="nc nc--lead" href="noticias/donde-se-chicha-el-finde.html" data-seccion="agenda">
+          <span class="nc-media nc-media--empty" aria-hidden="true"><span>Agenda</span></span>
+          <span class="nc-body">
+            <span class="nc-meta"><span class="nc-sec">Agenda</span><span class="nc-date">19 oct 2026</span></span>
+            <span class="nc-title">¿Dónde se chicha el finde?</span>
+            
+          </span>
+        </a>
+        <a class="nc" href="noticias/donde-esta-adorni.html" data-seccion="politica">
+          <span class="nc-media nc-media--empty" aria-hidden="true"><span>Política</span></span>
+          <span class="nc-body">
+            <span class="nc-meta"><span class="nc-sec">Política</span><span class="nc-date">19 oct 2026</span></span>
+            <span class="nc-title">¿Dónde está Adorni?</span>
+            
+          </span>
+        </a>
+        <a class="nc" href="noticias/campeon-liga-amateur-platense.html" data-seccion="deportes">
+          <span class="nc-media nc-media--empty" aria-hidden="true"><span>Deportes</span></span>
+          <span class="nc-body">
+            <span class="nc-meta"><span class="nc-sec">Deportes</span><span class="nc-date">19 oct 2026</span></span>
+            <span class="nc-title">El campeón de la liga amateur platense</span>
+            
+          </span>
+        </a>
+      </div>
+      <p class="news-empty" id="news-empty" hidden>No hay notas en esta sección todavía.</p>
     </div>
   </section>
 
@@ -59,6 +93,6 @@
 
 <script src="assets/nav.js"></script>
 <script src="assets/weather.js"></script>
-
+<script src="assets/news.js"></script>
 </body>
 </html>

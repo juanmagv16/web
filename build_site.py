@@ -7,12 +7,17 @@ Genera TODO el sitio de Sube Canal a partir de plantillas compartidas
 Correr con: python3 build_site.py
 Vuelve a escribir: index.html, comunidad.html, contenidos.html,
 noticias.html, tienda.html, contacto.html, y todos los archivos
-dentro de programas/.
+dentro de programas/ y noticias/.
+
+Las notas de la sección Noticias NO se escriben acá: cada una es un
+archivo de texto en la carpeta redaccion/ (ver redaccion/LEEME.md).
 
 Para agregar/editar el contenido de un programa, buscar el diccionario
 PROGRAMS más abajo.
 """
+import html
 import os
+import re
 
 ROOT = os.path.dirname(__file__)
 
@@ -38,6 +43,7 @@ BURGER_ICON = '''<svg viewBox="0 0 24 24" width="20" height="20" fill="none" str
 NAV_ITEMS = [
     ("comunidad", "Comunidad", "comunidad.html"),
     ("contenidos", "Contenidos", "contenidos.html"),
+    ("noticias", "Noticias", "noticias.html"),
     ("tienda", "Tienda", "tienda.html"),
     ("contacto", "Contacto", "contacto.html"),
 ]
@@ -142,7 +148,7 @@ def write(path, html):
 # ============================================================
 LIVE_PLAYLIST_ID = "PLYT7ujTIBmWat3a4FBqiq8kWbAD_kybd5"
 
-HOME_BODY = '''  <section class="hero">
+HOME_BODY_TEMPLATE = '''  <section class="hero">
     <div class="wrap">
       <div>
         <h1>Subite a este<br><span class="accent">viaje colectivo</span></h1>
@@ -177,20 +183,10 @@ HOME_BODY = '''  <section class="hero">
     <div class="wrap">
       <div class="section-head">
         <h2>Noticias destacadas</h2>
+        <a class="section-head-link" href="noticias.html">Ver todas las noticias →</a>
       </div>
       <div class="news-grid">
-        <a class="news-card" href="noticias.html">
-          <span class="news-tag">Noticia destacada</span>
-          <span class="news-title">¿Dónde está Adorni?</span>
-        </a>
-        <a class="news-card" href="noticias.html">
-          <span class="news-tag">Noticia destacada</span>
-          <span class="news-title">El campeón de la liga amateur platense</span>
-        </a>
-        <a class="news-card" href="noticias.html">
-          <span class="news-tag">Noticia destacada</span>
-          <span class="news-title">¿Dónde se chicha el finde?</span>
-        </a>
+{featured_news}
       </div>
     </div>
   </section>
@@ -225,7 +221,7 @@ HOME_BODY = '''  <section class="hero">
       </div>
     </div>
   </section>
-'''.format(list_id=LIVE_PLAYLIST_ID)
+'''
 
 # ============================================================
 # BENEFICIOS (beneficios.html) — grilla tal cual estaba
@@ -450,14 +446,14 @@ CONTENIDOS_BODY = '''  <section class="content">
 
       </div>
 
-      <div class="content-subhead content-subhead--noticias">
-        <span class="content-subhead-eyebrow">Próximamente</span>
+      <div class="content-subhead">
+        <span class="content-subhead-eyebrow">Redacción SUBE</span>
         <h3>Noticias</h3>
       </div>
 
       <a class="hub-card" href="noticias.html">
         <span class="hub-card-title">Coberturas, notas y actualidad</span>
-        <span class="hub-card-desc">Estamos preparando esta sección — todavía no tiene contenido cargado.</span>
+        <span class="hub-card-desc">La parte informativa de SUBE: lo que pasa en La Plata y en el país, contado por nuestra redacción.</span>
         <span class="hub-card-arrow">→</span>
       </a>
 
@@ -465,16 +461,308 @@ CONTENIDOS_BODY = '''  <section class="content">
   </section>
 '''
 
-NOTICIAS_BODY = '''  <section class="soon">
-    <div class="wrap">
-      <a class="back-link" href="contenidos.html">{back}Volver a Contenidos</a>
-      <div class="section-head">
-        <h2>Noticias</h2>
-        <p>Estamos preparando esta sección. Muy pronto vas a poder leer acá coberturas, notas y actualidad hecha por SUBE.</p>
+# ============================================================
+# NOTICIAS (noticias.html + noticias/*.html)
+# ============================================================
+# Cada nota es un archivo de texto dentro de la carpeta redaccion/.
+# El formato está explicado en redaccion/LEEME.md y hay una plantilla
+# lista para copiar en redaccion/_plantilla.txt. Los archivos que
+# empiezan con "_" o que no terminan en .txt se ignoran.
+NEWS_SOURCE_DIR = os.path.join(ROOT, "redaccion")
+NEWS_DEFAULT_AUTHOR = "Redacción SUBE"
+MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
+         "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+WHATSAPP_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20l1.2-4.2A8.5 8.5 0 1 1 20 11.5z"></path></svg>'
+LINK_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"></path><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"></path></svg>'
+
+SI = ("si", "sí", "yes", "true", "1")
+
+
+def _slugify(text):
+    text = text.lower()
+    for a, b in (("á", "a"), ("é", "e"), ("í", "i"), ("ó", "o"), ("ú", "u"), ("ü", "u"), ("ñ", "n")):
+        text = text.replace(a, b)
+    text = re.sub(r"[^a-z0-9]+", "-", text).strip("-")
+    return text or "nota"
+
+
+def parse_note(path):
+    """Lee un archivo de redaccion/ y devuelve un diccionario con la nota."""
+    with open(path, encoding="utf-8") as f:
+        raw = f.read().replace("\r\n", "\n")
+    if "\n---" in raw:
+        head, body = raw.split("\n---", 1)
+        body = body.split("\n", 1)[1] if "\n" in body else ""
+    else:
+        head, body = raw, ""
+    meta = {}
+    for line in head.split("\n"):
+        if ":" in line and not line.strip().startswith("#"):
+            key, value = line.split(":", 1)
+            meta[_slugify(key.strip())] = value.strip()
+
+    name = os.path.splitext(os.path.basename(path))[0]
+    if not meta.get("titulo"):
+        raise SystemExit("ERROR en redaccion/{}: falta la línea 'titulo:'".format(os.path.basename(path)))
+    fecha = meta.get("fecha", "")
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
+        raise SystemExit("ERROR en redaccion/{}: la fecha tiene que tener el formato AAAA-MM-DD (por ejemplo 2026-10-19)".format(os.path.basename(path)))
+    return {
+        "slug": _slugify(meta.get("slug") or re.sub(r"^\d{4}-\d{2}-\d{2}-?", "", name)),
+        "titulo": meta["titulo"],
+        "seccion": meta.get("seccion") or "Actualidad",
+        "bajada": meta.get("bajada", ""),
+        "autor": meta.get("autor") or NEWS_DEFAULT_AUTHOR,
+        "fecha": fecha,
+        "imagen": meta.get("imagen", ""),
+        "epigrafe": meta.get("epigrafe", ""),
+        "destacada": meta.get("destacada", "").lower() in SI,
+        "publicar": meta.get("publicar", "si").lower() in SI,
+        "cuerpo": body.strip(),
+    }
+
+
+def load_news():
+    """Todas las notas publicables, de la más nueva a la más vieja."""
+    if not os.path.isdir(NEWS_SOURCE_DIR):
+        return []
+    notes = []
+    for fname in sorted(os.listdir(NEWS_SOURCE_DIR)):
+        if fname.startswith("_") or not fname.endswith(".txt"):
+            continue
+        note = parse_note(os.path.join(NEWS_SOURCE_DIR, fname))
+        if note["publicar"]:
+            notes.append(note)
+    notes.sort(key=lambda n: (n["fecha"], n["slug"]), reverse=True)
+    seen = set()
+    for n in notes:
+        if n["slug"] in seen:
+            raise SystemExit("ERROR: hay dos notas con la misma dirección '{}'. Cambiale el nombre a una de las dos.".format(n["slug"]))
+        seen.add(n["slug"])
+    return notes
+
+
+def fecha_larga(iso):
+    y, m, d = (int(x) for x in iso.split("-"))
+    return "{} de {} de {}".format(d, MESES[m - 1], y)
+
+
+def fecha_corta(iso):
+    y, m, d = (int(x) for x in iso.split("-"))
+    return "{} {} {}".format(d, MESES[m - 1][:3], y)
+
+
+def _inline(text):
+    """Escapa el texto y aplica **negrita**, *cursiva* y [texto](link)."""
+    t = html.escape(text, quote=False)
+    t = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", t)
+    t = re.sub(r"(?<!\*)\*(?!\s)(.+?)(?<!\s)\*(?!\*)", r"<em>\1</em>", t)
+
+    def link(m):
+        href = m.group(2).replace('"', "%22")
+        external = href.startswith("http")
+        attrs = ' target="_blank" rel="noopener"' if external else ""
+        return '<a href="{}"{}>{}</a>'.format(href, attrs, m.group(1))
+    return re.sub(r"\[([^\]]+)\]\(([^)\s]+)\)", link, t)
+
+
+def body_to_html(body):
+    """Convierte el cuerpo de la nota: párrafos separados por una línea en
+    blanco, '## ' para un intertítulo y '> ' para una cita destacada."""
+    blocks = [b.strip() for b in re.split(r"\n\s*\n", body) if b.strip()]
+    out = []
+    for b in blocks:
+        if b.startswith("## "):
+            out.append("<h2>{}</h2>".format(_inline(b[3:].strip())))
+        elif b.startswith(">"):
+            text = " ".join(line.lstrip("> ").strip() for line in b.split("\n"))
+            out.append("<blockquote>{}</blockquote>".format(_inline(text)))
+        else:
+            out.append("<p>{}</p>".format(_inline(" ".join(line.strip() for line in b.split("\n")))))
+    return "\n        ".join(out)
+
+
+def _img_src(note, depth):
+    img = note["imagen"]
+    if not img:
+        return ""
+    if img.startswith("http"):
+        return img
+    if not os.path.isfile(os.path.join(ROOT, "assets", "noticias", img)):
+        print("AVISO: la nota '{}' usa la imagen '{}', pero no está en assets/noticias/. "
+              "Se muestra sin foto hasta que la subas.".format(note["slug"], img))
+        return ""
+    return "{}assets/noticias/{}".format(up(depth), img)
+
+
+def news_url(note, depth):
+    return "{}noticias/{}.html".format(up(depth), note["slug"])
+
+
+def news_card_html(note, depth, lead=False):
+    e = html.escape
+    src = _img_src(note, depth)
+    media = ('<span class="nc-media"><img src="{}" alt="" loading="lazy"></span>'.format(e(src))
+             if src else '<span class="nc-media nc-media--empty" aria-hidden="true"><span>{}</span></span>'.format(e(note["seccion"])))
+    bajada = '<span class="nc-bajada">{}</span>'.format(e(note["bajada"])) if note["bajada"] else ""
+    return '''<a class="nc{lead}" href="{url}" data-seccion="{sec_key}">
+          {media}
+          <span class="nc-body">
+            <span class="nc-meta"><span class="nc-sec">{sec}</span><span class="nc-date">{fecha}</span></span>
+            <span class="nc-title">{titulo}</span>
+            {bajada}
+          </span>
+        </a>'''.format(
+        lead=" nc--lead" if lead else "",
+        url=news_url(note, depth),
+        sec_key=e(_slugify(note["seccion"])),
+        media=media,
+        sec=e(note["seccion"]),
+        fecha=fecha_corta(note["fecha"]),
+        titulo=e(note["titulo"]),
+        bajada=bajada,
+    )
+
+
+def news_index_body(notes):
+    if not notes:
+        listing = '<p class="news-empty">Todavía no hay notas publicadas. Volvé pronto.</p>'
+        filters = ""
+    else:
+        sections = []
+        for n in notes:
+            if n["seccion"] not in sections:
+                sections.append(n["seccion"])
+        filters = ""
+        if len(sections) > 1:
+            chips = ['<button type="button" class="news-chip is-active" data-filter="">Todas</button>']
+            chips += ['<button type="button" class="news-chip" data-filter="{}">{}</button>'.format(
+                html.escape(_slugify(sec)), html.escape(sec)) for sec in sections]
+            filters = '<div class="news-filters" role="group" aria-label="Filtrar por sección">\n        {}\n      </div>'.format("\n        ".join(chips))
+        lead = news_card_html(notes[0], 0, lead=True)
+        rest = "\n        ".join(news_card_html(n, 0) for n in notes[1:])
+        listing = '''<div class="news-list" id="news-list">
+        {lead}
+        {rest}
       </div>
+      <p class="news-empty" id="news-empty" hidden>No hay notas en esta sección todavía.</p>'''.format(lead=lead, rest=rest)
+
+    return '''  <section class="news-page">
+    <div class="wrap">
+      <div class="news-page-head">
+        <span class="eyebrow">Redacción SUBE</span>
+        <h1>Noticias</h1>
+        <p>Actualidad, coberturas y notas desde La Plata.</p>
+      </div>
+      {filters}
+      {listing}
     </div>
   </section>
-'''.format(back=BACK_ICON)
+'''.format(filters=filters, listing=listing)
+
+
+def news_article_body(note, notes):
+    e = html.escape
+    src = _img_src(note, 1)
+    figure = ""
+    if src:
+        caption = '<figcaption>{}</figcaption>'.format(e(note["epigrafe"])) if note["epigrafe"] else ""
+        figure = '<figure class="article-figure"><img src="{}" alt="{}">{}</figure>'.format(
+            e(src), e(note["epigrafe"] or note["titulo"]), caption)
+    if note["cuerpo"]:
+        body = body_to_html(note["cuerpo"])
+    else:
+        body = '<p class="article-pending">Esta nota está en redacción. Volvé pronto para leerla completa.</p>'
+    bajada = '<p class="article-bajada">{}</p>'.format(e(note["bajada"])) if note["bajada"] else ""
+
+    others = [n for n in notes if n["slug"] != note["slug"]]
+    same = [n for n in others if n["seccion"] == note["seccion"]]
+    more = (same + [n for n in others if n not in same])[:3]
+    more_html = ""
+    if more:
+        more_html = '''<aside class="article-more">
+        <h2>Seguí leyendo</h2>
+        <div class="news-list news-list--more">
+        {}
+        </div>
+      </aside>'''.format("\n        ".join(news_card_html(n, 1) for n in more))
+
+    return '''  <article class="article">
+    <div class="wrap">
+      <a class="back-link" href="../noticias.html">{back}Volver a Noticias</a>
+      <header class="article-head">
+        <p class="article-meta"><span class="nc-sec">{sec}</span><time datetime="{iso}">{fecha}</time></p>
+        <h1>{titulo}</h1>
+        {bajada}
+        <p class="article-byline">Por {autor}</p>
+      </header>
+      {figure}
+      <div class="article-body">
+        {body}
+      </div>
+      <div class="article-share" data-share>
+        <span>Compartir</span>
+        <a class="share-btn" data-share-to="whatsapp" href="#" target="_blank" rel="noopener">{wa}WhatsApp</a>
+        <a class="share-btn" data-share-to="x" href="#" target="_blank" rel="noopener">{x}X</a>
+        <button type="button" class="share-btn" data-share-to="copy">{link}<span>Copiar link</span></button>
+      </div>
+      {more}
+    </div>
+  </article>
+'''.format(
+        back=BACK_ICON,
+        sec=e(note["seccion"]),
+        iso=note["fecha"],
+        fecha=fecha_larga(note["fecha"]),
+        titulo=e(note["titulo"]),
+        bajada=bajada,
+        autor=e(note["autor"]),
+        figure=figure,
+        body=body,
+        wa=WHATSAPP_ICON,
+        x=X_ICON,
+        link=LINK_ICON,
+        more=more_html,
+    )
+
+
+def home_featured_news_html(notes):
+    """Las 3 tarjetas de 'Noticias destacadas' de la home: primero las
+    marcadas como destacadas, y si faltan se completan con las más nuevas."""
+    picked = [n for n in notes if n["destacada"]][:3]
+    picked += [n for n in notes if n not in picked][:3 - len(picked)]
+    cards = []
+    for n in picked:
+        cards.append('''        <a class="news-card" href="{url}">
+          <span class="news-tag">{sec}</span>
+          <span class="news-title">{titulo}</span>
+        </a>'''.format(url=news_url(n, 0), sec=html.escape(n["seccion"]), titulo=html.escape(n["titulo"])))
+    return "\n".join(cards)
+
+
+def write_news_articles(notes):
+    out_dir = os.path.join(ROOT, "noticias")
+    current = {n["slug"] + ".html" for n in notes}
+    # Borra páginas de notas que ya no existen (o que se despublicaron)
+    if os.path.isdir(out_dir):
+        for fname in os.listdir(out_dir):
+            if fname.endswith(".html") and fname not in current:
+                os.remove(os.path.join(out_dir, fname))
+                print("borrado:", "noticias/" + fname)
+    for n in notes:
+        desc = n["bajada"] or n["titulo"]
+        write(
+            "noticias/{}.html".format(n["slug"]),
+            page_html(
+                "{} · Noticias · SUBE".format(html.escape(n["titulo"])),
+                html.escape(desc),
+                news_article_body(n, notes),
+                depth=1,
+                active="noticias",
+                extra_scripts=["news.js"],
+            ),
+        )
+
 
 TIENDA_BODY = '''  <section class="soon">
     <div class="wrap">
@@ -740,6 +1028,12 @@ def program_body(p):
 # ESCRITURA DE ARCHIVOS
 # ============================================================
 if __name__ == "__main__":
+    NEWS = load_news()
+    HOME_BODY = HOME_BODY_TEMPLATE.format(
+        list_id=LIVE_PLAYLIST_ID,
+        featured_news=home_featured_news_html(NEWS),
+    )
+
     write(
         "index.html",
         page_html(
@@ -777,12 +1071,14 @@ if __name__ == "__main__":
         "noticias.html",
         page_html(
             "Noticias · SUBE",
-            "Noticias de SUBE. Próximamente.",
-            NOTICIAS_BODY,
+            "Noticias de actualidad, coberturas y notas de la redacción de SUBE, desde La Plata.",
+            news_index_body(NEWS),
             depth=0,
-            active="contenidos",
+            active="noticias",
+            extra_scripts=["news.js"],
         ),
     )
+    write_news_articles(NEWS)
     write(
         "tienda.html",
         page_html(

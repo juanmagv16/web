@@ -1,0 +1,9 @@
+titulo: ¿Dónde se chicha el finde?
+seccion: Agenda
+fecha: 2026-10-19
+destacada: si
+bajada:
+autor:
+imagen:
+epigrafe:
+---

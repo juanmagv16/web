@@ -1,0 +1,19 @@
+titulo: Acá va el título de la nota
+seccion: Política
+fecha: 2026-10-19
+destacada: no
+bajada: Una o dos oraciones que resumen la nota. Aparece debajo del título y en la portada de Noticias.
+autor: Nombre Apellido
+imagen: nombre-de-la-foto.jpg
+epigrafe: Texto que va debajo de la foto (quién aparece, dónde, crédito).
+publicar: si
+---
+Primer párrafo de la nota. Puede ocupar varias líneas: mientras no dejes una línea en blanco, sigue siendo el mismo párrafo.
+
+Segundo párrafo. Para poner algo en **negrita** se encierra entre dos asteriscos, y para *cursiva* entre uno solo. Un link se escribe así: [texto que se ve](https://www.ejemplo.com).
+
+## Esto es un intertítulo
+
+> "Esto es una cita destacada: se escribe empezando la línea con el signo mayor."
+
+Último párrafo.
