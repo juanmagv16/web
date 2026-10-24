@@ -5,6 +5,8 @@ Genera TODO el sitio de Sube Canal a partir de plantillas compartidas
 (header, footer, nav) para que cada página quede consistente.
 
 Correr con: python3 build_site.py
+(con --revisar, cualquier aviso termina con error; lo usa la revisión
+automática de GitHub)
 Vuelve a escribir: index.html, comunidad.html, contenidos.html,
 noticias.html, tienda.html, contacto.html, y todos los archivos
 dentro de programas/ y noticias/.
@@ -18,6 +20,7 @@ PROGRAMS más abajo.
 import html
 import os
 import re
+import sys
 
 ROOT = os.path.dirname(__file__)
 
@@ -483,6 +486,17 @@ LINK_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke=
 SI = ("si", "sí", "yes", "true", "1")
 
 
+AVISOS = []
+
+
+def avisar(msg):
+    """Problemas que no frenan la generación del sitio, pero que la
+    revisión automática de GitHub marca como error (ver --revisar)."""
+    if msg not in AVISOS:
+        AVISOS.append(msg)
+        print("AVISO: " + msg)
+
+
 def _slugify(text):
     text = text.lower()
     for a, b in (("á", "a"), ("é", "e"), ("í", "i"), ("ó", "o"), ("ú", "u"), ("ü", "u"), ("ñ", "n")):
@@ -594,8 +608,8 @@ def _img_src(note, depth):
     if img.startswith("http"):
         return img
     if not os.path.isfile(os.path.join(ROOT, "assets", "noticias", img)):
-        print("AVISO: la nota '{}' usa la imagen '{}', pero no está en assets/noticias/. "
-              "Se muestra sin foto hasta que la subas.".format(note["slug"], img))
+        avisar("la nota '{}' usa la imagen '{}', pero no está en assets/noticias/. "
+               "Se muestra sin foto hasta que la subas.".format(note["slug"], img))
         return ""
     return "{}assets/noticias/{}".format(up(depth), img)
 
@@ -1116,3 +1130,10 @@ if __name__ == "__main__":
                 active="contenidos",
             ),
         )
+
+    # Modo revisión (lo usa GitHub en .github/workflows/revisar-sitio.yml):
+    # cualquier aviso cuenta como error para que se vea la cruz roja.
+    if "--revisar" in sys.argv and AVISOS:
+        for msg in AVISOS:
+            print("::error::" + msg)
+        sys.exit(1)
