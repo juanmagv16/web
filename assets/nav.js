@@ -27,6 +27,6 @@
     if (!nav.contains(e.target) && !toggle.contains(e.target)) close();
   });
   window.addEventListener("resize", function () {
-    if (window.innerWidth > 1140) close();
+    if (window.innerWidth > 1240) close();
   });
 })();

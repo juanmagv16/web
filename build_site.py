@@ -49,6 +49,7 @@ NAV_ITEMS = [
     ("noticias", "Noticias", "noticias.html"),
     ("tienda", "Tienda", "tienda.html"),
     ("contacto", "Contacto", "contacto.html"),
+    ("mipase", "Mi pase", "mi-pase.html"),
 ]
 
 
@@ -60,7 +61,12 @@ def up(depth):
 def nav_links_html(depth, active):
     links = []
     for key, label, href in NAV_ITEMS:
-        cls = ' class="is-current"' if key == active else ""
+        classes = []
+        if key == active:
+            classes.append("is-current")
+        if key == "mipase":
+            classes.append("nav-pass")
+        cls = ' class="{}"'.format(" ".join(classes)) if classes else ""
         links.append('<a href="{u}{href}"{cls}>{label}</a>'.format(u=up(depth), href=href, cls=cls, label=label))
     return "\n      ".join(links)
 
@@ -276,7 +282,7 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
     <div class="wrap">
       <div class="section-head">
         <h2>Beneficios para nuestra comunidad</h2>
-        <p>Espacios amigos que suman descuentos exclusivos para quienes sostienen a SUBE. Mostrá tu carnet de pasajerx y viajá con beneficios.</p>
+        <p>Espacios amigos que suman descuentos exclusivos para quienes sostienen a SUBE. Mostrá tu boleto de pasajerx desde <a href="mi-pase.html">Mi pase</a> y viajá con beneficios.</p>
       </div>
 
       <div class="carousel">
@@ -298,6 +304,23 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
       <a class="partner-cta" href="mailto:laplatasube@gmail.com?subject=Quiero%20sumar%20mi%20comercio%20a%20SUBE">
         <span class="partner-cta-title">¿Tenés un comercio o espacio en La Plata?</span>
         <span class="partner-cta-desc">Si querés formar parte de esta red, contactate con nosotros y nuestro equipo comercial te estará respondiendo.</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="pass-cta-section">
+    <div class="wrap">
+      <a class="pass-cta" href="mi-pase.html">
+        <span class="pass-cta-ticket" aria-hidden="true">
+          <span class="pass-cta-ticket-top">SUBE</span>
+          <span class="pass-cta-ticket-mid">Pasajerx al día</span>
+        </span>
+        <span class="pass-cta-text">
+          <span class="eyebrow">Mi pase</span>
+          <span class="pass-cta-title">¿Ya sos pasajerx? Entrá y mostrá tu boleto</span>
+          <span class="pass-cta-desc">Con tu mail ves si estás al día y tenés tu boleto para mostrar en los comercios adheridos. Si tenés un comercio adherido, desde ahí también podés verificar socios.</span>
+        </span>
+        <span class="pass-cta-arrow" aria-hidden="true">→</span>
       </a>
     </div>
   </section>
@@ -783,6 +806,43 @@ def write_news_articles(notes):
         )
 
 
+# ============================================================
+# MI PASE (mi-pase.html): socios, comercios y equipo Sube
+# ============================================================
+# La página es un "esqueleto": las pantallas las arma assets/mi-pase.js
+# y los datos los maneja assets/mi-pase-datos.js (hoy en modo
+# demostración; después se conecta a Supabase).
+AVISO_PRIVACIDAD = '''<h3>Aviso de privacidad de Mi pase</h3>
+<p><em>Borrador para revisar por el equipo de Sube.</em></p>
+<p><strong>Quién es responsable.</strong> Sube Canal (La Plata) es responsable de los datos que se usan en Mi pase. Podés escribirnos a <a href="mailto:laplatasube@gmail.com">laplatasube@gmail.com</a>.</p>
+<p><strong>Qué datos usamos.</strong> Tu nombre y apellido, tu mail, el estado de tu aporte a la Comunidad de Pasajerxs y la fecha hasta la que está vigente. No guardamos datos de tarjetas ni de pagos: los pagos se hacen en Mercado Pago.</p>
+<p><strong>Para qué.</strong> Para que puedas ingresar a tu cuenta, ver tu boleto y usar los beneficios de la comunidad.</p>
+<p><strong>Comercios adheridos.</strong> Los comercios de la red pueden buscarte por nombre y apellido para confirmar si estás al día. Solo ven la respuesta (activx o no), nunca tu mail ni otros datos. Sube registra qué comercio hizo cada verificación y cuándo, para cuidar el buen uso de la herramienta y conocer cómo se usan los beneficios.</p>
+<p><strong>Tus derechos.</strong> Podés pedir ver, corregir o borrar tus datos escribiéndonos al mail de arriba, según la Ley 25.326 de Protección de Datos Personales. La Agencia de Acceso a la Información Pública es el organismo de control de esta ley.</p>'''
+
+MI_PASE_BODY = '''  <section class="pase-page">
+    <div class="wrap">
+      <div class="pase-head">
+        <span class="eyebrow">Comunidad de Pasajerxs</span>
+        <h1>Mi pase</h1>
+        <p>Tu boleto para usar los beneficios de la comunidad, y la herramienta de verificación para los comercios adheridos.</p>
+      </div>
+
+      <div id="pase-app" class="pase-app" aria-live="polite">
+        <noscript><p class="pase-error">Para usar Mi pase necesitás tener JavaScript activado en el navegador.</p></noscript>
+      </div>
+
+      <template id="aviso-privacidad-texto">{aviso}</template>
+
+      <details class="pase-privacy-footer" id="privacidad">
+        <summary>Aviso de privacidad</summary>
+        <div class="pase-privacidad-body">{aviso}</div>
+      </details>
+    </div>
+  </section>
+'''.format(aviso=AVISO_PRIVACIDAD)
+
+
 TIENDA_BODY = '''  <section class="soon">
     <div class="wrap">
       <div class="section-head">
@@ -1098,6 +1158,17 @@ if __name__ == "__main__":
         ),
     )
     write_news_articles(NEWS)
+    write(
+        "mi-pase.html",
+        page_html(
+            "Mi pase · SUBE",
+            "Mi pase: el boleto de la Comunidad de Pasajerxs de SUBE y la verificación de socios para comercios adheridos.",
+            MI_PASE_BODY,
+            depth=0,
+            active="mipase",
+            extra_scripts=["mi-pase-datos.js", "mi-pase.js"],
+        ),
+    )
     write(
         "tienda.html",
         page_html(
