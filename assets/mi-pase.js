@@ -47,9 +47,36 @@
     on('[data-reiniciar-demo]', 'click', function () {
       if (confirm('¿Volver a los datos de ejemplo? Se borran las pruebas que hiciste.')) API.reiniciarDemo().then(inicio);
     });
+    app.querySelectorAll('input[type=password]').forEach(botonVerClave);
     var foco = app.querySelector('[autofocus]');
     if (foco) foco.focus();
     window.scrollTo({ top: 0 });
+  }
+
+  // Botón con un ojo para mostrar u ocultar lo que se escribe en la contraseña
+  var OJO = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+  var OJO_TACHADO = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s3.6-7 10-7c2.1 0 3.9.8 5.4 1.8M22 12s-3.6 7-10 7c-2.1 0-3.9-.8-5.4-1.8"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path><path d="M3 3l18 18"></path></svg>';
+  function botonVerClave(input) {
+    var caja = document.createElement('span');
+    caja.className = 'pase-pass';
+    input.parentNode.insertBefore(caja, input);
+    caja.appendChild(input);
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pase-pass-toggle';
+    btn.setAttribute('aria-pressed', 'false');
+    btn.setAttribute('aria-label', 'Mostrar contraseña');
+    btn.innerHTML = OJO + '<span>Ver</span>';
+    btn.addEventListener('click', function () {
+      var visible = input.type === 'password';
+      input.type = visible ? 'text' : 'password';
+      btn.setAttribute('aria-pressed', visible ? 'true' : 'false');
+      btn.setAttribute('aria-label', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
+      btn.innerHTML = (visible ? OJO_TACHADO + '<span>Ocultar</span>' : OJO + '<span>Ver</span>');
+      input.focus();
+      try { var n = input.value.length; input.setSelectionRange(n, n); } catch (e) { /* ok */ }
+    });
+    caja.appendChild(btn);
   }
 
   function avisoDemo() {
