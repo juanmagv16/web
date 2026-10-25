@@ -1,0 +1,5 @@
+titulo: Nota de prueba de publicación automática
+seccion: Prueba
+fecha: 2026-10-26
+---
+Texto de prueba.
