@@ -1,0 +1,96 @@
+# Publicación automática del sitio de SUBE
+# ------------------------------------------------------------
+# Cada vez que se sube un cambio a la rama main (por ejemplo, una nota
+# nueva en redaccion/ o una foto en assets/noticias/), GitHub:
+#   1. Vuelve a generar el sitio (python build_site.py).
+#   2. Revisa que las notas estén bien escritas: título, fecha en formato
+#      AAAA-MM-DD, que no haya dos notas con el mismo nombre y que las
+#      fotos mencionadas estén subidas. Si algo está mal, se detiene,
+#      no publica nada y el cambio aparece con una cruz roja (el detalle
+#      se ve en la pestaña "Actions").
+#   3. Guarda las páginas actualizadas en el repositorio.
+#   4. Publica el sitio. En uno o dos minutos la nota está en la web.
+#
+# Requisito (una sola vez): Settings → Pages → Build and deployment →
+# Source: "GitHub Actions".
+#
+# En los Pull Request solo revisa, no publica.
+
+name: Publicar el sitio
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+concurrency:
+  group: publicar-sitio
+  cancel-in-progress: false
+
+jobs:
+  revisar:
+    name: Revisar (Pull Request)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Generar el sitio y revisar las notas
+        run: python build_site.py --revisar
+      - name: Avisar si hay páginas para regenerar
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::notice::Las páginas se van a regenerar solas al aceptar este cambio:"
+            git status --short
+          fi
+          echo "Revisión terminada."
+
+  publicar:
+    name: Generar, revisar y publicar
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generar el sitio y revisar las notas
+        run: python build_site.py --revisar
+
+      - name: Guardar las páginas actualizadas
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Las páginas ya estaban actualizadas."
+            exit 0
+          fi
+          git status --short
+          git config user.name "Redacción SUBE (automático)"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Publicar cambios de la redacción (automático)"
+          git push
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Publicar en la web
+        id: deployment
+        uses: actions/deploy-pages@v4

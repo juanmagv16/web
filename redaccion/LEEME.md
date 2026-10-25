@@ -2,14 +2,20 @@
 
 Cada nota de la sección **Noticias** es un archivo de texto (`.txt`) dentro de esta carpeta. No hace falta tocar código.
 
-## Publicar una nota nueva
+## Publicar una nota nueva (desde la web de GitHub, sin instalar nada)
 
-1. Copiá el archivo `_plantilla.txt` y ponele un nombre nuevo con este formato: `AAAA-MM-DD-palabras-del-titulo.txt`. Por ejemplo, `2026-10-21-paro-docente.txt`.
-   - El nombre (sin la fecha) es la dirección de la nota en la web. Esa nota quedaría en `noticias/paro-docente.html`.
-   - Usá minúsculas, sin tildes ni espacios: separá las palabras con guiones.
-2. Completá los datos de arriba (ver la tabla).
-3. Escribí la nota debajo de la línea `---`.
-4. Guardá el archivo y regenerá el sitio con `python3 build_site.py` (o pedíselo a quien mantenga la web).
+1. Entrá a la carpeta **`redaccion`** del repositorio en github.com y tocá **Add file → Create new file**.
+2. En el nombre del archivo escribí `AAAA-MM-DD-palabras-del-titulo.txt`. Por ejemplo: `2026-10-21-paro-docente.txt`.
+   - El nombre (sin la fecha) es la dirección de la nota en la web: esa nota queda en `noticias/paro-docente.html`.
+   - Minúsculas, sin tildes ni espacios: separá las palabras con guiones.
+3. Abrí [`_plantilla.txt`](_plantilla.txt) en otra pestaña, copiá su contenido, pegalo y completá los datos (ver la tabla).
+4. Escribí la nota debajo de la línea `---`.
+5. Si tiene foto: entrá a la carpeta **`assets/noticias`**, tocá **Add file → Upload files** y subila con el mismo nombre que pusiste en `imagen:`. Conviene subir la foto **antes** que la nota.
+6. Tocá **Commit changes** (abajo o arriba a la derecha) y confirmá.
+
+En uno o dos minutos la nota aparece publicada. Podés seguir el progreso en la pestaña **Actions**: un círculo amarillo significa que se está publicando; un tilde verde, que ya está en la web.
+
+**Si aparece una cruz roja:** la nota tiene algún problema (por ejemplo, la fecha mal escrita o una foto que no se subió) y **no se publicó nada**. Entrá a **Actions**, abrí el último intento y en el paso "Generar el sitio y revisar las notas" vas a ver el motivo. Corregí el archivo (ícono del lápiz → editar → Commit changes) y se vuelve a intentar solo.
 
 | Campo | Para qué sirve | ¿Obligatorio? |
 |---|---|---|
@@ -40,8 +46,8 @@ Si una nota todavía no tiene cuerpo, se publica igual y muestra el aviso "Esta 
 
 ## Sacar o corregir una nota
 
-- **Corregir:** editá el archivo y volvé a generar el sitio.
+- **Corregir:** abrí el archivo en GitHub, tocá el lápiz, editá y tocá **Commit changes**.
 - **Despublicar sin borrar:** cambiá a `publicar: no`.
-- **Borrar:** eliminá el archivo. Al regenerar el sitio, su página desaparece sola.
+- **Borrar:** abrí el archivo, tocá los tres puntitos (⋯) → **Delete file** → **Commit changes**. Su página desaparece sola.
 
 Los archivos que empiezan con `_` (como la plantilla) nunca se publican.

@@ -53,7 +53,7 @@ verdad y se puede editar a mano como siempre.
 
 ## Noticias (redacción)
 
-La sección **Noticias** se arma sola a partir de los archivos de texto de la carpeta `redaccion/`: una nota por archivo. Las fotos van en `assets/noticias/`. Cómo escribir y publicar una nota está explicado en [`redaccion/LEEME.md`](redaccion/LEEME.md). Después de agregar o editar una nota hay que regenerar el sitio con `python3 build_site.py`.
+La sección **Noticias** se arma sola a partir de los archivos de texto de la carpeta `redaccion/`: una nota por archivo. Las fotos van en `assets/noticias/`. Cómo escribir y publicar una nota está explicado en [`redaccion/LEEME.md`](redaccion/LEEME.md). Al subir o editar una nota desde GitHub, el sitio se regenera y se publica solo (ver `.github/workflows/publicar-sitio.yml`).
 
 ## Cómo publicarlo en GitHub Pages
 
