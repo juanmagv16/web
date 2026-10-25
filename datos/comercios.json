@@ -1,0 +1,209 @@
+{
+  "comercios": [
+    {
+      "slug": "puntoexe-informatica",
+      "nombre": ".exe informatica",
+      "rubro": "Tecnología",
+      "instagram": "puntoexe.informatica",
+      "beneficios": [
+        "15% de descuento en servicio técnico"
+      ],
+      "ubicacion": "",
+      "tipo": "adherido",
+      "logo": ""
+    },
+    {
+      "slug": "lamparas-aurora",
+      "nombre": "Aurora lamparas",
+      "rubro": "Bazar/Deco",
+      "instagram": "lamparas.aurora",
+      "beneficios": [
+        "10% de descuento"
+      ],
+      "ubicacion": "",
+      "tipo": "adherido",
+      "logo": ""
+    },
+    {
+      "slug": "carpincho-indumentaria",
+      "nombre": "Carpincho",
+      "rubro": "Indumentaria",
+      "instagram": "carpincho.indumentaria",
+      "beneficios": [
+        "10% de descuento"
+      ],
+      "ubicacion": "",
+      "tipo": "adherido",
+      "logo": ""
+    },
+    {
+      "slug": "casachicha-lp",
+      "nombre": "Casa Chicha",
+      "rubro": "Producción cultural",
+      "instagram": "casachicha.lp",
+      "beneficios": [
+        "10% de descuento en birras",
+        "10% de descuento en talleres (por cupo)"
+      ],
+      "ubicacion": "33C2+7J La Plata, Provincia de Buenos Aires",
+      "tipo": "adherido",
+      "logo": ""
+    },
+    {
+      "slug": "estacionquenoma",
+      "nombre": "Estación Quenoma",
+      "rubro": "Gastronomía",
+      "instagram": "estacionquenoma",
+      "beneficios": [
+        "15% de descuento"
+      ],
+      "ubicacion": "33M3+2X La Plata, Provincia de Buenos Aires",
+      "tipo": "adherido",
+      "logo": ""
+    },
+    {
+      "slug": "la-compostera",
+      "nombre": "La compostera",
+      "rubro": "Gastronomía",
+      "instagram": "la_compostera",
+      "beneficios": [
+        "10% de descuento"
+      ],
+      "ubicacion": "33H4+8V La Plata, Provincia de Buenos Aires",
+      "tipo": "adherido",
+      "logo": ""
+    },
+    {
+      "slug": "laola-indie",
+      "nombre": "La Ola Indie",
+      "rubro": "Producción cultural",
+      "instagram": "laola.indie",
+      "beneficios": [
+        "15% de descuento en entradas anticipadas"
+      ],
+      "ubicacion": "",
+      "tipo": "adherido",
+      "logo": ""
+    },
+    {
+      "slug": "libreriamascaro",
+      "nombre": "Mascaro",
+      "rubro": "Librería/Editorial",
+      "instagram": "libreriamascaro",
+      "beneficios": [
+        "10% de descuento"
+      ],
+      "ubicacion": "33H7+JF La Plata, Provincia de Buenos Aires",
+      "tipo": "adherido",
+      "logo": ""
+    },
+    {
+      "slug": "munayarena",
+      "nombre": "Munay arena",
+      "rubro": "Gimnasio/Deportes",
+      "instagram": "munayarena",
+      "beneficios": [
+        "15% de descuento"
+      ],
+      "ubicacion": "3XXM+3M Gonnet, Provincia de Buenos Aires",
+      "tipo": "adherido",
+      "logo": ""
+    },
+    {
+      "slug": "mundo-semilla",
+      "nombre": "Mundo Semilla",
+      "rubro": "Gastronomía",
+      "instagram": "mundo.semilla",
+      "beneficios": [
+        "10% de descuento en milanesas (acumulable con Cuenta DNI)"
+      ],
+      "ubicacion": "",
+      "tipo": "adherido",
+      "logo": ""
+    },
+    {
+      "slug": "pao-tatt",
+      "nombre": "Pao tatt",
+      "rubro": "Tatuajes",
+      "instagram": "pao.tatt",
+      "beneficios": [
+        "15% de descuento"
+      ],
+      "ubicacion": "",
+      "tipo": "adherido",
+      "logo": ""
+    },
+    {
+      "slug": "refugio62",
+      "nombre": "Refugio 62",
+      "rubro": "Gastronomía",
+      "instagram": "refugio62_",
+      "beneficios": [
+        "10% de descuento en todas las cervezas"
+      ],
+      "ubicacion": "33F5+V2 La Plata, Provincia de Buenos Aires",
+      "tipo": "adherido",
+      "logo": ""
+    },
+    {
+      "slug": "roots-cooperativa",
+      "nombre": "Roots Pizza",
+      "rubro": "Gastronomía",
+      "instagram": "roots_cooperativa",
+      "beneficios": [
+        "10% para la comunidad"
+      ],
+      "ubicacion": "33H2+JP La Plata, Provincia de Buenos Aires",
+      "tipo": "adherido",
+      "logo": ""
+    },
+    {
+      "slug": "tatana-ar",
+      "nombre": "Tatana",
+      "rubro": "Gastronomía",
+      "instagram": "tatana.ar",
+      "beneficios": [
+        "10% de descuento en vermú seleccionados"
+      ],
+      "ubicacion": "33H6+R6 La Plata, Provincia de Buenos Aires",
+      "tipo": "adherido",
+      "logo": ""
+    },
+    {
+      "slug": "ve-gui",
+      "nombre": "Ve_gui",
+      "rubro": "Gastronomía",
+      "instagram": "ve_gui_",
+      "beneficios": [
+        "10% de descuento"
+      ],
+      "ubicacion": "",
+      "tipo": "adherido",
+      "logo": ""
+    },
+    {
+      "slug": "vaga-arg",
+      "nombre": "Vaga",
+      "rubro": "Gastronomía",
+      "instagram": "vaga.arg",
+      "beneficios": [
+        "10% de descuento"
+      ],
+      "ubicacion": "33C4+XR La Plata, Provincia de Buenos Aires",
+      "tipo": "adherido",
+      "logo": ""
+    },
+    {
+      "slug": "cuatrogatoslocos",
+      "nombre": "Cuatro gatos locos",
+      "rubro": "Gastronomía",
+      "instagram": "cuatrogatoslocos_",
+      "beneficios": [
+        "10% de descuento en combos"
+      ],
+      "ubicacion": "",
+      "tipo": "adherido",
+      "logo": ""
+    }
+  ]
+}
