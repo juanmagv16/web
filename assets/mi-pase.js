@@ -534,6 +534,7 @@
           adminComercios(sesion);
           setTimeout(function () {
             var box = $('#f-error');
+            if (box && r.aviso) { box.innerHTML = '<p class="pase-help">' + esc(r.aviso) + '</p>'; return; }
             if (box) box.innerHTML = '<p class="pase-ok">Listo: le mandamos el link a ' + esc(r.enviado_a) + '.' +
               (DEMO ? ' <span class="pase-muted">(En la demostración no se envía el mail.)</span>' : '') + '</p>';
           }, 300);
@@ -595,10 +596,19 @@
   // ============================================
   // ARRANQUE
   // ============================================
-  API.sesionActual().then(function (s) {
-    if (s) return panel(s);
-    var h = (location.hash || '').replace('#', '');
-    if (h === 'comercio' || h === 'socio' || h === 'admin') return ingreso(h);
-    inicio();
+  // Si la persona llegó desde el link del mail, primero elige su contraseña.
+  (API.pasoPendiente ? API.pasoPendiente() : Promise.resolve(null)).then(function (paso) {
+    if (paso && paso.tipo === 'elegir_clave') return elegirClave(paso.rol, null);
+    if (paso && paso.tipo === 'error') {
+      inicio();
+      app.insertAdjacentHTML('beforeend', errorHtml(paso.mensaje));
+      return;
+    }
+    return API.sesionActual().then(function (s) {
+      if (s) return panel(s);
+      var h = (location.hash || '').replace('#', '');
+      if (h === 'comercio' || h === 'socio' || h === 'admin') return ingreso(h);
+      inicio();
+    });
   });
 })();

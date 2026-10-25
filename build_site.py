@@ -1166,7 +1166,7 @@ if __name__ == "__main__":
             MI_PASE_BODY,
             depth=0,
             active="mipase",
-            extra_scripts=["mi-pase-datos.js", "mi-pase.js"],
+            extra_scripts=["mi-pase-config.js", "mi-pase-inicio.js"],
         ),
     )
     write(
