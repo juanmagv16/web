@@ -577,10 +577,36 @@ def _slugify(text):
     return text or "nota"
 
 
+def _meta_decap(raw, path):
+    """Notas .md que guarda el panel de redacción (Decap): encabezado YAML
+    entre dos líneas '---' y debajo el cuerpo en Markdown."""
+    import yaml
+    m = re.match(r"^---\s*\n(.*?)\n---\s*(?:\n|$)(.*)$", raw, re.S)
+    if not m:
+        raise SystemExit("ERROR en redaccion/{}: falta el encabezado de la nota.".format(os.path.basename(path)))
+    datos = yaml.safe_load(m.group(1)) or {}
+    meta = {}
+    for k, v in datos.items():
+        if isinstance(v, bool):
+            v = "si" if v else "no"
+        elif v is None:
+            v = ""
+        elif hasattr(v, "isoformat"):
+            v = v.isoformat()[:10]
+        meta[_slugify(str(k))] = str(v).strip()
+    img = meta.get("imagen", "")
+    if img and not img.startswith("http"):
+        meta["imagen"] = re.sub(r"^/?(assets/noticias/)?", "", img)
+    return meta, m.group(2)
+
+
 def parse_note(path):
     """Lee un archivo de redaccion/ y devuelve un diccionario con la nota."""
     with open(path, encoding="utf-8") as f:
         raw = f.read().replace("\r\n", "\n")
+    if path.endswith(".md"):
+        meta, body = _meta_decap(raw, path)
+        return _armar_nota(meta, body, path)
     if "\n---" in raw:
         head, body = raw.split("\n---", 1)
         body = body.split("\n", 1)[1] if "\n" in body else ""
@@ -591,7 +617,10 @@ def parse_note(path):
         if ":" in line and not line.strip().startswith("#"):
             key, value = line.split(":", 1)
             meta[_slugify(key.strip())] = value.strip()
+    return _armar_nota(meta, body, path)
 
+
+def _armar_nota(meta, body, path):
     name = os.path.splitext(os.path.basename(path))[0]
     if not meta.get("titulo"):
         raise SystemExit("ERROR en redaccion/{}: falta la línea 'titulo:'".format(os.path.basename(path)))
@@ -619,7 +648,7 @@ def load_news():
         return []
     notes = []
     for fname in sorted(os.listdir(NEWS_SOURCE_DIR)):
-        if fname.startswith("_") or not fname.endswith(".txt"):
+        if fname.startswith("_") or not (fname.endswith(".txt") or fname.endswith(".md")) or fname.upper().startswith("LEEME"):
             continue
         note = parse_note(os.path.join(NEWS_SOURCE_DIR, fname))
         if note["publicar"]:
@@ -648,6 +677,7 @@ def _inline(text):
     t = html.escape(text, quote=False)
     t = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", t)
     t = re.sub(r"(?<!\*)\*(?!\s)(.+?)(?<!\s)\*(?!\*)", r"<em>\1</em>", t)
+    t = re.sub(r"(?<![\w_])_(?!\s)(.+?)(?<!\s)_(?![\w_])", r"<em>\1</em>", t)
 
     def link(m):
         href = m.group(2).replace('"', "%22")
@@ -657,19 +687,41 @@ def _inline(text):
     return re.sub(r"\[([^\]]+)\]\(([^)\s]+)\)", link, t)
 
 
-def body_to_html(body):
+def _src_relativa(src, depth):
+    if src.startswith("http"):
+        return src
+    return up(depth) + src.lstrip("/")
+
+
+def body_to_html(body, depth=1):
     """Convierte el cuerpo de la nota: párrafos separados por una línea en
-    blanco, '## ' para un intertítulo y '> ' para una cita destacada."""
+    blanco, '## ' para un intertítulo, '> ' para una cita destacada, listas
+    con '- ' o '1. ' e imágenes con ![epígrafe](foto)."""
     blocks = [b.strip() for b in re.split(r"\n\s*\n", body) if b.strip()]
     out = []
     for b in blocks:
-        if b.startswith("## "):
-            out.append("<h2>{}</h2>".format(_inline(b[3:].strip())))
+        lineas = [l.rstrip() for l in b.split("\n")]
+        img = re.fullmatch(r"!\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)", b)
+        if img:
+            alt = html.escape(img.group(1))
+            cap = "<figcaption>{}</figcaption>".format(alt) if alt else ""
+            out.append('<figure class="article-figure"><img src="{}" alt="{}" loading="lazy">{}</figure>'.format(
+                html.escape(_src_relativa(img.group(2), depth)), alt, cap))
+        elif re.match(r"^#{2,6} ", b):
+            out.append("<h2>{}</h2>".format(_inline(re.sub(r"^#{2,6} ", "", b).strip())))
         elif b.startswith(">"):
-            text = " ".join(line.lstrip("> ").strip() for line in b.split("\n"))
+            text = " ".join(line.lstrip("> ").strip() for line in lineas)
             out.append("<blockquote>{}</blockquote>".format(_inline(text)))
+        elif all(re.match(r"^\s*[-*+] ", l) for l in lineas):
+            out.append("<ul>{}</ul>".format("".join("<li>{}</li>".format(_inline(re.sub(r"^\s*[-*+] ", "", l))) for l in lineas)))
+        elif all(re.match(r"^\s*\d+[.)] ", l) for l in lineas):
+            out.append("<ol>{}</ol>".format("".join("<li>{}</li>".format(_inline(re.sub(r"^\s*\d+[.)] ", "", l))) for l in lineas)))
         else:
-            out.append("<p>{}</p>".format(_inline(" ".join(line.strip() for line in b.split("\n")))))
+            partes = []
+            for l in lineas:
+                corte = l.endswith("\\") or l.endswith("  ")
+                partes.append(_inline(l.rstrip("\\").strip()) + ("<br>" if corte else " "))
+            out.append("<p>{}</p>".format("".join(partes).strip()))
     return "\n        ".join(out)
 
 

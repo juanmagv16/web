@@ -1,0 +1,109 @@
+# ============================================================
+# Panel de la redacción de SUBE (Decap CMS)
+# ------------------------------------------------------------
+# Se entra desde /admin/ con una cuenta de GitHub que tenga acceso
+# al repositorio. Cada nota se guarda como un archivo en redaccion/
+# y las fotos en assets/noticias/. Al publicarla, GitHub regenera y
+# publica el sitio solo (.github/workflows/publicar-sitio.yml).
+# ============================================================
+
+backend:
+  name: github
+  repo: juanmagv16/web          # al pasar al sitio oficial: subecanal/web
+  branch: main
+  # Servicio de inicio de sesión con GitHub (Cloudflare Worker).
+  # Reemplazar por la dirección del Worker cuando esté creado.
+  base_url: https://REEMPLAZAR-POR-EL-WORKER.workers.dev
+  commit_messages:
+    create: "Redacción: nota nueva «{{slug}}»"
+    update: "Redacción: nota editada «{{slug}}»"
+    delete: "Redacción: nota borrada «{{slug}}»"
+    uploadMedia: "Redacción: foto {{path}}"
+    deleteMedia: "Redacción: foto borrada {{path}}"
+
+# Flujo editorial: Borrador → En revisión → Lista. Solo se publica
+# cuando alguien toca "Publicar" en una nota "Lista".
+publish_mode: editorial_workflow
+
+locale: es
+site_url: https://juanmagv16.github.io/web
+display_url: https://juanmagv16.github.io/web
+logo_url: https://juanmagv16.github.io/web/assets/logo.png
+
+media_folder: assets/noticias
+public_folder: /assets/noticias
+
+collections:
+  - name: noticias
+    label: Noticias
+    label_singular: nota
+    description: "Las notas de la sección Noticias. Las fotos se achican solas al publicar."
+    folder: redaccion
+    extension: md
+    format: frontmatter
+    create: true
+    delete: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    preview_path: "noticias/{{slug}}.html"
+    summary: "{{fecha}} · {{seccion}} · {{titulo}}"
+    sortable_fields: ["fecha", "titulo", "seccion"]
+    view_filters:
+      - label: Destacadas en la portada
+        field: destacada
+        pattern: true
+      - label: Despublicadas
+        field: publicar
+        pattern: false
+    fields:
+      - label: Título
+        name: titulo
+        widget: string
+      - label: Sección
+        name: seccion
+        widget: string
+        default: Actualidad
+        hint: "Por ejemplo: Política, Deportes, Cultura, Agenda. Cada sección nueva aparece sola como filtro en la portada de Noticias."
+      - label: Fecha de publicación
+        name: fecha
+        widget: datetime
+        format: YYYY-MM-DD
+        default: "{{now}}"
+        date_format: DD/MM/YYYY
+        time_format: false
+        picker_utc: true
+      - label: Bajada
+        name: bajada
+        widget: text
+        required: false
+        hint: "Una o dos oraciones que resumen la nota. Aparece debajo del título y en la portada."
+      - label: Firma
+        name: autor
+        widget: string
+        required: false
+        hint: "Si queda vacío, dice «Redacción SUBE»."
+      - label: Foto principal
+        name: imagen
+        widget: image
+        required: false
+        choose_url: true
+      - label: Epígrafe de la foto
+        name: epigrafe
+        widget: string
+        required: false
+      - label: Destacada en la portada
+        name: destacada
+        widget: boolean
+        default: false
+        hint: "Las destacadas más nuevas ocupan los 3 lugares de «Noticias destacadas» en la home."
+      - label: Visible en la web
+        name: publicar
+        widget: boolean
+        default: true
+        hint: "Apagalo para sacar una nota de la web sin borrarla."
+      - label: Nota
+        name: body
+        widget: markdown
+        required: false
+        buttons: ["bold", "italic", "link", "heading-two", "quote", "bulleted-list", "numbered-list"]
+        editor_components: ["image"]
+        hint: "Si queda vacía, la nota se publica con el aviso «Esta nota está en redacción»."

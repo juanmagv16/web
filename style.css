@@ -1488,3 +1488,9 @@ a.program-ig-chip:hover{ color: var(--lime); border-color: rgba(193,255,0,0.35);
 }
 .pase-pass-toggle:hover, .pase-pass-toggle[aria-pressed="true"]{ color: var(--lime); background: rgba(193,255,0,0.08); }
 
+
+/* Listas dentro de las notas (panel de redacción) */
+.article-body ul, .article-body ol{ margin: 0 0 1.3em; padding-left: 1.4em; }
+.article-body li{ margin: 0.35em 0; }
+.article-body li::marker{ color: var(--lime); }
+.article-body figure{ margin: 1.8em 0; }

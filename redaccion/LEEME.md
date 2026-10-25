@@ -2,7 +2,22 @@
 
 Cada nota de la sección **Noticias** es un archivo de texto (`.txt`) dentro de esta carpeta. No hace falta tocar código.
 
-## Publicar una nota nueva (desde la web de GitHub, sin instalar nada)
+## La forma recomendada: el panel de redacción
+
+Entrá a **/admin/** del sitio (por ejemplo `https://subecanal.com.ar/admin/`) e iniciá sesión con tu cuenta de GitHub.
+
+1. Tocá **Nueva nota** y completá el formulario: título, sección, fecha, bajada, firma, foto, epígrafe y el texto de la nota (con negritas, intertítulos, citas, listas y fotos dentro del texto).
+2. Tocá **Guardar**: la nota queda como **Borrador**. Nadie la ve en la web.
+3. En **Flujo editorial**, movela a **En revisión** para que alguien la lea, y después a **Lista**.
+4. Quien edita toca **Publicar**. En uno o dos minutos la nota está en la web.
+
+Las fotos se achican solas al publicar. Para corregir o sacar una nota publicada: abrila en el panel, editala (o apagá **Visible en la web**) y volvé a publicar.
+
+## Otra forma: subir el archivo desde la web de GitHub
+
+Sirve si el panel no está disponible. Las notas del panel son archivos `.md` en esta carpeta; también se pueden seguir usando archivos `.txt` como el de la plantilla.
+
+### Publicar una nota nueva (desde la web de GitHub, sin instalar nada)
 
 1. Entrá a la carpeta **`redaccion`** del repositorio en github.com y tocá **Add file → Create new file**.
 2. En el nombre del archivo escribí `AAAA-MM-DD-palabras-del-titulo.txt`. Por ejemplo: `2026-10-21-paro-docente.txt`.

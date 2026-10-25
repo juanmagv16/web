@@ -17,8 +17,12 @@
 # Requisito (una sola vez): Settings → Pages → Build and deployment →
 # Source: "GitHub Actions".
 #
-# Además corre solo cada hora, para tomar los cambios de las planillas, y se puede correr a mano: Actions → "Publicar el sitio" →
-# "Run workflow".
+# Además corre solo cada hora, para tomar los cambios de las planillas,
+# y se puede correr a mano: Actions → "Publicar el sitio" → "Run workflow".
+#
+# Las notas cargadas desde el panel de redacción (/admin/, Decap CMS)
+# llegan como Pull Request mientras están en revisión: acá solo se
+# revisan; al publicarlas desde el panel, se publican en la web.
 #
 # En los Pull Request solo revisa, no publica.
 
@@ -50,7 +54,9 @@ jobs:
         with:
           python-version: "3.12"
       - name: Generar el sitio y revisar las notas
-        run: python build_site.py --revisar
+        run: |
+          pip install --quiet pyyaml
+          python build_site.py --revisar
       - name: Avisar si hay páginas para regenerar
         run: |
           if [ -n "$(git status --porcelain)" ]; then
@@ -79,8 +85,11 @@ jobs:
 
       - name: Traer comercios y programación desde Google Sheets
         run: |
-          pip install --quiet pillow
+          pip install --quiet pillow pyyaml
           python scripts/sync_planillas.py
+
+      - name: Achicar las fotos de las notas
+        run: python scripts/optimizar_fotos.py
 
       - name: Generar el sitio y revisar las notas
         run: python build_site.py --revisar

@@ -1,9 +1,0 @@
-titulo: ¿Dónde está Adorni?
-seccion: Política
-fecha: 2026-10-19
-destacada: si
-bajada:
-autor:
-imagen:
-epigrafe:
----
