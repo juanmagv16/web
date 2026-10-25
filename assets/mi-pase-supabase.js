@@ -28,6 +28,7 @@
     if (/Invalid login credentials/i.test(msg)) msg = 'El mail o la contraseña no son correctos.';
     else if (/Email not confirmed/i.test(msg)) msg = 'Tu cuenta todavía no está activada. Tocá "Activar mi cuenta".';
     else if (/rate limit|too many|security purposes/i.test(msg)) msg = 'Ya pediste un link hace muy poco. Esperá unos minutos y volvé a probar.';
+    else if (/Error sending|sending (magic link|confirmation|recovery)|smtp|535|550/i.test(msg)) msg = 'No pudimos enviarte el mail en este momento. Probá de nuevo en unos minutos; si sigue pasando, escribinos a laplatasube@gmail.com.';
     else if (/not authorized/i.test(msg)) msg = 'Todavía no podemos enviar mails a esa dirección (el envío de mails de Sube está en configuración).';
     else if (/Password should be at least/i.test(msg)) msg = 'La contraseña tiene que tener al menos 8 caracteres.';
     else if (/same password|different from the old/i.test(msg)) msg = 'Elegí una contraseña distinta a la anterior.';

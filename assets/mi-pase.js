@@ -192,7 +192,7 @@
       var btn = e.target.querySelector('button[type=submit]'); ocupado(btn, true);
       API.pedirEnlace(rol, e.target.mail.value).then(function (r) { enlaceEnviado(rol, r); }, function (err) {
         ocupado(btn, false);
-        var extra = rol === 'socio'
+        var extra = rol === 'socio' && /No encontramos/.test(err.message)
           ? '<p class="pase-help">Si te suscribiste con otro mail, probá con ese. Si cambiaste de mail en Mercado Pago, avisanos desde <a href="comunidad.html#asociate">esta sección</a> o escribinos a <a href="mailto:laplatasube@gmail.com">laplatasube@gmail.com</a>.</p>'
           : '';
         $('#f-error').innerHTML = errorHtml(err.message) + extra;
