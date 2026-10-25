@@ -20,6 +20,16 @@
   var relojTimer = null;
 
   // ---------- Utilidades ----------
+  // "juan manuel garcía" → "Juan Manuel García"; "mario del canto peña" → "Mario del Canto Peña".
+  // Solo cambia cómo se muestra: los datos guardados quedan igual.
+  var PARTICULAS = { de: 1, del: 1, la: 1, las: 1, los: 1, y: 1, e: 1, da: 1, di: 1, van: 1, von: 1 };
+  function nombrePropio(t) {
+    return String(t == null ? '' : t).trim().replace(/\s+/g, ' ').toLowerCase().split(' ').map(function (p, i) {
+      if (i > 0 && PARTICULAS[p]) return p;
+      return p.replace(/(^|[-'’])(\p{L})/gu, function (_, sep, letra) { return sep + letra.toUpperCase(); });
+    }).join(' ');
+  }
+
   function esc(t) {
     return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -253,7 +263,7 @@
   }
 
   function barraSesion(sesion, rotulo) {
-    return '<div class="pase-session"><span>' + rotulo + ' · <strong>' + esc(sesion.nombre) + '</strong></span>' +
+    return '<div class="pase-session"><span>' + rotulo + ' · <strong>' + esc(sesion.rol === 'socio' ? nombrePropio(sesion.nombre) : sesion.nombre) + '</strong></span>' +
       '<button type="button" class="pase-link" data-salir>Salir</button></div>';
   }
   function engancharSalir() { on('[data-salir]', 'click', function () { API.salir().then(inicio); }); }
@@ -261,7 +271,7 @@
   // ---------- Pasajerx: el boleto ----------
   function panelSocio(sesion) {
     API.miPase().then(function (p) {
-      var nombre = esc(p.nombre + ' ' + p.apellido);
+      var nombre = esc(nombrePropio(p.nombre + ' ' + p.apellido));
       var ticket;
       if (p.al_dia) {
         ticket =
@@ -372,7 +382,7 @@
         $('#tbody').innerHTML = lista.filter(function (s) {
           return !f || API.normalizar(s.nombre + ' ' + s.apellido + ' ' + s.mail).indexOf(f) >= 0;
         }).sort(function (a, b) { return (a.apellido + a.nombre).localeCompare(b.apellido + b.nombre); }).map(function (s) {
-          return '<tr><td>' + esc(s.nombre + ' ' + s.apellido) + '</td><td>' + esc(s.mail) + '</td><td>' +
+          return '<tr><td>' + esc(nombrePropio(s.nombre + ' ' + s.apellido)) + '</td><td>' + esc(s.mail) + '</td><td>' +
             (s.al_dia ? badge('Al día', 'ok') : badge('Vencido', 'no')) + '</td><td>' + fechaCorta(s.vigente_hasta) + '</td><td>' +
             (s.cuenta_activada ? 'Activada' : '<span class="pase-muted">Sin activar</span>') + '</td></tr>';
         }).join('') || '<tr><td colspan="5" class="pase-muted">No hay socios que coincidan.</td></tr>';
@@ -640,7 +650,7 @@
         var c = {}; arr.forEach(function (b) { if (b[campo]) c[b[campo]] = (c[b[campo]] || 0) + 1; });
         return Object.keys(c).map(function (k) { return [k, c[k]]; }).sort(function (a, b) { return b[1] - a[1]; });
       }
-      var porSocio = contar(lista.filter(function (b) { return b.resultado === 'activo' || b.resultado === 'no_activo'; }), 'socio');
+      var porSocio = contar(lista.filter(function (b) { return b.resultado === 'activo' || b.resultado === 'no_activo'; }), 'socio').map(function (f) { return [nombrePropio(f[0]), f[1]]; });
       var porComercio = contar(lista, 'comercio');
       var porMes = {}; lista.forEach(function (b) { var m = b.fecha.slice(0, 7); porMes[m] = (porMes[m] || 0) + 1; });
       var meses = Object.keys(porMes).sort().reverse().slice(0, 6);
@@ -669,7 +679,7 @@
         $('#tbody').innerHTML = lista.filter(function (b) { return !com || b.comercio === com; }).map(function (b) {
           var r = RESULTADOS[b.resultado] || [b.resultado, 'muted'];
           return '<tr><td>' + fechaHora(b.fecha) + '</td><td>' + esc(b.comercio) + '</td><td>' + esc(b.texto) + '</td><td>' +
-            badge(r[0], r[1]) + '</td><td>' + (b.socio ? esc(b.socio) : '<span class="pase-muted">—</span>') + '</td></tr>';
+            badge(r[0], r[1]) + '</td><td>' + (b.socio ? esc(nombrePropio(b.socio)) : '<span class="pase-muted">—</span>') + '</td></tr>';
         }).join('') || '<tr><td colspan="5" class="pase-muted">Todavía no hay búsquedas.</td></tr>';
       }
       pintar('');
