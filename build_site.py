@@ -162,11 +162,11 @@ HOME_BODY_TEMPLATE = '''  <section class="hero">
       <div>
         <h1>Subite a este<br><span class="accent">viaje colectivo</span></h1>
         <div class="hero-sub">
-          <p>SUBE es un medio de comunicación independiente y autogestivo hecho en La Plata. Creamos contenidos, generamos encuentros y construimos comunidad alrededor de la cultura local.</p>
+          <p>Somos un canal platense hecho a pulmón. Creamos contenidos, generamos encuentros y construimos comunidad alrededor de la cultura local.</p>
           <p>La Comunidad de Pasajerxs sostiene SUBE todos los meses. Sumándote, vos también sos parte y accedés a beneficios en una red de espacios amigos.</p>
         </div>
         <div class="hero-actions">
-          <a href="comunidad.html#asociate" class="btn btn-primary">Quiero ser pasajerx</a>
+          <a href="comunidad.html#asociate" class="btn btn-primary">Subirme a la comunidad</a>
           <a href="comunidad.html#beneficios" class="btn btn-ghost">Ver beneficios</a>
         </div>
       </div>
@@ -1117,7 +1117,7 @@ if __name__ == "__main__":
         "index.html",
         page_html(
             "SUBE :: Un viaje colectivo por La Plata",
-            "SUBE es un medio de comunicación autogestivo con identidad platense. Conocé los beneficios de la Comunidad de Pasajerxs y sumate como socix.",
+            "SUBE es un canal platense hecho a pulmón. Conocé los beneficios de la Comunidad de Pasajerxs y sumate como socix.",
             HOME_BODY,
             depth=0,
             active=None,
