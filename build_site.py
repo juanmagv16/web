@@ -278,6 +278,55 @@ def benefit_card_html(slug, initial, name, cat, perks, ig, ubicacion=None):
         </article>'''.format(slug=slug, name=name, initial=initial, cat=cat, perks=perks_html, ig=ig, icon=IG_ICON, loc_attr=loc_attr)
 
 
+def comercios_desde_planilla():
+    """Comercios que trae scripts/sync_comunidad.py desde Google Sheets
+    (datos/comercios.json). Si todavía no hay datos, se usa BENEFIT_CARDS."""
+    ruta = os.path.join(ROOT, "datos", "comercios.json")
+    if not os.path.exists(ruta):
+        return None
+    import json
+    with open(ruta, encoding="utf-8") as fh:
+        return json.load(fh).get("comercios") or None
+
+
+def benefit_card_from_sheet(c):
+    e = html.escape
+    nombre = c["nombre"]
+    if c.get("logo") and os.path.exists(os.path.join(ROOT, c["logo"])):
+        logo = '<div class="benefit-logo"><img src="{}" alt="{}" loading="lazy"></div>'.format(e(c["logo"]), e(nombre))
+    else:
+        logo = '<div class="benefit-logo mono" data-slug="{}" data-name="{}">{}</div>'.format(
+            e(c.get("instagram") or c["slug"]), e(nombre), e(nombre[:1].upper()))
+    perks = "".join("<li>{}</li>".format(e(b)) for b in c.get("beneficios", []))
+    ig = c.get("instagram")
+    foot = ('<a class="benefit-ig" href="https://www.instagram.com/{0}/" target="_blank" rel="noopener">{1}<span>@{0}</span></a>'.format(e(ig), IG_ICON)
+            if ig else "")
+    loc = ' data-location="{}"'.format(e(c["ubicacion"])) if c.get("ubicacion") else ""
+    return """        <article class="benefit-card"{loc}>
+          <div class="benefit-top">
+            {logo}
+            <div>
+              <div class="benefit-name">{nombre}</div>
+              <div class="benefit-cat">{rubro}</div>
+            </div>
+          </div>
+          <ul class="benefit-perks">
+            {perks}
+          </ul>
+          <div class="benefit-foot">
+            {foot}
+          </div>
+        </article>""".format(loc=loc, logo=logo, nombre=e(nombre), rubro=e(c.get("rubro", "")), perks=perks, foot=foot)
+
+
+def benefit_cards_html():
+    comercios = comercios_desde_planilla()
+    if comercios:
+        # Los que son solo auspiciantes no aparecen en la lista de beneficios
+        return "\n\n".join(benefit_card_from_sheet(c) for c in comercios if c.get("tipo") != "auspiciante")
+    return "\n\n".join(benefit_card_html(*c) for c in BENEFIT_CARDS)
+
+
 COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
     <div class="wrap">
       <div class="section-head">
@@ -386,7 +435,7 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
     </div>
   </section>
 '''.format(
-    cards="\n\n".join(benefit_card_html(*c) for c in BENEFIT_CARDS),
+    cards=benefit_cards_html(),
     chevron=CHEVRON_ICON,
     arrow_left=ARROW_LEFT_ICON,
     arrow_right=ARROW_RIGHT_ICON,
@@ -1132,7 +1181,7 @@ if __name__ == "__main__":
             COMUNIDAD_BODY,
             depth=0,
             active="comunidad",
-            extra_scripts=["logo-autoload.js", "geo.js", "benefits.js", "carousel.js"],
+            extra_scripts=["logo-autoload.js", "geo.js", "carousel.js"],
         ),
     )
     write(

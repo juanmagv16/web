@@ -1,0 +1,228 @@
+#!/usr/bin/env python3
+"""
+Trae los comercios de la Comunidad desde la planilla de Google Sheets y
+descarga sus logos desde Drive.
+
+Lo corre GitHub automáticamente (ver .github/workflows/publicar-sitio.yml)
+antes de generar el sitio. Deja:
+  - datos/comercios.json          → la lista que usa build_site.py
+  - assets/socios/planilla/*.png  → los logos, achicados y listos para la web
+
+Si la planilla no responde o viene vacía, NO toca nada: la web sigue con
+la última versión buena y se muestra un aviso en GitHub.
+
+Requisitos de la planilla:
+  - Compartida como "Cualquier persona con el vínculo: Lector".
+  - Fila 1 con los títulos. Se reconocen (sin importar mayúsculas ni tildes):
+      Nombre · Rubro · Instagram · Beneficio (y Beneficio 2, 3…) ·
+      Ubicación · Logo · Tipo (opcional) · Activo (opcional)
+  - Los logos: link de Drive (compartido igual que la planilla) o link
+    directo a una imagen.
+
+Uso manual:  python3 scripts/sync_comunidad.py
+"""
+import csv
+import io
+import json
+import os
+import re
+import sys
+import unicodedata
+import urllib.request
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+FUENTES = os.path.join(ROOT, "datos", "fuentes.json")
+SALIDA = os.path.join(ROOT, "datos", "comercios.json")
+LOGOS_DIR = os.path.join(ROOT, "assets", "socios", "planilla")
+LOGO_MAX = 320  # px del lado más largo
+
+
+def aviso(msg):
+    # En GitHub se ve como un aviso amarillo; en la terminal, como texto.
+    print("::warning::" + msg if os.environ.get("GITHUB_ACTIONS") else "AVISO: " + msg)
+
+
+def norm(t):
+    t = unicodedata.normalize("NFD", str(t or ""))
+    t = "".join(c for c in t if unicodedata.category(c) != "Mn")
+    return re.sub(r"\s+", " ", t.lower()).strip()
+
+
+def slugify(t):
+    return re.sub(r"[^a-z0-9]+", "-", norm(t)).strip("-") or "comercio"
+
+
+def descargar(url, limite=8 * 1024 * 1024):
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (SUBE web)"})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        tipo = r.headers.get("Content-Type", "")
+        datos = r.read(limite + 1)
+    if len(datos) > limite:
+        raise ValueError("archivo demasiado grande")
+    return datos, tipo
+
+
+def url_csv(cfg):
+    m = re.search(r"/spreadsheets/d/([a-zA-Z0-9_-]+)", cfg["planilla"])
+    if not m:
+        raise ValueError("el link de la planilla no parece de Google Sheets")
+    url = "https://docs.google.com/spreadsheets/d/{}/export?format=csv".format(m.group(1))
+    gid = str(cfg.get("gid", "")).strip()
+    if gid:
+        url += "&gid=" + gid
+    return url
+
+
+def columnas(titulos):
+    t = [norm(x) for x in titulos]
+
+    def una(*claves):
+        for i, h in enumerate(t):
+            if any(h == c or h.startswith(c) for c in claves):
+                return i
+        return -1
+
+    return {
+        "nombre": una("nombre", "comercio", "negocio", "espacio"),
+        "rubro": una("rubro", "categoria"),
+        "instagram": una("link de instagram", "instagram", "ig"),
+        "beneficios": [i for i, h in enumerate(t) if h.startswith("beneficio") or h.startswith("descuento")],
+        "ubicacion": una("ubicacion", "direccion", "domicilio"),
+        "logo": una("logo", "imagen"),
+        "tipo": una("tipo"),
+        "activo": una("activo", "visible", "publicar"),
+    }
+
+
+def handle_instagram(v):
+    v = str(v or "").strip()
+    m = re.search(r"instagram\.com/([^/?#\s]+)", v, re.I)
+    if m:
+        v = m.group(1)
+    v = v.lstrip("@").strip().strip("/")
+    return v if re.fullmatch(r"[A-Za-z0-9._]{1,30}", v or "") else ""
+
+
+def url_imagen(v):
+    v = str(v or "").strip()
+    if not v.startswith("http"):
+        return ""
+    m = re.search(r"drive\.google\.com/(?:file/d/|open\?id=|uc\?(?:[^#]*&)?id=)([a-zA-Z0-9_-]+)", v)
+    if m:
+        return "https://drive.google.com/uc?export=download&id=" + m.group(1)
+    return v
+
+
+def guardar_logo(url, slug):
+    from PIL import Image  # se instala en GitHub (pip install pillow)
+    datos, tipo = descargar(url)
+    if "text/html" in tipo:
+        raise ValueError("Drive devolvió una página en lugar de la imagen (¿el archivo está compartido con 'Cualquier persona con el vínculo'?)")
+    im = Image.open(io.BytesIO(datos))
+    im.load()
+    if im.mode not in ("RGB", "RGBA"):
+        im = im.convert("RGBA")
+    im.thumbnail((LOGO_MAX, LOGO_MAX))
+    os.makedirs(LOGOS_DIR, exist_ok=True)
+    nombre = slug + ".png"
+    im.save(os.path.join(LOGOS_DIR, nombre), optimize=True)
+    return "assets/socios/planilla/" + nombre
+
+
+def main():
+    if not os.path.exists(FUENTES):
+        aviso("No está datos/fuentes.json: la Comunidad sigue con los datos anteriores.")
+        return 0
+    cfg = json.load(open(FUENTES, encoding="utf-8")).get("comercios", {})
+    try:
+        url = url_csv(cfg)
+        try:
+            crudo, _ = descargar(url)
+        except Exception:  # noqa: BLE001
+            # Plan B: la otra forma de exportar de Google (primera pestaña visible)
+            crudo, _ = descargar(url.replace("/export?format=csv", "/gviz/tq?tqx=out:csv").replace("&gid=", "&gid="))
+        texto = crudo.decode("utf-8-sig")
+        if texto.lstrip().startswith("<"):
+            raise ValueError("Google pidió iniciar sesión: la planilla tiene que estar compartida como 'Cualquier persona con el vínculo: Lector'")
+        filas = list(csv.reader(io.StringIO(texto)))
+    except Exception as e:  # noqa: BLE001
+        aviso("No se pudo leer la planilla de comercios ({}). La web sigue con los datos anteriores.".format(e))
+        return 0
+
+    # La fila de títulos puede no ser la primera (por ejemplo, si hay un título arriba)
+    head, cols = None, None
+    for i, f in enumerate(filas[:10]):
+        c = columnas(f)
+        if c["nombre"] >= 0 and (c["beneficios"] or c["rubro"] >= 0):
+            head, cols = i, c
+            break
+    if cols is None:
+        aviso("En la planilla de comercios no encontramos la fila de títulos (Nombre, Rubro, Beneficio…). La web sigue con los datos anteriores.")
+        return 0
+
+    def celda(f, i):
+        return f[i].strip() if 0 <= i < len(f) and f[i] else ""
+
+    comercios, vistos, problemas = [], set(), []
+    for n, f in enumerate(filas[head + 1:], start=head + 2):
+        nombre = celda(f, cols["nombre"])
+        if not nombre:
+            continue
+        activo = norm(celda(f, cols["activo"]))
+        if activo in ("no", "n", "0", "false", "oculto", "baja"):
+            continue
+        tipo = norm(celda(f, cols["tipo"]))
+        beneficios = []
+        for i in cols["beneficios"]:
+            for b in re.split(r"\s*(?:\n|;|\s\|\s)\s*", celda(f, i)):
+                if b.strip():
+                    beneficios.append(b.strip())
+        ig = handle_instagram(celda(f, cols["instagram"]))
+        slug = slugify(ig or nombre)
+        while slug in vistos:
+            slug += "-2"
+        vistos.add(slug)
+        c = {
+            "slug": slug,
+            "nombre": nombre,
+            "rubro": celda(f, cols["rubro"]),
+            "instagram": ig,
+            "beneficios": beneficios,
+            "ubicacion": celda(f, cols["ubicacion"]),
+            "tipo": "auspiciante" if tipo.startswith("ausp") else ("ambos" if tipo.startswith("amb") else "adherido"),
+            "logo": "",
+        }
+        url = url_imagen(celda(f, cols["logo"]))
+        if url:
+            try:
+                c["logo"] = guardar_logo(url, slug)
+            except Exception as e:  # noqa: BLE001
+                problemas.append("fila {} ({}): no se pudo usar el logo: {}".format(n, nombre, e))
+        if c["tipo"] != "auspiciante" and not beneficios:
+            problemas.append("fila {} ({}): no tiene beneficio cargado".format(n, nombre))
+        comercios.append(c)
+
+    if not comercios:
+        aviso("La planilla de comercios vino sin comercios. Por las dudas, la web sigue con los datos anteriores.")
+        return 0
+
+    # Logos que ya no se usan
+    usados = {os.path.basename(c["logo"]) for c in comercios if c["logo"]}
+    if os.path.isdir(LOGOS_DIR):
+        for fn in os.listdir(LOGOS_DIR):
+            if fn not in usados:
+                os.remove(os.path.join(LOGOS_DIR, fn))
+
+    with open(SALIDA, "w", encoding="utf-8") as fh:
+        json.dump({"comercios": comercios}, fh, ensure_ascii=False, indent=2)
+        fh.write("\n")
+    con_logo = sum(1 for c in comercios if c["logo"])
+    print("Comercios leídos de la planilla: {} ({} con logo).".format(len(comercios), con_logo))
+    print("Columnas reconocidas: " + ", ".join(k for k, v in cols.items() if (v >= 0 if isinstance(v, int) else v)))
+    for p in problemas:
+        aviso(p)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
