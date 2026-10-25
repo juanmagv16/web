@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """
-Trae los comercios de la Comunidad desde la planilla de Google Sheets y
-descarga sus logos desde Drive.
+Trae los datos de las planillas de Google Sheets que usa la web:
+  - Comercios de la Comunidad (y sus logos desde Drive)
+  - Programación (grilla de Contenidos y "Próxima parada" de la portada)
 
 Lo corre GitHub automáticamente (ver .github/workflows/publicar-sitio.yml)
-antes de generar el sitio. Deja:
+antes de generar el sitio. Los links de las planillas están en
+datos/fuentes.json. Deja:
   - datos/comercios.json          → la lista que usa build_site.py
   - assets/socios/planilla/*.png  → los logos, achicados y listos para la web
+  - datos/programacion.csv        → la copia que lee assets/schedule.js
 
 Si la planilla no responde o viene vacía, NO toca nada: la web sigue con
 la última versión buena y se muestra un aviso en GitHub.
@@ -19,7 +22,7 @@ Requisitos de la planilla:
   - Los logos: link de Drive (compartido igual que la planilla) o link
     directo a una imagen.
 
-Uso manual:  python3 scripts/sync_comunidad.py
+Uso manual:  python3 scripts/sync_planillas.py
 """
 import csv
 import io
@@ -129,25 +132,62 @@ def guardar_logo(url, slug):
     return "assets/socios/planilla/" + nombre
 
 
+def leer_csv(cfg):
+    """Descarga una pestaña de Google Sheets como filas de CSV."""
+    url = url_csv(cfg)
+    try:
+        crudo, _ = descargar(url)
+    except Exception:  # noqa: BLE001
+        # Plan B: la otra forma de exportar de Google
+        crudo, _ = descargar(url.replace("/export?format=csv", "/gviz/tq?tqx=out:csv"))
+    texto = crudo.decode("utf-8-sig")
+    if texto.lstrip().startswith("<"):
+        raise ValueError("Google pidió iniciar sesión: la planilla tiene que estar compartida como 'Cualquier persona con el vínculo: Lector'")
+    return texto
+
+
+def sync_programacion(cfg):
+    """Guarda la pestaña de programación tal cual (assets/schedule.js la interpreta)."""
+    destino = os.path.join(ROOT, "datos", "programacion.csv")
+    try:
+        texto = leer_csv(cfg)
+    except Exception as e:  # noqa: BLE001
+        aviso("No se pudo leer la planilla de programación ({}). La web sigue con los datos anteriores.".format(e))
+        return
+    filas = list(csv.reader(io.StringIO(texto)))
+    ok = False
+    for f in filas[:10]:
+        t = [norm(x) for x in f]
+        if any(h.startswith("programa") for h in t) and any(h.startswith("hora") for h in t):
+            ok = True
+            break
+    datos = [f for f in filas if any(c.strip() for c in f)]
+    if not ok or len(datos) < 2:
+        aviso("En la planilla de programación no encontramos los títulos (Programa, Hora…) o no tiene programas. La web sigue con los datos anteriores.")
+        return
+    with open(destino, "w", encoding="utf-8", newline="") as fh:
+        fh.write(texto if texto.endswith("\n") else texto + "\n")
+    print("Programación: {} filas guardadas.".format(len(datos) - 1))
+
+
 def main():
     if not os.path.exists(FUENTES):
-        aviso("No está datos/fuentes.json: la Comunidad sigue con los datos anteriores.")
+        aviso("No está datos/fuentes.json: la web sigue con los datos anteriores.")
         return 0
-    cfg = json.load(open(FUENTES, encoding="utf-8")).get("comercios", {})
+    fuentes = json.load(open(FUENTES, encoding="utf-8"))
+    if fuentes.get("programacion"):
+        sync_programacion(fuentes["programacion"])
+    if fuentes.get("comercios"):
+        sync_comercios(fuentes["comercios"])
+    return 0
+
+
+def sync_comercios(cfg):
     try:
-        url = url_csv(cfg)
-        try:
-            crudo, _ = descargar(url)
-        except Exception:  # noqa: BLE001
-            # Plan B: la otra forma de exportar de Google (primera pestaña visible)
-            crudo, _ = descargar(url.replace("/export?format=csv", "/gviz/tq?tqx=out:csv").replace("&gid=", "&gid="))
-        texto = crudo.decode("utf-8-sig")
-        if texto.lstrip().startswith("<"):
-            raise ValueError("Google pidió iniciar sesión: la planilla tiene que estar compartida como 'Cualquier persona con el vínculo: Lector'")
-        filas = list(csv.reader(io.StringIO(texto)))
+        filas = list(csv.reader(io.StringIO(leer_csv(cfg))))
     except Exception as e:  # noqa: BLE001
         aviso("No se pudo leer la planilla de comercios ({}). La web sigue con los datos anteriores.".format(e))
-        return 0
+        return
 
     # La fila de títulos puede no ser la primera (por ejemplo, si hay un título arriba)
     head, cols = None, None
@@ -158,7 +198,7 @@ def main():
             break
     if cols is None:
         aviso("En la planilla de comercios no encontramos la fila de títulos (Nombre, Rubro, Beneficio…). La web sigue con los datos anteriores.")
-        return 0
+        return
 
     def celda(f, i):
         return f[i].strip() if 0 <= i < len(f) and f[i] else ""
@@ -204,7 +244,7 @@ def main():
 
     if not comercios:
         aviso("La planilla de comercios vino sin comercios. Por las dudas, la web sigue con los datos anteriores.")
-        return 0
+        return
 
     # Logos que ya no se usan
     usados = {os.path.basename(c["logo"]) for c in comercios if c["logo"]}
@@ -221,7 +261,7 @@ def main():
     print("Columnas reconocidas: " + ", ".join(k for k, v in cols.items() if (v >= 0 if isinstance(v, int) else v)))
     for p in problemas:
         aviso(p)
-    return 0
+    return
 
 
 if __name__ == "__main__":

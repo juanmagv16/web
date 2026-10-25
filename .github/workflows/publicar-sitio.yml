@@ -2,8 +2,9 @@
 # ------------------------------------------------------------
 # Cada vez que se sube un cambio a la rama main (por ejemplo, una nota
 # nueva en redaccion/ o una foto en assets/noticias/), GitHub:
-#   0. Trae los comercios de la Comunidad (y sus logos) desde Google Sheets
-#      (scripts/sync_comunidad.py; la planilla está en datos/fuentes.json).
+#   0. Trae de Google Sheets los comercios de la Comunidad (y sus logos) y
+#      la programación (scripts/sync_planillas.py; los links de las
+#      planillas están en datos/fuentes.json).
 #   1. Vuelve a generar el sitio (python build_site.py).
 #   2. Revisa que las notas estén bien escritas: título, fecha en formato
 #      AAAA-MM-DD, que no haya dos notas con el mismo nombre y que las
@@ -16,8 +17,7 @@
 # Requisito (una sola vez): Settings → Pages → Build and deployment →
 # Source: "GitHub Actions".
 #
-# Además corre solo cada hora, para tomar los cambios de la planilla de
-# comercios, y se puede correr a mano: Actions → "Publicar el sitio" →
+# Además corre solo cada hora, para tomar los cambios de las planillas, y se puede correr a mano: Actions → "Publicar el sitio" →
 # "Run workflow".
 #
 # En los Pull Request solo revisa, no publica.
@@ -77,10 +77,10 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Traer los comercios desde Google Sheets
+      - name: Traer comercios y programación desde Google Sheets
         run: |
           pip install --quiet pillow
-          python scripts/sync_comunidad.py
+          python scripts/sync_planillas.py
 
       - name: Generar el sitio y revisar las notas
         run: python build_site.py --revisar

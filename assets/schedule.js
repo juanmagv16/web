@@ -19,10 +19,10 @@
 (function () {
   "use strict";
 
-  // Mismo link de "Publicar en la web" que ya usa benefits.js, apuntado
-  // específicamente a la pestaña "Programación" mediante su gid.
-  var SHEET_CSV_URL =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFybsjITyt2XR-XYTWibjY4PItJ46VK27XJOuHQ0JrJ-tZujG6duyDrwlsTdZLRbJusM-rZyMqxtky/pub?output=csv&gid=141065091&single=true";
+  // Copia de la planilla de programación que GitHub actualiza cada hora
+  // (scripts/sync_planillas.py; el link de la planilla está en
+  // datos/fuentes.json). Si falta o no sirve, se usa el respaldo de abajo.
+  var SHEET_CSV_URL = "datos/programacion.csv";
 
   var AR_OFFSET_MS = 3 * 60 * 60 * 1000; // Argentina = UTC-3 (fijo, sin DST)
   var DAY_MS = 24 * 60 * 60 * 1000;
