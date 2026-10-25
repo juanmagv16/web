@@ -298,7 +298,7 @@
       var fila = f.fila || i + 2; // número de fila tal como se ve en el Excel
       var mail = normalizarMail(f.mail);
       if (!f.nombre && !f.apellido && !mail) return; // fila vacía
-      if (!mailValido(mail)) { problemas.push({ fila: fila, motivo: 'Mail vacío o mal escrito', dato: f.mail || '' }); return; }
+      if (!mailValido(mail)) { problemas.push({ fila: fila, motivo: f.motivo_mail || 'Mail vacío o mal escrito', dato: f.mail || ((f.nombre || '') + ' ' + (f.apellido || '')).trim() }); return; }
       if (vistos[mail]) { problemas.push({ fila: fila, motivo: 'Mail repetido (ya está en la fila ' + vistos[mail] + ')', dato: mail }); return; }
       if (!f.nombre) { problemas.push({ fila: fila, motivo: 'Falta el nombre', dato: mail }); return; }
       vistos[mail] = fila;

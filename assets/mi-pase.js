@@ -389,16 +389,17 @@
       '<div class="pase-card pase-card--flat">' +
       '<h3>Carga mensual de socios</h3>' +
       '<p class="pase-sub">Subí el Excel con <strong>todos</strong> los socios del mes. Quienes estaban en la lista y no figuran en el Excel nuevo pasan a <strong>vencidos</strong>. Antes de guardar vas a ver un resumen de los cambios.</p>' +
+      '<p class="pase-sub">Podés subir <strong>un solo Excel</strong> con nombre y mail, o <strong>los dos archivos de finanzas juntos</strong> (el de socios activos y el de mails) sin editarlos: los unimos solos por la columna que tengan en común (DNI, número de socio o nombre y apellido).</p>' +
       '<p class="pase-sub">Columnas que se reconocen: <b>Nombre</b> y <b>Apellido</b> (o una sola columna "Nombre y apellido"), <b>Mail</b>, <b>Estado</b> (activo / inactivo) y, si querés, <b>Vigente hasta</b>. ' +
       '<a href="assets/plantilla-socios.xlsx" download>Descargar plantilla de ejemplo</a></p>' +
-      '<label class="pase-drop" id="drop"><input type="file" id="archivo" accept=".xlsx,.xls,.csv" hidden>' +
-      '<span class="pase-drop-title">Arrastrá el Excel acá</span><span class="pase-drop-sub">o tocá para elegirlo (.xlsx, .xls o .csv)</span></label>' +
+      '<label class="pase-drop" id="drop"><input type="file" id="archivo" accept=".xlsx,.xls,.csv" multiple hidden>' +
+      '<span class="pase-drop-title">Arrastrá el Excel acá</span><span class="pase-drop-sub">uno o los dos archivos juntos · o tocá para elegirlos (.xlsx, .xls o .csv)</span></label>' +
       '<div id="excel-out"></div></div>';
     var drop = $('#drop'), input = $('#archivo');
     ['dragover', 'dragenter'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('is-over'); }); });
     ['dragleave', 'drop'].forEach(function (ev) { drop.addEventListener(ev, function () { drop.classList.remove('is-over'); }); });
-    drop.addEventListener('drop', function (e) { e.preventDefault(); if (e.dataTransfer.files[0]) leerArchivo(e.dataTransfer.files[0], sesion); });
-    input.addEventListener('change', function () { if (input.files[0]) leerArchivo(input.files[0], sesion); });
+    drop.addEventListener('drop', function (e) { e.preventDefault(); if (e.dataTransfer.files.length) leerArchivos(e.dataTransfer.files, sesion); });
+    input.addEventListener('change', function () { if (input.files.length) leerArchivos(input.files, sesion); });
   }
 
   function cargarXLSX() {
@@ -411,20 +412,102 @@
     });
   }
 
-  function leerArchivo(file, sesion) {
+  function leerArchivos(lista, sesion) {
+    var files = Array.prototype.slice.call(lista, 0);
     var out = $('#excel-out');
-    out.innerHTML = '<p class="pase-loading">Leyendo ' + esc(file.name) + '…</p>';
+    if (files.length > 2) { out.innerHTML = errorHtml('Subí uno o dos archivos como máximo.'); return; }
+    out.innerHTML = '<p class="pase-loading">Leyendo ' + esc(files.map(function (f) { return f.name; }).join(' y ')) + '…</p>';
     cargarXLSX().then(function (XLSX) {
-      return file.arrayBuffer().then(function (buf) {
-        var wb = XLSX.read(buf, { type: 'array', cellDates: true });
-        var hoja = wb.Sheets[wb.SheetNames[0]];
-        var filas = XLSX.utils.sheet_to_json(hoja, { header: 1, defval: '', raw: true, blankrows: true });
-        return interpretar(filas);
-      });
-    }).then(function (r) {
+      return Promise.all(files.map(function (file) {
+        return file.arrayBuffer().then(function (buf) {
+          var wb = XLSX.read(buf, { type: 'array', cellDates: true });
+          var hoja = wb.Sheets[wb.SheetNames[0]];
+          return { nombre: file.name, filas: XLSX.utils.sheet_to_json(hoja, { header: 1, defval: '', raw: true, blankrows: true }) };
+        });
+      }));
+    }).then(function (tablas) {
+      var r = tablas.length === 1 ? interpretar(tablas[0].filas) : unirArchivos(tablas);
       if (r.error) { out.innerHTML = errorHtml(r.error); return; }
-      return API.admin.previsualizarImportacion(r.filas).then(function (res) { mostrarResumen(res, r.filas, sesion); });
+      return API.admin.previsualizarImportacion(r.filas).then(function (res) { mostrarResumen(res, r.filas, sesion, r.nota); });
     }).catch(function (err) { out.innerHTML = errorHtml(err.message); });
+  }
+
+  // ---------- Unir el Excel de socios con el Excel de mails ----------
+  var CLAVE_ID = /\b(dni|documento|doc|cuit|cuil|id|nro|numero|n°|codigo|legajo)\b/;
+
+  function encabezado(filas) {
+    for (var i = 0; i < Math.min(filas.length, 10); i++) {
+      var llenas = (filas[i] || []).filter(function (c) { return /[a-záéíóúñ]/i.test(String(c)); }).length;
+      var m = mapear(filas[i]);
+      if (llenas >= 2 && (m.mail >= 0 || m.nombre >= 0 || m.completo >= 0)) return { i: i, map: m, titulos: (filas[i] || []).map(API.normalizar) };
+    }
+    return null;
+  }
+  // Clave por nombre que no depende del orden: "Pérez, Ana" = "Ana Pérez"
+  function claveNombre(fila, map) {
+    var t = map.completo >= 0 && txt(fila[map.completo]) ? fila[map.completo]
+      : txt(fila[map.nombre]) + ' ' + (map.apellido >= 0 ? txt(fila[map.apellido]) : '');
+    return API.normalizar(String(t).replace(/,/g, ' ')).split(' ').filter(Boolean).sort().join(' ');
+  }
+  // Separa "Nombre y apellido" en sus partes, respetando "Pérez, Ana" y columnas "Apellido y nombre"
+  function partirNombre(valor, titulo) {
+    valor = txt(valor);
+    if (valor.indexOf(',') >= 0) {
+      var c = valor.split(',');
+      return { apellido: txt(c[0]), nombre: txt(c.slice(1).join(' ')) };
+    }
+    var p = valor.split(/\s+/);
+    if (/apellido.*nombre/.test(titulo || '')) return { apellido: p.shift() || '', nombre: p.join(' ') };
+    return { nombre: p.shift() || '', apellido: p.join(' ') };
+  }
+
+  function unirArchivos(tablas) {
+    var info = tablas.map(function (t) { return { t: t, h: encabezado(t.filas) }; });
+    var malo = info.filter(function (x) { return !x.h; })[0];
+    if (malo) return { error: 'No encontramos la fila de títulos en "' + malo.t.nombre + '". Revisá que tenga títulos como Nombre, Apellido o Mail.' };
+    var conMail = info.filter(function (x) { return x.h.map.mail >= 0; });
+    if (conMail.length === 0) return { error: 'Ninguno de los dos archivos tiene una columna de mail.' };
+    var mails = conMail[0], socios = info.filter(function (x) { return x !== mails; })[0];
+    if (socios.h.map.nombre < 0 && socios.h.map.completo < 0) {
+      return { error: 'En "' + socios.t.nombre + '" no encontramos las columnas de nombre y apellido.' };
+    }
+
+    // ¿Por qué columna los unimos? Primero un dato único (DNI, número de socio…); si no hay, nombre y apellido.
+    var colS = -1, colM = -1, rotulo = 'nombre y apellido';
+    socios.h.titulos.forEach(function (t, i) {
+      if (colS >= 0 || !t || !CLAVE_ID.test(t)) return;
+      var j = mails.h.titulos.indexOf(t);
+      if (j >= 0) { colS = i; colM = j; rotulo = t; }
+    });
+    var clave = function (fila, x, col) { return col >= 0 ? API.normalizar(fila[col]) : claveNombre(fila, x.h.map); };
+
+    var mapa = {}, dudosos = {};
+    mails.t.filas.slice(mails.h.i + 1).forEach(function (f) {
+      var k = clave(f, mails, colM), m = txt(f[mails.h.map.mail]).toLowerCase();
+      if (!k || !m) return;
+      if (mapa[k] && mapa[k] !== m) dudosos[k] = true;
+      mapa[k] = m;
+    });
+
+    var map = socios.h.map, sinMail = 0;
+    var datos = socios.t.filas.slice(socios.h.i + 1).map(function (f, j) {
+      var nombre = '', apellido = '';
+      if (map.nombre >= 0) { nombre = txt(f[map.nombre]); apellido = map.apellido >= 0 ? txt(f[map.apellido]) : ''; }
+      if (map.completo >= 0 && !nombre) { var pn = partirNombre(f[map.completo], socios.h.titulos[map.completo]); nombre = pn.nombre; apellido = pn.apellido; }
+      var k = clave(f, socios, colS);
+      var mail = map.mail >= 0 && txt(f[map.mail]) ? txt(f[map.mail]) : (dudosos[k] ? '' : (mapa[k] || ''));
+      var motivo = null;
+      if (!mail && (nombre || apellido)) {
+        sinMail++;
+        motivo = dudosos[k] ? 'Hay dos mails distintos para esta persona en "' + mails.t.nombre + '"' : 'No encontramos su mail en "' + mails.t.nombre + '"';
+      }
+      var estado = map.estado >= 0 ? API.normalizar(f[map.estado]) : 'activo';
+      var activo = !estado || /^(activo|activa|si|ok|al dia|pago|pagado|1|true|vigente)/.test(estado);
+      return { fila: socios.h.i + j + 2, nombre: nombre, apellido: apellido, mail: mail, motivo_mail: motivo,
+        estado: activo ? 'activo' : 'inactivo', vigente_hasta: map.vigencia >= 0 ? fechaISO(f[map.vigencia]) : null };
+    });
+    return { filas: datos, nota: 'Unimos "' + socios.t.nombre + '" con los mails de "' + mails.t.nombre + '" usando la columna «' + rotulo + '». ' +
+      (sinMail ? sinMail + ' persona(s) quedaron sin mail (las ves abajo, con el número de fila del archivo de socios).' : 'Todas las personas tienen su mail.') };
   }
 
   // Reconoce las columnas aunque estén en otro orden o con otros nombres parecidos.
@@ -439,8 +522,8 @@
       var nombre = '', apellido = '';
       if (map.nombre >= 0) { nombre = txt(f[map.nombre]); apellido = map.apellido >= 0 ? txt(f[map.apellido]) : ''; }
       if (map.completo >= 0 && !nombre) {
-        var partes = txt(f[map.completo]).split(/\s+/);
-        nombre = partes.shift() || ''; apellido = partes.join(' ');
+        var pn = partirNombre(f[map.completo], API.normalizar(filas[iHead][map.completo]));
+        nombre = pn.nombre; apellido = pn.apellido;
       }
       var estado = map.estado >= 0 ? API.normalizar(f[map.estado]) : 'activo';
       var activo = !estado || /^(activo|activa|si|ok|al dia|pago|pagado|1|true|vigente)/.test(estado);
@@ -476,7 +559,7 @@
     return null;
   }
 
-  function mostrarResumen(r, filas, sesion) {
+  function mostrarResumen(r, filas, sesion, nota) {
     var out = $('#excel-out');
     var problemas = r.problemas.length
       ? '<details class="pase-problems" open><summary>' + r.problemas.length + ' fila(s) con problemas que no se van a cargar</summary><ul>' +
@@ -485,6 +568,7 @@
       : '';
     out.innerHTML =
       '<h3 class="pase-h3">Resumen de cambios</h3>' +
+      (nota ? '<p class="pase-sub">' + esc(nota) + '</p>' : '') +
       '<div class="pase-stats">' +
       stat(r.filas, 'socios en el Excel') + stat(r.nuevos, 'nuevos') + stat(r.siguen_activos, 'siguen al día') +
       stat(r.reactivados, 'vuelven a estar al día') + stat(r.pasan_a_inactivos + r.no_figuran, 'pasan a vencidos') +
