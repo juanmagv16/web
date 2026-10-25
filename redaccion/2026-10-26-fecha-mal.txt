@@ -1,0 +1,4 @@
+titulo: Nota con fecha mal escrita
+fecha: 26/10/2026
+---
+Texto.
