@@ -56,7 +56,7 @@
           return sb.auth.signOut().then(function () { throw new Error('La cuenta de este comercio está dada de baja. Escribinos a laplatasube@gmail.com.'); });
         }
         if (!rol) {
-          return sb.auth.signOut().then(function () { throw new Error('Tu mail ya no figura entre los socios de la comunidad. Si creés que es un error, escribinos a laplatasube@gmail.com.'); });
+          return sb.auth.signOut().then(function () { throw new Error('Tu mail ya no figura en la comunidad. Si creés que es un error, escribinos a laplatasube@gmail.com.'); });
         }
         var tabla = rol === 'equipo' ? 'equipo' : rol === 'comercio' ? 'comercios' : 'socios';
         return sb.from(tabla).select('nombre').eq(rol === 'equipo' ? 'mail' : 'user_id', rol === 'equipo' ? mail : s.user.id).maybeSingle()
@@ -108,7 +108,7 @@
           if (r.error) {
             if (/No encontramos/.test(r.error.message)) {
               throw new Error(rol === 'socio'
-                ? 'No encontramos ese mail entre los socios de la comunidad.'
+                ? 'No encontramos ese mail en la comunidad.'
                 : 'Ese mail no corresponde a ningún comercio adherido.');
             }
             throw fallo(r.error);
@@ -132,8 +132,6 @@
     miPase: function () {
       return rpc('mi_pase').then(function (p) { if (!p) throw new Error('No encontramos tu pase.'); return p; });
     },
-
-    elegirTrato: function (t) { return rpc('elegir_trato', { t: t }).then(function () {}); },
 
     verificarSocio: function (texto) {
       var palabras = normalizar(texto).split(' ').filter(Boolean);

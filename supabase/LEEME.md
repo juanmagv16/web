@@ -9,10 +9,6 @@ Supabase guarda la lista de socios, los comercios adheridos, el equipo de Sube y
 3. **Antes de correrlo**, bajá hasta el final del archivo: ahí está la lista de mails del **equipo de Sube** (las personas que van a poder cargar el Excel y ver el registro). Reemplazá o agregá los mails que correspondan.
 4. Pegalo en el editor y tocá **Run**. Tiene que terminar con "Success". Se puede volver a correr sin problema.
 
-### Actualizaciones (correr después del paso 1)
-
-- [`03-trato.sql`](03-trato.sql): agrega la pregunta "¿Cómo querés que te nombremos?" (pasajera / pasajero / prefiero no especificarlo). Se pega en **SQL Editor** y se toca **Run**, igual que el paso 1.
-
 ## 2. Que solo puedan crear cuenta quienes están en las listas
 
 1. Entrá a **Authentication → Hooks** (en algunos paneles: *Auth Hooks*).

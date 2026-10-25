@@ -338,7 +338,7 @@ begin
   end if;
   return jsonb_build_object('error', jsonb_build_object(
     'http_code', 403,
-    'message', 'No encontramos ese mail entre los socios de la comunidad. Si te suscribiste con otro mail, probá con ese.'));
+    'message', 'No encontramos ese mail en la comunidad. Si te suscribiste con otro mail, probá con ese.'));
 end;
 $$;
 grant execute on function public.solo_miembros(jsonb) to supabase_auth_admin;

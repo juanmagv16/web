@@ -46,7 +46,7 @@
       return {
         id: 's' + (i + 1), nombre: s[0], apellido: s[1], mail: s[2],
         estado: s[3], vigente_hasta: s[4], clave: s[5],
-        acepto_privacidad: !!s[5], creado: hoyISO(-90), trato: s[5] ? 'pasajera' : null
+        acepto_privacidad: !!s[5], creado: hoyISO(-90)
       };
     });
     var comercios = [
@@ -183,7 +183,7 @@
       var u = lista.find(function (x) { return x.mail === mail; });
       if (!u) {
         return error(rol === 'socio'
-          ? 'No encontramos ese mail entre los socios de la comunidad.'
+          ? 'No encontramos ese mail en la comunidad.'
           : 'Ese mail no corresponde a ningún comercio adherido.');
       }
       if (rol === 'comercio' && !u.activo) return error('La cuenta de este comercio está dada de baja.');
@@ -213,15 +213,9 @@
       var s = leerSesion(); if (!s || s.rol !== 'socio') return error('Tenés que ingresar.');
       var u = leer().socios.find(function (x) { return x.id === s.id; });
       return esperar({ nombre: u.nombre, apellido: u.apellido, mail: u.mail,
-        al_dia: estaAlDia(u), vigente_hasta: u.vigente_hasta || null, trato: u.trato || null });
+        al_dia: estaAlDia(u), vigente_hasta: u.vigente_hasta || null });
     },
 
-    elegirTrato: function (t) {
-      var s = leerSesion(); if (!s || s.rol !== 'socio') return error('Tenés que ingresar.');
-      if (['pasajera', 'pasajero', 'neutro'].indexOf(t) < 0) return error('Opción no válida.');
-      leer().socios.find(function (x) { return x.id === s.id; }).trato = t; guardar();
-      return esperar(true);
-    },
 
     // ---- Comercio ----
     verificarSocio: function (texto) {

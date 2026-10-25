@@ -1488,12 +1488,3 @@ a.program-ig-chip:hover{ color: var(--lime); border-color: rgba(193,255,0,0.35);
 }
 .pase-pass-toggle:hover, .pase-pass-toggle[aria-pressed="true"]{ color: var(--lime); background: rgba(193,255,0,0.08); }
 
-/* Mi pase: "¿Cómo querés que te nombremos?" */
-.pase-trato{ border: 0; margin: 0; padding: 0; display:flex; flex-wrap: wrap; gap: 8px; }
-.pase-trato legend{ width: 100%; margin-bottom: 10px; font-size: 0.85rem; font-weight: 500; color: var(--grey); }
-.pase-trato-op{ flex-direction: row !important; align-items: center; gap: 8px !important; padding: 10px 14px; border: 1px solid var(--card-border); border-radius: 999px; cursor: pointer; color: var(--white) !important; font-size: 0.92rem !important; }
-.pase-trato-op:has(input:checked){ border-color: var(--lime); background: rgba(193,255,0,0.08); }
-.pase-trato-op input{ accent-color: var(--lime); margin: 0; }
-.pase-trato-card{ max-width: 520px; margin: 0 auto 20px; }
-.pase-trato-card form{ display:flex; flex-direction: column; gap: 16px; align-items: flex-start; }
-.pase-trato-card .pase-trato-op{ display:inline-flex; }
