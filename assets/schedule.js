@@ -22,7 +22,11 @@
   // Copia de la planilla de programación que GitHub actualiza cada hora
   // (scripts/sync_planillas.py; el link de la planilla está en
   // datos/fuentes.json). Si falta o no sirve, se usa el respaldo de abajo.
-  var SHEET_CSV_URL = "datos/programacion.csv";
+  var FUENTES_CSV = [
+    "datos/programacion.csv",
+    // Planilla anterior publicada: se usa solo mientras no exista la copia de arriba.
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFybsjITyt2XR-XYTWibjY4PItJ46VK27XJOuHQ0JrJ-tZujG6duyDrwlsTdZLRbJusM-rZyMqxtky/pub?output=csv&gid=141065091&single=true"
+  ];
 
   var AR_OFFSET_MS = 3 * 60 * 60 * 1000; // Argentina = UTC-3 (fijo, sin DST)
   var DAY_MS = 24 * 60 * 60 * 1000;
@@ -346,8 +350,8 @@
   var ultimaFuente = "ninguna"; // "sheets" | "fallback" | "ninguna"
   var ultimoError = null;
 
-  function cargar() {
-    return fetchConTimeout(SHEET_CSV_URL, FETCH_TIMEOUT_MS)
+  function intentar(i) {
+    return fetchConTimeout(FUENTES_CSV[i], FETCH_TIMEOUT_MS)
       .then(function (res) {
         if (!res.ok) throw new Error("status " + res.status);
         return res.text();
@@ -363,6 +367,14 @@
         ultimoError = null;
         return programas;
       })
+      .catch(function (err) {
+        if (i + 1 < FUENTES_CSV.length) return intentar(i + 1);
+        throw err;
+      });
+  }
+
+  function cargar() {
+    return intentar(0)
       .catch(function (err) {
         ultimoError = String((err && err.message) || err);
         var fallback = parsearProgramacion(FALLBACK_CSV);
