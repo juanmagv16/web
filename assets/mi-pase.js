@@ -1,7 +1,7 @@
 /* ============================================
    SUBE — Mi pase (pantallas)
    ------------------------------------------------------
-   Pasajerxs: activan su cuenta con su mail, eligen contraseña
+   Socios: activan su cuenta con su mail, eligen contraseña
    y ven su boleto "vivo" (nombre, vigencia y hora en tiempo real).
    Comercios adheridos: buscan a un socio por nombre y apellido
    y ven si está activo o no.
@@ -94,9 +94,9 @@
       '<strong>Modo demostración.</strong> Los socios y comercios son inventados y lo que pruebes queda solo en tu navegador. ' +
       '<details><summary>Cuentas para probar</summary>' +
       '<ul>' +
-      '<li><b>Pasajerx al día:</b> ana.demo@ejemplo.com · clave <code>sube1234</code></li>' +
-      '<li><b>Pasajerx vencida:</b> carla.prueba@ejemplo.com · clave <code>sube1234</code></li>' +
-      '<li><b>Pasajerx sin activar:</b> bruno.ejemplo@ejemplo.com (tocá "Activar mi cuenta")</li>' +
+      '<li><b>Pasajera al día:</b> ana.demo@ejemplo.com · clave <code>sube1234</code></li>' +
+      '<li><b>Pasajera vencida:</b> carla.prueba@ejemplo.com · clave <code>sube1234</code></li>' +
+      '<li><b>Pasajero sin activar:</b> bruno.ejemplo@ejemplo.com (tocá "Activar mi cuenta")</li>' +
       '<li><b>Comercio:</b> casachicha@demo.subecanal.com.ar · clave <code>sube1234</code></li>' +
       '<li><b>Equipo Sube:</b> finanzas@demo.subecanal.com.ar · clave <code>sube1234</code></li>' +
       '</ul>' +
@@ -120,7 +120,7 @@
     mostrar(
       '<div class="pase-doors">' +
       '<button type="button" class="pase-door" data-go="socio">' +
-      '<span class="pase-door-eyebrow">Soy pasajerx</span>' +
+      '<span class="pase-door-eyebrow">Soy de la comunidad</span>' +
       '<span class="pase-door-title">Ver mi boleto</span>' +
       '<span class="pase-door-desc">Entrá con tu mail para ver si estás al día y mostrar tu boleto en los comercios adheridos.</span>' +
       '<span class="pase-door-arrow">→</span></button>' +
@@ -141,7 +141,7 @@
   // INGRESO (los tres roles)
   // ============================================
   var TEXTOS = {
-    socio: { titulo: 'Ingresá a tu pase', eyebrow: 'Pasajerx',
+    socio: { titulo: 'Ingresá a tu pase', eyebrow: 'Comunidad de pasajeros',
       ayuda: '¿Es la primera vez que entrás? Activá tu cuenta con el mail con el que te suscribiste.' },
     comercio: { titulo: 'Ingreso de comercios', eyebrow: 'Comercio adherido',
       ayuda: '¿Primera vez? Activá la cuenta con el mail que le diste a Sube.' },
@@ -235,7 +235,8 @@
       '<span class="pase-hint">Al menos 8 caracteres.</span></label>' +
       '<label>Repetila<input type="password" name="clave2" autocomplete="new-password" required></label>' +
       (rol === 'socio'
-        ? '<label class="pase-check"><input type="checkbox" name="privacidad"> <span>Leí y acepto el aviso de privacidad de Sube.</span></label>' + PRIVACIDAD
+        ? opcionesTrato(null) +
+          '<label class="pase-check"><input type="checkbox" name="privacidad"> <span>Leí y acepto el aviso de privacidad de Sube.</span></label>' + PRIVACIDAD
         : '') +
       '<div id="f-error"></div>' +
       '<button class="btn btn-primary" type="submit">Guardar y entrar</button>' +
@@ -245,8 +246,12 @@
       e.preventDefault();
       var f = e.target;
       if (f.clave.value !== f.clave2.value) return mostrarError('#f-error', 'Las dos contraseñas no coinciden.');
+      var trato = f.querySelector('input[name=trato]:checked');
+      if (rol === 'socio' && !trato) return mostrarError('#f-error', 'Elegí cómo querés que te nombremos en tu pase.');
       var btn = f.querySelector('button[type=submit]'); ocupado(btn, true);
-      API.definirClave(token, f.clave.value, f.privacidad ? f.privacidad.checked : true).then(panel, function (err) {
+      API.definirClave(token, f.clave.value, f.privacidad ? f.privacidad.checked : true).then(function (sesion) {
+        return (trato && API.elegirTrato ? API.elegirTrato(trato.value) : Promise.resolve()).then(function () { return sesion; });
+      }).then(panel, function (err) {
         ocupado(btn, false); mostrarError('#f-error', err);
       });
     });
@@ -268,7 +273,18 @@
   }
   function engancharSalir() { on('[data-salir]', 'click', function () { API.salir().then(inicio); }); }
 
-  // ---------- Pasajerx: el boleto ----------
+  // ---------- Cómo nombrar a cada socio (lo elige cada persona) ----------
+  var TRATOS = [['pasajera', 'Pasajera'], ['pasajero', 'Pasajero'], ['neutro', 'Prefiero no especificarlo']];
+  function rotuloTrato(t) { return t === 'pasajera' ? 'Pasajera' : t === 'pasajero' ? 'Pasajero' : 'Comunidad'; }
+  function estadoAlDia(t) { return t === 'pasajera' ? 'Pasajera al día' : t === 'pasajero' ? 'Pasajero al día' : 'Al día con la comunidad'; }
+  function opcionesTrato(actual) {
+    return '<fieldset class="pase-trato"><legend>¿Cómo querés que te nombremos en tu pase?</legend>' +
+      TRATOS.map(function (o) {
+        return '<label class="pase-trato-op"><input type="radio" name="trato" value="' + o[0] + '"' + (actual === o[0] ? ' checked' : '') + '> <span>' + o[1] + '</span></label>';
+      }).join('') + '</fieldset>';
+  }
+
+  // ---------- Socio: el boleto ----------
   function panelSocio(sesion) {
     API.miPase().then(function (p) {
       var nombre = esc(nombrePropio(p.nombre + ' ' + p.apellido));
@@ -276,8 +292,8 @@
       if (p.al_dia) {
         ticket =
           '<div class="ticket ticket--ok" aria-live="polite">' +
-          '<div class="ticket-head"><img src="assets/logo.png" alt="SUBE"><span>Comunidad de Pasajerxs</span></div>' +
-          '<div class="ticket-status"><span class="ticket-dot" aria-hidden="true"></span>Pasajerx al día</div>' +
+          '<div class="ticket-head"><img src="assets/logo.png" alt="SUBE"><span>Comunidad de pasajeros</span></div>' +
+          '<div class="ticket-status"><span class="ticket-dot" aria-hidden="true"></span>' + estadoAlDia(p.trato) + '</div>' +
           '<div class="ticket-name">' + nombre + '</div>' +
           '<div class="ticket-row"><span>Vigente hasta</span><strong>' + fechaCorta(p.vigente_hasta) + '</strong></div>' +
           '<div class="ticket-perf" aria-hidden="true"></div>' +
@@ -288,7 +304,7 @@
       } else {
         ticket =
           '<div class="ticket ticket--off">' +
-          '<div class="ticket-head"><img src="assets/logo.png" alt="SUBE"><span>Comunidad de Pasajerxs</span></div>' +
+          '<div class="ticket-head"><img src="assets/logo.png" alt="SUBE"><span>Comunidad de pasajeros</span></div>' +
           '<div class="ticket-status">Suscripción vencida</div>' +
           '<div class="ticket-name">' + nombre + '</div>' +
           (p.vigente_hasta ? '<div class="ticket-row"><span>Venció el</span><strong>' + fechaCorta(p.vigente_hasta) + '</strong></div>' : '') +
@@ -297,9 +313,31 @@
           '<a class="btn btn-primary" href="' + MP_LINK + '">Renovar mi aporte</a>' +
           '</div>';
       }
-      mostrar(barraSesion(sesion, 'Pasajerx') + '<div class="pase-ticket-wrap">' + ticket + '</div>' +
-        '<p class="pase-note">¿Algún dato está mal? Escribinos a <a href="mailto:laplatasube@gmail.com">laplatasube@gmail.com</a>.</p>');
+      // Quienes activaron su cuenta antes de esta opción la eligen una sola vez.
+      var pregunta = p.trato ? '' :
+        '<div class="pase-card pase-card--flat pase-trato-card"><form id="f-trato">' + opcionesTrato(null) +
+        '<button class="btn btn-primary" type="submit">Guardar</button></form><div id="f-error"></div></div>';
+      mostrar(barraSesion(sesion, rotuloTrato(p.trato)) + pregunta + '<div class="pase-ticket-wrap">' + ticket + '</div>' +
+        '<p class="pase-note">¿Algún dato está mal? Escribinos a <a href="mailto:laplatasube@gmail.com">laplatasube@gmail.com</a>.' +
+        (p.trato ? ' · <button type="button" class="pase-link" data-cambiar-trato>Cambiar cómo te nombramos</button>' : '') + '</p>');
       engancharSalir();
+      on('[data-cambiar-trato]', 'click', function () {
+        var nota = app.querySelector('.pase-ticket-wrap');
+        nota.insertAdjacentHTML('beforebegin', '<div class="pase-card pase-card--flat pase-trato-card"><form id="f-trato">' + opcionesTrato(p.trato) +
+          '<button class="btn btn-primary" type="submit">Guardar</button></form><div id="f-error"></div></div>');
+        app.querySelector('[data-cambiar-trato]').remove();
+        engancharTrato();
+      });
+      function engancharTrato() {
+        on('#f-trato', 'submit', function (e) {
+          e.preventDefault();
+          var elegido = e.target.querySelector('input[name=trato]:checked');
+          if (!elegido) return mostrarError('#f-error', 'Elegí una opción.');
+          var btn = e.target.querySelector('button[type=submit]'); ocupado(btn, true);
+          API.elegirTrato(elegido.value).then(function () { panelSocio(sesion); }, function (err) { ocupado(btn, false); mostrarError('#f-error', err); });
+        });
+      }
+      engancharTrato();
       if (p.al_dia) iniciarReloj();
     }, function () { API.salir().then(inicio); });
   }
@@ -318,7 +356,7 @@
   function panelComercio(sesion) {
     mostrar(barraSesion(sesion, 'Comercio') +
       '<div class="pase-card">' +
-      '<p class="eyebrow">Verificar socio</p><h2>¿Es socix de la comunidad?</h2>' +
+      '<p class="eyebrow">Verificar socio</p><h2>¿Está al día con la comunidad?</h2>' +
       '<p class="pase-sub">Escribí el nombre y el apellido tal como te lo dice la persona.</p>' +
       '<form class="pase-form pase-search" id="f-buscar" novalidate autocomplete="off">' +
       '<label class="sr-only" for="q">Nombre y apellido</label>' +
@@ -337,9 +375,9 @@
         ocupado(btn, false);
         var nombre = esc(q.trim());
         var html;
-        if (r.resultado === 'activo') html = '<div class="pase-result pase-result--ok"><span class="pase-result-icon">✔</span><div><strong>Socix activx</strong><span>' + nombre + ' está al día con la comunidad.</span></div></div>';
+        if (r.resultado === 'activo') html = '<div class="pase-result pase-result--ok"><span class="pase-result-icon">✔</span><div><strong>Al día</strong><span>' + nombre + ' está al día con la comunidad.</span></div></div>';
         else if (r.resultado === 'repetido') html = '<div class="pase-result pase-result--warn"><span class="pase-result-icon">!</span><div><strong>Hay más de un socio con ese nombre</strong><span>Pedile algún dato más (por ejemplo, su mail) y escribinos para confirmarlo.</span></div></div>';
-        else html = '<div class="pase-result pase-result--no"><span class="pase-result-icon">✘</span><div><strong>No figura como socix activx</strong><span>Revisá que el nombre y el apellido estén bien escritos.</span></div></div>';
+        else html = '<div class="pase-result pase-result--no"><span class="pase-result-icon">✘</span><div><strong>No figura al día</strong><span>Revisá que el nombre y el apellido estén bien escritos.</span></div></div>';
         $('#resultado').innerHTML = html;
         e.target.q.select();
       }, function (err) { ocupado(btn, false); $('#resultado').innerHTML = errorHtml(err.message); });
@@ -639,7 +677,7 @@
 
   // ---------- Registro de búsquedas ----------
   var RESULTADOS = {
-    activo: ['Activx', 'ok'], no_activo: ['Vencidx', 'no'], no_encontrado: ['No es socix', 'muted'], repetido: ['Nombre repetido', 'warn']
+    activo: ['Al día', 'ok'], no_activo: ['Vencido', 'no'], no_encontrado: ['No figura', 'muted'], repetido: ['Nombre repetido', 'warn']
   };
   function adminRegistro() {
     API.admin.busquedas().then(function (lista) {

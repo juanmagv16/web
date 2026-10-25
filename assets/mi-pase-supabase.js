@@ -133,6 +133,8 @@
       return rpc('mi_pase').then(function (p) { if (!p) throw new Error('No encontramos tu pase.'); return p; });
     },
 
+    elegirTrato: function (t) { return rpc('elegir_trato', { t: t }).then(function () {}); },
+
     verificarSocio: function (texto) {
       var palabras = normalizar(texto).split(' ').filter(Boolean);
       if (palabras.length < 2) return Promise.reject(new Error('Escribí nombre y apellido.'));

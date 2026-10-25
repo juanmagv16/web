@@ -163,7 +163,7 @@ HOME_BODY_TEMPLATE = '''  <section class="hero">
         <h1>Subite a este<br><span class="accent">viaje colectivo</span></h1>
         <div class="hero-sub">
           <p>Somos un canal platense hecho a pulmón. Creamos contenidos, generamos encuentros y construimos comunidad alrededor de la cultura local.</p>
-          <p>La Comunidad de Pasajerxs sostiene SUBE todos los meses. Sumándote, vos también sos parte y accedés a beneficios en una red de espacios amigos.</p>
+          <p>La Comunidad de pasajeros sostiene SUBE todos los meses. Sumándote, vos también sos parte y accedés a beneficios en una red de espacios amigos.</p>
         </div>
         <div class="hero-actions">
           <a href="comunidad.html#asociate" class="btn btn-primary">Subirme a la comunidad</a>
@@ -282,7 +282,7 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
     <div class="wrap">
       <div class="section-head">
         <h2>Beneficios para nuestra comunidad</h2>
-        <p>Espacios amigos que suman descuentos exclusivos para quienes sostienen a SUBE. Mostrá tu boleto de pasajerx desde <a href="mi-pase.html">Mi pase</a> y viajá con beneficios.</p>
+        <p>Espacios amigos que suman descuentos exclusivos para quienes sostienen a SUBE. Mostrá tu boleto desde <a href="mi-pase.html">Mi pase</a> y viajá con beneficios.</p>
       </div>
 
       <div class="carousel">
@@ -313,11 +313,11 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
       <a class="pass-cta" href="mi-pase.html">
         <span class="pass-cta-ticket" aria-hidden="true">
           <span class="pass-cta-ticket-top">SUBE</span>
-          <span class="pass-cta-ticket-mid">Pasajerx al día</span>
+          <span class="pass-cta-ticket-mid">Al día</span>
         </span>
         <span class="pass-cta-text">
           <span class="eyebrow">Mi pase</span>
-          <span class="pass-cta-title">¿Ya sos pasajerx? Entrá y mostrá tu boleto</span>
+          <span class="pass-cta-title">¿Ya sos parte de la comunidad? Entrá y mostrá tu boleto</span>
           <span class="pass-cta-desc">Con tu mail ves si estás al día y tenés tu boleto para mostrar en los comercios adheridos. Si tenés un comercio adherido, desde ahí también podés verificar socios.</span>
         </span>
         <span class="pass-cta-arrow" aria-hidden="true">→</span>
@@ -330,7 +330,7 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
       <div class="section-head">
         <p class="eyebrow">Asociate</p>
         <h2>Elegí cómo subirte</h2>
-        <p>Tu aporte sostiene la producción de Sube Canal y te suma a la Comunidad de Pasajerxs, con acceso a todos los beneficios de la red.</p>
+        <p>Tu aporte sostiene la producción de Sube Canal y te suma a la Comunidad de pasajeros, con acceso a todos los beneficios de la red.</p>
       </div>
 
       <div class="plans">
@@ -815,15 +815,15 @@ def write_news_articles(notes):
 AVISO_PRIVACIDAD = '''<h3>Aviso de privacidad de Mi pase</h3>
 <p><em>Borrador para revisar por el equipo de Sube.</em></p>
 <p><strong>Quién es responsable.</strong> Sube Canal (La Plata) es responsable de los datos que se usan en Mi pase. Podés escribirnos a <a href="mailto:laplatasube@gmail.com">laplatasube@gmail.com</a>.</p>
-<p><strong>Qué datos usamos.</strong> Tu nombre y apellido, tu mail, el estado de tu aporte a la Comunidad de Pasajerxs y la fecha hasta la que está vigente. No guardamos datos de tarjetas ni de pagos: los pagos se hacen en Mercado Pago.</p>
+<p><strong>Qué datos usamos.</strong> Tu nombre y apellido, tu mail, el estado de tu aporte a la Comunidad de pasajeros, la fecha hasta la que está vigente y, si lo elegís, cómo querés que te nombremos en tu pase (pasajera o pasajero). No guardamos datos de tarjetas ni de pagos: los pagos se hacen en Mercado Pago.</p>
 <p><strong>Para qué.</strong> Para que puedas ingresar a tu cuenta, ver tu boleto y usar los beneficios de la comunidad.</p>
-<p><strong>Comercios adheridos.</strong> Los comercios de la red pueden buscarte por nombre y apellido para confirmar si estás al día. Solo ven la respuesta (activx o no), nunca tu mail ni otros datos. Sube registra qué comercio hizo cada verificación y cuándo, para cuidar el buen uso de la herramienta y conocer cómo se usan los beneficios.</p>
+<p><strong>Comercios adheridos.</strong> Los comercios de la red pueden buscarte por nombre y apellido para confirmar si estás al día. Solo ven la respuesta (al día o no), nunca tu mail ni otros datos. Sube registra qué comercio hizo cada verificación y cuándo, para cuidar el buen uso de la herramienta y conocer cómo se usan los beneficios.</p>
 <p><strong>Tus derechos.</strong> Podés pedir ver, corregir o borrar tus datos escribiéndonos al mail de arriba, según la Ley 25.326 de Protección de Datos Personales. La Agencia de Acceso a la Información Pública es el organismo de control de esta ley.</p>'''
 
 MI_PASE_BODY = '''  <section class="pase-page">
     <div class="wrap">
       <div class="pase-head">
-        <span class="eyebrow">Comunidad de Pasajerxs</span>
+        <span class="eyebrow">Comunidad de pasajeros</span>
         <h1>Mi pase</h1>
         <p>Tu boleto para usar los beneficios de la comunidad, y la herramienta de verificación para los comercios adheridos.</p>
       </div>
@@ -1117,7 +1117,7 @@ if __name__ == "__main__":
         "index.html",
         page_html(
             "SUBE :: Un viaje colectivo por La Plata",
-            "SUBE es un canal platense hecho a pulmón. Conocé los beneficios de la Comunidad de Pasajerxs y sumate como socix.",
+            "SUBE es un canal platense hecho a pulmón. Conocé los beneficios de la Comunidad de pasajeros y sumate.",
             HOME_BODY,
             depth=0,
             active=None,
@@ -1128,7 +1128,7 @@ if __name__ == "__main__":
         "comunidad.html",
         page_html(
             "Comunidad · SUBE",
-            "La Comunidad de Pasajerxs de SUBE: beneficios en comercios amigos y cómo sumarte con tu aporte.",
+            "La Comunidad de pasajeros de SUBE: beneficios en comercios amigos y cómo sumarte con tu aporte.",
             COMUNIDAD_BODY,
             depth=0,
             active="comunidad",
@@ -1162,7 +1162,7 @@ if __name__ == "__main__":
         "mi-pase.html",
         page_html(
             "Mi pase · SUBE",
-            "Mi pase: el boleto de la Comunidad de Pasajerxs de SUBE y la verificación de socios para comercios adheridos.",
+            "Mi pase: el boleto de la Comunidad de pasajeros de SUBE y la verificación de socios para comercios adheridos.",
             MI_PASE_BODY,
             depth=0,
             active="mipase",

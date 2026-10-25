@@ -24,7 +24,7 @@ Activá tu cuenta de Mi pase · SUBE
 ```html
 <div style="margin:0;padding:32px 16px;background:#0b0b0b;font-family:Arial,Helvetica,sans-serif;">
   <div style="max-width:480px;margin:0 auto;background:#151512;border-radius:16px;padding:32px;color:#f5f5f0;">
-    <p style="margin:0 0 8px;font-size:12px;font-weight:bold;letter-spacing:2px;color:#c1ff00;">COMUNIDAD DE PASAJERXS</p>
+    <p style="margin:0 0 8px;font-size:12px;font-weight:bold;letter-spacing:2px;color:#c1ff00;">COMUNIDAD DE PASAJEROS</p>
     <h1 style="margin:0 0 16px;font-size:26px;line-height:1.2;color:#f5f5f0;">Activá tu cuenta de Mi pase</h1>
     <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#d6d6d0;">Tocá el botón para entrar a Mi pase y elegir tu contraseña. Desde ahí vas a poder mostrar tu boleto en los comercios adheridos de la comunidad.</p>
     <p style="margin:0 0 28px;"><a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#c1ff00;color:#0b0b0b;text-decoration:none;font-weight:bold;font-size:15px;padding:14px 28px;border-radius:999px;">Activar mi cuenta</a></p>
@@ -50,7 +50,7 @@ Tu link para entrar a Mi pase · SUBE
 ```html
 <div style="margin:0;padding:32px 16px;background:#0b0b0b;font-family:Arial,Helvetica,sans-serif;">
   <div style="max-width:480px;margin:0 auto;background:#151512;border-radius:16px;padding:32px;color:#f5f5f0;">
-    <p style="margin:0 0 8px;font-size:12px;font-weight:bold;letter-spacing:2px;color:#c1ff00;">COMUNIDAD DE PASAJERXS</p>
+    <p style="margin:0 0 8px;font-size:12px;font-weight:bold;letter-spacing:2px;color:#c1ff00;">COMUNIDAD DE PASAJEROS</p>
     <h1 style="margin:0 0 16px;font-size:26px;line-height:1.2;color:#f5f5f0;">Entrá a Mi pase</h1>
     <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#d6d6d0;">Pediste un link para entrar a Mi pase. Al tocar el botón vas a poder elegir una contraseña nueva.</p>
     <p style="margin:0 0 28px;"><a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#c1ff00;color:#0b0b0b;text-decoration:none;font-weight:bold;font-size:15px;padding:14px 28px;border-radius:999px;">Entrar y elegir contraseña</a></p>

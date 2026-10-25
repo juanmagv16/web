@@ -17,7 +17,7 @@
    ============================================ */
 (function () {
   var MODO = 'demo';
-  var KEY = 'sube-mi-pase-demo-v1';
+  var KEY = 'sube-mi-pase-demo-v2';
   var SESSION_KEY = 'sube-mi-pase-demo-sesion';
 
   function hoyISO(offsetDias) {
@@ -46,7 +46,7 @@
       return {
         id: 's' + (i + 1), nombre: s[0], apellido: s[1], mail: s[2],
         estado: s[3], vigente_hasta: s[4], clave: s[5],
-        acepto_privacidad: !!s[5], creado: hoyISO(-90)
+        acepto_privacidad: !!s[5], creado: hoyISO(-90), trato: s[5] ? 'pasajera' : null
       };
     });
     var comercios = [
@@ -213,7 +213,14 @@
       var s = leerSesion(); if (!s || s.rol !== 'socio') return error('Tenés que ingresar.');
       var u = leer().socios.find(function (x) { return x.id === s.id; });
       return esperar({ nombre: u.nombre, apellido: u.apellido, mail: u.mail,
-        al_dia: estaAlDia(u), vigente_hasta: u.vigente_hasta || null });
+        al_dia: estaAlDia(u), vigente_hasta: u.vigente_hasta || null, trato: u.trato || null });
+    },
+
+    elegirTrato: function (t) {
+      var s = leerSesion(); if (!s || s.rol !== 'socio') return error('Tenés que ingresar.');
+      if (['pasajera', 'pasajero', 'neutro'].indexOf(t) < 0) return error('Opción no válida.');
+      leer().socios.find(function (x) { return x.id === s.id; }).trato = t; guardar();
+      return esperar(true);
     },
 
     // ---- Comercio ----

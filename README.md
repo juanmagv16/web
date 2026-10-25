@@ -1,6 +1,6 @@
 # Sube Canal
 
-Sitio web de Sube Canal: presenta los beneficios de la Comunidad de Pasajerxs y permite asociarse mediante Mercado Pago.
+Sitio web de Sube Canal: presenta los beneficios de la Comunidad de pasajeros y permite asociarse mediante Mercado Pago.
 
 Es un sitio estático (HTML + CSS puro, sin build ni dependencias) pensado para alojarse gratis en **GitHub Pages**.
 
