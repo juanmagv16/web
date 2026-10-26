@@ -19,9 +19,12 @@
     : [SUPABASE_JS, base + 'mi-pase-supabase.js'];
 
   pasos.reduce(function (p, src) { return p.then(function () { return cargar(src); }); }, Promise.resolve())
-    .then(function () { return cargar(base + 'mi-pase.js'); })
+    .then(function () {
+      // La página pública de verificación de credenciales usa su propio archivo.
+      return cargar(base + (document.getElementById('cred-verif') ? 'credencial.js' : 'mi-pase.js'));
+    })
     .catch(function () {
-      var app = document.getElementById('pase-app');
+      var app = document.getElementById('pase-app') || document.getElementById('cred-verif');
       if (app) app.innerHTML = '<p class="pase-error" role="alert">No pudimos cargar Mi pase. Revisá tu conexión a internet y recargá la página.</p>';
     });
 })();

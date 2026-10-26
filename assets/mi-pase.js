@@ -5,8 +5,11 @@
    y ven su boleto "vivo" (nombre, vigencia y hora en tiempo real).
    Comercios adheridos: buscan a una persona por nombre y apellido
    y ven si está activo o no.
+   Redacción (entrada oculta: mi-pase.html#redaccion): credencial con
+   código QR para verificarla y portal de trabajo del equipo.
    Equipo de Sube: carga el Excel mensual de la comunidad, da de alta
-   y de baja comercios y ve el registro de búsquedas.
+   y de baja comercios y personas de la redacción, y ve el registro
+   de búsquedas.
 
    Los datos los maneja window.SubePase (assets/mi-pase-datos.js).
    ============================================ */
@@ -17,6 +20,8 @@
   var DEMO = API.modo === 'demo';
   var MP_LINK = 'comunidad.html#asociate';
   var XLSX_URL = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  var QR_URL = 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js';
+  var AREAS = ['Redacción', 'Edición', 'Corrección', 'Fotografía', 'Producción', 'Coordinación'];
   var relojTimer = null;
 
   // ---------- Utilidades ----------
@@ -99,6 +104,7 @@
       '<li><b>Persona sin activar:</b> bruno.ejemplo@ejemplo.com (tocá "Activar mi cuenta")</li>' +
       '<li><b>Comercio:</b> casachicha@demo.subecanal.com.ar · clave <code>sube1234</code></li>' +
       '<li><b>Equipo Sube:</b> finanzas@demo.subecanal.com.ar · clave <code>sube1234</code></li>' +
+      '<li><b>Redacción</b> (entrada oculta, <a href="mi-pase.html?demo#redaccion">mi-pase.html#redaccion</a>): redaccion@demo.subecanal.com.ar · clave <code>sube1234</code></li>' +
       '</ul>' +
       '<button type="button" class="pase-link" data-reiniciar-demo>Volver a los datos de ejemplo</button>' +
       '</details></div>';
@@ -145,6 +151,8 @@
       ayuda: '¿Es la primera vez que entrás? Activá tu cuenta con el mail con el que te suscribiste.' },
     comercio: { titulo: 'Ingreso de comercios', eyebrow: 'Comercio adherido',
       ayuda: '¿Primera vez? Activá la cuenta con el mail que le diste a Sube.' },
+    redaccion: { titulo: 'Portal de la redacción', eyebrow: 'Redacción SUBE',
+      ayuda: '¿Primera vez? Activá tu cuenta con el mail que le diste a la coordinación.' },
     admin: { titulo: 'Equipo Sube', eyebrow: 'Administración', ayuda: '' }
   };
 
@@ -189,7 +197,9 @@
       '<h2>' + (olvido ? 'Recuperar contraseña' : 'Activar mi cuenta') + '</h2>' +
       '<p class="pase-sub">' + (rol === 'socio'
         ? 'Escribí el mail con el que te suscribiste en Mercado Pago. Te vamos a mandar un link para que elijas tu contraseña.'
-        : 'Escribí el mail del comercio. Te vamos a mandar un link para que elijas la contraseña.') + '</p>' +
+        : rol === 'redaccion'
+          ? 'Escribí el mail con el que te sumaron a la redacción. Te vamos a mandar un link para que elijas tu contraseña.'
+          : 'Escribí el mail del comercio. Te vamos a mandar un link para que elijas la contraseña.') + '</p>' +
       '<form class="pase-form" id="f-enlace" novalidate>' +
       '<label>Mail<input type="email" name="mail" autocomplete="email" required autofocus></label>' +
       '<div id="f-error"></div>' +
@@ -236,7 +246,9 @@
       '<label>Repetila<input type="password" name="clave2" autocomplete="new-password" required></label>' +
       (rol === 'socio'
         ? '<label class="pase-check"><input type="checkbox" name="privacidad"> <span>Leí y acepto el aviso de privacidad de Sube.</span></label>' + PRIVACIDAD
-        : '') +
+        : rol === 'redaccion'
+          ? '<label class="pase-check"><input type="checkbox" name="privacidad"> <span>Acepto que mi nombre, mi área y mi sección se muestren a quien verifique mi credencial con el código QR.</span></label>'
+          : '') +
       '<div id="f-error"></div>' +
       '<button class="btn btn-primary" type="submit">Guardar y entrar</button>' +
       '</form></div>'
@@ -259,17 +271,19 @@
     if (!sesion) return inicio();
     if (sesion.rol === 'socio') return panelSocio(sesion);
     if (sesion.rol === 'comercio') return panelComercio(sesion);
+    if (sesion.rol === 'redaccion') return panelRedaccion(sesion);
     return panelAdmin(sesion, 'socios');
   }
 
   function barraSesion(sesion, rotulo) {
-    return '<div class="pase-session"><span>' + rotulo + ' · <strong>' + esc(sesion.rol === 'socio' ? nombrePropio(sesion.nombre) : sesion.nombre) + '</strong></span>' +
-      '<button type="button" class="pase-link" data-salir>Salir</button></div>';
+    var nombre = sesion.rol === 'socio' || sesion.rol === 'redaccion' ? nombrePropio(sesion.nombre) : sesion.nombre;
+    return '<div class="pase-session"><span>' + rotulo + ' · <strong>' + esc(nombre) + '</strong></span>' +
+      '<span class="pase-session-actions"><button type="button" class="pase-link" data-salir>Salir</button></span></div>';
   }
   function engancharSalir() { on('[data-salir]', 'click', function () { API.salir().then(inicio); }); }
 
   // ---------- Socio: el boleto ----------
-  function panelSocio(sesion) {
+  function panelSocio(sesion, volver) {
     API.miPase().then(function (p) {
       var nombre = esc(nombrePropio(p.nombre + ' ' + p.apellido));
       var ticket;
@@ -297,9 +311,12 @@
           '<a class="btn btn-primary" href="' + MP_LINK + '">Renovar mi aporte</a>' +
           '</div>';
       }
-      mostrar(barraSesion(sesion, 'Mi pase') + '<div class="pase-ticket-wrap">' + ticket + '</div>' +
+      mostrar(barraSesion(sesion, 'Mi pase') +
+        (volver ? '<button type="button" class="pase-back" data-volver-cred>← Volver a mi credencial</button>' : '') +
+        '<div class="pase-ticket-wrap">' + ticket + '</div>' +
         '<p class="pase-note">¿Algún dato está mal? Escribinos a <a href="mailto:laplatasube@gmail.com">laplatasube@gmail.com</a>.</p>');
       engancharSalir();
+      on('[data-volver-cred]', 'click', volver);
       if (p.al_dia) iniciarReloj();
     }, function () { API.salir().then(inicio); });
   }
@@ -312,6 +329,73 @@
       if (fecha) fecha.textContent = DIAS[d.getDay()] + ' ' + d.getDate() + ' de ' + MESES[d.getMonth()];
     }
     tick(); relojTimer = setInterval(tick, 1000);
+  }
+
+  // ---------- Redacción: credencial y portal de trabajo ----------
+  function numeroCredencial(n) { return 'R-' + ('000' + n).slice(-4); }
+  function urlVerificacion(codigo) {
+    return new URL('credencial.html?c=' + encodeURIComponent(codigo) + (DEMO ? '&demo' : ''), window.location.href).href;
+  }
+  function cargarQR() {
+    if (window.qrcode) return Promise.resolve(window.qrcode);
+    return new Promise(function (ok, mal) {
+      var s = document.createElement('script');
+      s.src = QR_URL; s.onload = function () { ok(window.qrcode); };
+      s.onerror = function () { mal(new Error('sin QR')); };
+      document.head.appendChild(s);
+    });
+  }
+  function credencialHtml(c) {
+    var area = esc(c.area) + (c.seccion ? ' · ' + esc(c.seccion) : '');
+    return '<div class="credencial" aria-live="polite">' +
+      '<div class="cred-band" aria-hidden="true"><span>PRENSA</span></div>' +
+      '<div class="cred-body">' +
+      '<div class="ticket-head"><img src="assets/logo.png" alt="SUBE"><span>Redacción SUBE</span></div>' +
+      '<div class="ticket-status"><span class="ticket-dot" aria-hidden="true"></span>Credencial vigente</div>' +
+      '<div class="ticket-name">' + esc(nombrePropio(c.nombre + ' ' + c.apellido)) + '</div>' +
+      '<div class="cred-area">' + area + '</div>' +
+      '<div class="cred-datos"><div><span>N.º</span><strong>' + numeroCredencial(c.numero) + '</strong></div>' +
+      '<div><span>Desde</span><strong>' + fechaCorta(c.desde) + '</strong></div></div>' +
+      '<div class="cred-qr-wrap"><div class="cred-qr" id="cred-qr" role="img" aria-label="Código QR para verificar la credencial"></div>' +
+      '<div class="ticket-clock"><span class="ticket-time" id="t-hora">--:--:--</span><span class="ticket-date" id="t-fecha"></span></div></div>' +
+      '<p class="ticket-foot">Mostrá esta credencial en coberturas. Con el código QR, cualquiera puede comprobar que es válida.</p>' +
+      '</div></div>';
+  }
+  function portalHtml(enlaces) {
+    if (!enlaces.length) return '';
+    return '<section class="portal"><h3 class="pase-h3">Portal de trabajo</h3><div class="portal-grid">' +
+      enlaces.map(function (l) {
+        var externo = /^https?:/.test(l.url);
+        return '<a class="portal-link" href="' + esc(l.url) + '"' + (externo ? ' target="_blank" rel="noopener"' : '') + '>' +
+          '<span class="portal-title">' + esc(l.titulo) + '</span>' +
+          (l.descripcion ? '<span class="portal-desc">' + esc(l.descripcion) + '</span>' : '') +
+          '<span class="portal-arrow" aria-hidden="true">→</span></a>';
+      }).join('') + '</div></section>';
+  }
+
+  // volverAdmin: cuando alguien del equipo que también es de la redacción mira su credencial.
+  function panelRedaccion(sesion, volverAdmin) {
+    Promise.all([API.miCredencial(), API.portal().catch(function () { return []; }), API.tambienSocio()]).then(function (r) {
+      var c = r[0], enlaces = r[1], esSocio = r[2];
+      if (!c) { API.salir().then(inicio); return; }
+      mostrar(barraSesion(sesion, 'Redacción') +
+        (volverAdmin ? '<button type="button" class="pase-back" data-volver-admin>← Volver al panel del equipo</button>' : '') +
+        '<div class="pase-ticket-wrap">' + credencialHtml(c) + '</div>' +
+        (esSocio ? '<p class="pase-note"><button type="button" class="pase-link" data-ver-boleto>Ver mi boleto de la comunidad de pasajeros</button></p>' : '') +
+        portalHtml(enlaces) +
+        '<p class="pase-note">¿Algún dato de tu credencial está mal? Escribinos a <a href="mailto:laplatasube@gmail.com">laplatasube@gmail.com</a>.</p>');
+      engancharSalir();
+      on('[data-volver-admin]', 'click', function () { panelAdmin(sesion, 'redaccion'); });
+      on('[data-ver-boleto]', 'click', function () { panelSocio(sesion, function () { panelRedaccion(sesion, volverAdmin); }); });
+      iniciarReloj();
+      var url = urlVerificacion(c.codigo);
+      cargarQR().then(function (qrcode) {
+        var qr = qrcode(0, 'M'); qr.addData(url); qr.make();
+        var box = $('#cred-qr'); if (box) box.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+      }).catch(function () {
+        var box = $('#cred-qr'); if (box) box.innerHTML = '<a class="cred-qr-link" href="' + esc(url) + '">Verificar credencial</a>';
+      });
+    }, function (err) { mostrar(errorHtml(err.message)); });
   }
 
   // ---------- Comercio: buscador ----------
@@ -349,7 +433,7 @@
   // ============================================
   // ADMINISTRACIÓN
   // ============================================
-  var PESTANAS = [['socios', 'Comunidad'], ['excel', 'Cargar Excel'], ['comercios', 'Comercios'], ['registro', 'Registro de búsquedas']];
+  var PESTANAS = [['socios', 'Comunidad'], ['excel', 'Cargar Excel'], ['comercios', 'Comercios'], ['redaccion', 'Redacción'], ['registro', 'Registro de búsquedas']];
 
   function panelAdmin(sesion, pestana) {
     mostrar(barraSesion(sesion, 'Equipo Sube') +
@@ -360,7 +444,14 @@
     app.querySelectorAll('[data-tab]').forEach(function (b) {
       b.addEventListener('click', function () { panelAdmin(sesion, b.getAttribute('data-tab')); });
     });
-    ({ socios: adminSocios, excel: adminExcel, comercios: adminComercios, registro: adminRegistro })[pestana](sesion);
+    ({ socios: adminSocios, excel: adminExcel, comercios: adminComercios, redaccion: adminRedaccion, registro: adminRegistro })[pestana](sesion);
+    // Si además es de la redacción, puede ver su credencial.
+    API.miCredencial().then(function (c) {
+      var acciones = $('.pase-session-actions');
+      if (!c || !acciones) return;
+      acciones.insertAdjacentHTML('afterbegin', '<button type="button" class="pase-link" data-mi-credencial>Mi credencial</button>');
+      on('[data-mi-credencial]', 'click', function () { panelRedaccion(sesion, true); });
+    }, function () { /* sin credencial */ });
   }
 
   function badge(txt, tipo) { return '<span class="pase-badge pase-badge--' + tipo + '">' + txt + '</span>'; }
@@ -637,6 +728,76 @@
     });
   }
 
+  // ---------- Redacción ----------
+  function selectArea(nombre, actual) {
+    return '<select name="' + nombre + '">' + AREAS.map(function (a) {
+      return '<option' + (a === actual ? ' selected' : '') + '>' + a + '</option>';
+    }).join('') + '</select>';
+  }
+  function adminRedaccion(sesion) {
+    API.admin.redaccion().then(function (lista) {
+      var activas = lista.filter(function (p) { return p.activo; });
+      $('#admin-body').innerHTML =
+        '<div class="pase-stats">' + stat(activas.length, 'personas con credencial vigente') +
+        stat(activas.filter(function (p) { return p.cuenta_activada; }).length, 'activaron su cuenta') + '</div>' +
+        '<div class="pase-card pase-card--flat"><h3>Sumar a alguien de la redacción</h3>' +
+        '<p class="pase-sub">Le llega un mail para activar su cuenta. Después entra desde <strong>mi-pase.html#redaccion</strong> (esa entrada no figura en la web) y ve su credencial y el portal de trabajo.</p>' +
+        '<form class="pase-form pase-form--row" id="f-redaccion" novalidate>' +
+        '<label>Nombre<input name="nombre" required></label>' +
+        '<label>Apellido<input name="apellido"></label>' +
+        '<label>Mail<input name="mail" type="email" required placeholder="nombre@mail.com"></label>' +
+        '<label>Área' + selectArea('area', 'Redacción') + '</label>' +
+        '<label>Sección<input name="seccion" placeholder="Ej: Deportes"></label>' +
+        '<button class="btn btn-primary" type="submit">Sumar</button></form><div id="f-error"></div></div>' +
+        '<div class="pase-table-wrap"><table class="pase-table"><thead><tr><th>N.º</th><th>Nombre</th><th>Área</th><th>Sección</th><th>Desde</th><th>Cuenta</th><th>Estado</th><th></th></tr></thead><tbody>' +
+        (lista.map(function (p) {
+          return '<tr data-id="' + p.id + '"><td>' + numeroCredencial(p.numero) + '</td><td>' + esc(nombrePropio(p.nombre + ' ' + p.apellido)) +
+            '<br><span class="pase-muted">' + esc(p.mail) + '</span></td><td>' + selectArea('area-' + p.id, p.area) + '</td>' +
+            '<td><input class="pase-inline" name="seccion-' + p.id + '" value="' + esc(p.seccion) + '" placeholder="—"></td>' +
+            '<td>' + fechaCorta(p.desde) + '</td><td>' + (p.cuenta_activada ? 'Activada' : '<span class="pase-muted">Sin activar</span>') + '</td><td>' +
+            (p.activo ? badge('Vigente', 'ok') : badge('Dada de baja', 'no')) + '</td><td class="pase-cell-actions">' +
+            '<button type="button" class="pase-link" data-guardar="' + p.id + '" hidden>Guardar</button>' +
+            '<button type="button" class="pase-link" data-baja="' + p.id + '" data-activo="' + (p.activo ? '1' : '0') + '">' +
+            (p.activo ? 'Dar de baja' : 'Reactivar') + '</button></td></tr>';
+        }).join('') || '<tr><td colspan="8" class="pase-muted">Todavía no hay nadie cargado.</td></tr>') +
+        '</tbody></table></div>' +
+        '<p class="pase-note">Los accesos del portal de trabajo se editan en Supabase: Table Editor → <strong>portal_enlaces</strong>.</p>';
+      app.querySelectorAll('tr[data-id]').forEach(function (tr) {
+        var id = tr.getAttribute('data-id'), btn = tr.querySelector('[data-guardar]');
+        tr.querySelectorAll('select, input').forEach(function (el) {
+          el.addEventListener('input', function () { btn.hidden = false; });
+          el.addEventListener('change', function () { btn.hidden = false; });
+        });
+        btn.addEventListener('click', function () {
+          ocupado(btn, true);
+          API.admin.editarRedaccion(id, { area: tr.querySelector('select').value, seccion: tr.querySelector('input').value.trim() })
+            .then(function () { adminRedaccion(sesion); }, function (err) { ocupado(btn, false); alert(err.message); });
+        });
+      });
+      app.querySelectorAll('[data-baja]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var activo = b.getAttribute('data-activo') === '1';
+          if (activo && !confirm('¿Dar de baja esta credencial? Deja de ser válida al instante y la persona ya no puede entrar al portal.')) return;
+          API.admin.editarRedaccion(b.getAttribute('data-baja'), { activo: !activo }).then(function () { adminRedaccion(sesion); });
+        });
+      });
+      on('#f-redaccion', 'submit', function (e) {
+        e.preventDefault();
+        var f = e.target, btn = f.querySelector('button[type=submit]'); ocupado(btn, true);
+        API.admin.agregarRedaccion({ nombre: f.nombre.value, apellido: f.apellido.value, mail: f.mail.value, area: f.area.value, seccion: f.seccion.value })
+          .then(function (r) {
+            adminRedaccion(sesion);
+            setTimeout(function () {
+              var box = $('#f-error');
+              if (box && r.aviso) { box.innerHTML = '<p class="pase-help">' + esc(r.aviso) + '</p>'; return; }
+              if (box) box.innerHTML = '<p class="pase-ok">Listo: le mandamos el link a ' + esc(r.enviado_a) + '.' +
+                (DEMO ? ' <span class="pase-muted">(En la demostración no se envía el mail.)</span>' : '') + '</p>';
+            }, 300);
+          }, function (err) { ocupado(btn, false); mostrarError('#f-error', err); });
+      });
+    }, function (err) { $('#admin-body').innerHTML = errorHtml(err.message); });
+  }
+
   // ---------- Registro de búsquedas ----------
   var RESULTADOS = {
     activo: ['Al día', 'ok'], no_activo: ['Vencido', 'no'], no_encontrado: ['No figura', 'muted'], repetido: ['Nombre repetido', 'warn']
@@ -701,7 +862,7 @@
     return API.sesionActual().then(function (s) {
       if (s) return panel(s);
       var h = (location.hash || '').replace('#', '');
-      if (h === 'comercio' || h === 'socio' || h === 'admin') return ingreso(h);
+      if (h === 'comercio' || h === 'socio' || h === 'admin' || h === 'redaccion') return ingreso(h);
       inicio();
     });
   });

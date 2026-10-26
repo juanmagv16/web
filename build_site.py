@@ -963,6 +963,24 @@ MI_PASE_BODY = '''  <section class="pase-page">
 '''.format(aviso=AVISO_PRIVACIDAD)
 
 
+# Página pública que abre el código QR de las credenciales de la redacción.
+# No figura en el menú.
+CREDENCIAL_BODY = '''  <section class="pase-page">
+    <div class="wrap">
+      <div class="pase-head">
+        <span class="eyebrow">Redacción SUBE</span>
+        <h1>Verificar credencial</h1>
+        <p>Comprobá si una credencial de prensa de SUBE es válida.</p>
+      </div>
+      <div id="cred-verif" class="cred-verif" aria-live="polite">
+        <p class="pase-loading">Comprobando…</p>
+        <noscript><p class="pase-error">Para comprobar la credencial necesitás tener JavaScript activado.</p></noscript>
+      </div>
+    </div>
+  </section>
+'''
+
+
 TIENDA_BODY = '''  <section class="soon">
     <div class="wrap">
       <div class="section-head">
@@ -1286,6 +1304,17 @@ if __name__ == "__main__":
             MI_PASE_BODY,
             depth=0,
             active="mipase",
+            extra_scripts=["mi-pase-config.js", "mi-pase-inicio.js"],
+        ),
+    )
+    write(
+        "credencial.html",
+        page_html(
+            "Verificar credencial · Redacción SUBE",
+            "Verificación de credenciales de prensa de la redacción de SUBE.",
+            CREDENCIAL_BODY,
+            depth=0,
+            active=None,
             extra_scripts=["mi-pase-config.js", "mi-pase-inicio.js"],
         ),
     )

@@ -23,6 +23,7 @@
   function hoyISO(offsetDias) {
     var d = new Date();
     d.setDate(d.getDate() + (offsetDias || 0));
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); // fecha local, no la de Greenwich
     return d.toISOString().slice(0, 10);
   }
 
@@ -63,7 +64,7 @@
       [-6, 'c2', 'Ana Demo'], [-3, 'c1', 'Lucía Simulada'], [-2, 'c1', 'Persona Desconocida'],
       [-1, 'c2', 'Juan Repetido']
     ];
-    var estado = { socios: socios, comercios: comercios, busquedas: busquedas, admins: [
+    var estado = { socios: socios, comercios: comercios, busquedas: busquedas, redaccion: redaccionDemo(), admins: [
       { id: 'a1', nombre: 'Finanzas (demo)', mail: 'finanzas@demo.subecanal.com.ar', clave: 'sube1234' }
     ] };
     ejemplos.forEach(function (e) {
@@ -73,13 +74,36 @@
     return estado;
   }
 
+  function redaccionDemo() {
+    return [
+      ['Rocío', 'Demo', 'redaccion@demo.subecanal.com.ar', 'Redacción', 'Deportes', true, 'sube1234', -40],
+      ['Martín', 'Ejemplo', 'edicion@demo.subecanal.com.ar', 'Edición', '', true, null, -120],
+      ['Paula', 'Prueba', 'baja@demo.subecanal.com.ar', 'Fotografía', 'Cultura', false, 'sube1234', -200]
+    ].map(function (r, i) {
+      return { id: 'r' + (i + 1), numero: i + 1, nombre: r[0], apellido: r[1], mail: r[2], area: r[3], seccion: r[4],
+        activo: r[5], clave: r[6], desde: hoyISO(r[7]), codigo: '00000000-0000-4000-8000-00000000000' + (i + 1),
+        acepto_privacidad: !!r[6] };
+    });
+  }
+  var PORTAL_DEMO = [
+    { titulo: 'Escribir una nota', descripcion: 'Panel de redacción: notas, fotos y flujo editorial. Se entra con tu cuenta de GitHub.', url: 'admin/' },
+    { titulo: 'Cómo publicar una nota', descripcion: 'Guía paso a paso del panel y reglas para que el sitio se vea ordenado.', url: 'https://github.com/juanmagv16/web/blob/main/redaccion/ayuda/LEEME.md' },
+    { titulo: 'Noticias publicadas', descripcion: 'Cómo se ve hoy la sección en la web.', url: 'noticias.html' },
+    { titulo: 'Programación', descripcion: 'La grilla semanal de SUBE.', url: 'programacion.html' },
+    { titulo: 'Escribirle a la coordinación', descripcion: 'Coberturas, dudas y pedidos.', url: 'mailto:laplatasube@gmail.com' }
+  ];
+
   // ---------- Guardado (navegador de quien prueba) ----------
   var memoria = null;
   function leer() {
     if (memoria) return memoria;
     try {
       var raw = localStorage.getItem(KEY);
-      if (raw) { memoria = JSON.parse(raw); return memoria; }
+      if (raw) {
+        memoria = JSON.parse(raw);
+        if (!memoria.redaccion) { memoria.redaccion = redaccionDemo(); guardar(); }
+        return memoria;
+      }
     } catch (e) { /* sin almacenamiento: se usa memoria */ }
     memoria = semilla();
     guardar();
@@ -138,6 +162,13 @@
     return resultado;
   }
 
+  function listaDe(db, rol) {
+    return rol === 'socio' ? db.socios : rol === 'comercio' ? db.comercios : rol === 'redaccion' ? db.redaccion : db.admins;
+  }
+  function credencialDe(r) {
+    return { nombre: r.nombre, apellido: r.apellido, area: r.area, seccion: r.seccion, desde: r.desde, numero: r.numero, codigo: r.codigo };
+  }
+
   // ---------- Activaciones (en la versión real llegan por mail) ----------
   var enlaces = {};
   function crearEnlace(tipo, id) {
@@ -161,11 +192,11 @@
 
     ingresar: function (rol, mail, clave) {
       var db = leer(); mail = normalizarMail(mail);
-      var lista = rol === 'socio' ? db.socios : rol === 'comercio' ? db.comercios : db.admins;
-      var u = lista.find(function (x) { return x.mail === mail; });
+      var u = listaDe(db, rol).find(function (x) { return x.mail === mail; });
       if (!u || !u.clave) return error(u ? 'Tu cuenta todavía no está activada. Tocá "Activar mi cuenta".' : 'El mail o la contraseña no son correctos.');
       if (u.clave !== clave) return error('El mail o la contraseña no son correctos.');
       if (rol === 'comercio' && !u.activo) return error('La cuenta de este comercio está dada de baja. Escribinos a laplatasube@gmail.com.');
+      if (rol === 'redaccion' && !u.activo) return error('Tu credencial de redacción está dada de baja. Si creés que es un error, escribinos a laplatasube@gmail.com.');
       var s = { rol: rol, id: u.id, nombre: rol === 'socio' ? u.nombre : u.nombre, mail: u.mail };
       guardarSesion(s);
       return esperar(copia(s));
@@ -179,14 +210,15 @@
     pedirEnlace: function (rol, mail) {
       var db = leer(); mail = normalizarMail(mail);
       if (!mailValido(mail)) return error('Revisá el mail: parece estar mal escrito.');
-      var lista = rol === 'socio' ? db.socios : db.comercios;
-      var u = lista.find(function (x) { return x.mail === mail; });
+      var u = listaDe(db, rol).find(function (x) { return x.mail === mail; });
       if (!u) {
         return error(rol === 'socio'
           ? 'No encontramos ese mail en la comunidad.'
-          : 'Ese mail no corresponde a ningún comercio adherido.');
+          : rol === 'redaccion'
+            ? 'Ese mail no figura en la redacción. Pedile a la coordinación que te sume.'
+            : 'Ese mail no corresponde a ningún comercio adherido.');
       }
-      if (rol === 'comercio' && !u.activo) return error('La cuenta de este comercio está dada de baja.');
+      if ((rol === 'comercio' || rol === 'redaccion') && !u.activo) return error('Esa cuenta está dada de baja.');
       return esperar({ enviado_a: mail, enlace_demo: crearEnlace(rol, u.id) });
     },
 
@@ -196,11 +228,11 @@
       if (!e || e.vence < Date.now()) return error('El link venció. Pedí uno nuevo.');
       if (!clave || clave.length < 8) return error('La contraseña tiene que tener al menos 8 caracteres.');
       var db = leer();
-      var lista = e.tipo === 'socio' ? db.socios : db.comercios;
-      var u = lista.find(function (x) { return x.id === e.id; });
-      if (e.tipo === 'socio' && !aceptoPrivacidad && !u.acepto_privacidad) return error('Para activar tu cuenta tenés que aceptar el aviso de privacidad.');
+      var u = listaDe(db, e.tipo).find(function (x) { return x.id === e.id; });
+      var conAviso = e.tipo === 'socio' || e.tipo === 'redaccion';
+      if (conAviso && !aceptoPrivacidad && !u.acepto_privacidad) return error('Para activar tu cuenta tenés que aceptar el aviso de privacidad.');
       u.clave = clave;
-      if (e.tipo === 'socio') u.acepto_privacidad = true;
+      if (conAviso) u.acepto_privacidad = true;
       delete enlaces[token];
       guardar();
       var s = { rol: e.tipo, id: u.id, nombre: u.nombre, mail: u.mail };
@@ -216,6 +248,25 @@
         al_dia: estaAlDia(u), vigente_hasta: u.vigente_hasta || null });
     },
 
+
+    // ---- Redacción ----
+    miCredencial: function () {
+      var s = leerSesion(); if (!s) return error('Tenés que ingresar.');
+      var r = leer().redaccion.find(function (x) { return x.mail === s.mail && x.activo; });
+      return esperar(r ? credencialDe(r) : null);
+    },
+    tambienSocio: function () {
+      var s = leerSesion(); if (!s) return Promise.resolve(false);
+      return esperar(leer().socios.some(function (x) { return x.mail === s.mail; }));
+    },
+    portal: function () { return esperar(copia(PORTAL_DEMO)); },
+    verificarCredencial: function (codigo) {
+      var r = leer().redaccion.find(function (x) { return x.codigo === codigo; });
+      if (!r) return esperar(null);
+      if (!r.activo) return esperar({ valida: false });
+      var c = credencialDe(r); delete c.codigo; c.valida = true;
+      return esperar(c);
+    },
 
     // ---- Comercio ----
     verificarSocio: function (texto) {
@@ -271,6 +322,31 @@
       cambiarEstadoComercio: function (id, activo) {
         var c = leer().comercios.find(function (x) { return x.id === id; });
         c.activo = !!activo; guardar(); return esperar(true);
+      },
+
+      redaccion: function () { return esperar(copia(leer().redaccion.map(function (r) {
+        return { id: r.id, numero: r.numero, nombre: r.nombre, apellido: r.apellido, mail: r.mail, area: r.area,
+          seccion: r.seccion, activo: r.activo, desde: r.desde, cuenta_activada: !!r.clave };
+      }))); },
+
+      agregarRedaccion: function (d) {
+        var db = leer(), mail = normalizarMail(d.mail);
+        if (!String(d.nombre || '').trim()) return error('Falta el nombre.');
+        if (!mailValido(mail)) return error('Revisá el mail.');
+        if (db.redaccion.some(function (r) { return r.mail === mail; })) return error('Ya hay alguien de la redacción con ese mail.');
+        var n = db.redaccion.reduce(function (m, r) { return Math.max(m, r.numero); }, 0) + 1;
+        var r = { id: 'r' + Date.now().toString(36), numero: n, nombre: d.nombre.trim(), apellido: String(d.apellido || '').trim(),
+          mail: mail, area: d.area || 'Redacción', seccion: String(d.seccion || '').trim(), activo: true, clave: null,
+          desde: hoyISO(0), codigo: '00000000-0000-4000-8000-' + ('000000000000' + Date.now().toString(16)).slice(-12),
+          acepto_privacidad: false };
+        db.redaccion.push(r); guardar();
+        return esperar({ enviado_a: mail, enlace_demo: crearEnlace('redaccion', r.id) });
+      },
+
+      editarRedaccion: function (id, cambios) {
+        var r = leer().redaccion.find(function (x) { return x.id === id; });
+        Object.keys(cambios).forEach(function (k) { r[k] = cambios[k]; });
+        guardar(); return esperar(true);
       },
 
       busquedas: function () {

@@ -21,7 +21,8 @@
     return h.get('error_description') || null;
   })();
 
-  var ROLES = { equipo: 'admin', comercio: 'comercio', socio: 'socio' };
+  var ROLES = { equipo: 'admin', redaccion: 'redaccion', comercio: 'comercio', socio: 'socio' };
+  var TABLAS = { equipo: 'equipo', redaccion: 'redaccion', comercio: 'comercios', socio: 'socios' };
 
   function fallo(err, porDefecto) {
     var msg = (err && (err.message || err.error_description)) || porDefecto || 'Algo salió mal. Probá de nuevo.';
@@ -55,10 +56,13 @@
         if (rol === 'comercio_baja') {
           return sb.auth.signOut().then(function () { throw new Error('La cuenta de este comercio está dada de baja. Escribinos a laplatasube@gmail.com.'); });
         }
+        if (rol === 'redaccion_baja') {
+          return sb.auth.signOut().then(function () { throw new Error('Tu credencial de redacción está dada de baja. Si creés que es un error, escribinos a laplatasube@gmail.com.'); });
+        }
         if (!rol) {
           return sb.auth.signOut().then(function () { throw new Error('Tu mail ya no figura en la comunidad. Si creés que es un error, escribinos a laplatasube@gmail.com.'); });
         }
-        var tabla = rol === 'equipo' ? 'equipo' : rol === 'comercio' ? 'comercios' : 'socios';
+        var tabla = TABLAS[rol];
         return sb.from(tabla).select('nombre').eq(rol === 'equipo' ? 'mail' : 'user_id', rol === 'equipo' ? mail : s.user.id).maybeSingle()
           .then(function (q) {
             return { rol: ROLES[rol], id: s.user.id, nombre: (q.data && q.data.nombre) || mail, mail: mail };
@@ -109,7 +113,9 @@
             if (/No encontramos/.test(r.error.message)) {
               throw new Error(rol === 'socio'
                 ? 'No encontramos ese mail en la comunidad.'
-                : 'Ese mail no corresponde a ningún comercio adherido.');
+                : rol === 'redaccion'
+                  ? 'Ese mail no figura en la redacción. Pedile a la coordinación que te sume.'
+                  : 'Ese mail no corresponde a ningún comercio adherido.');
             }
             throw fallo(r.error);
           }
@@ -121,16 +127,35 @@
       if (!clave || clave.length < 8) return Promise.reject(new Error('La contraseña tiene que tener al menos 8 caracteres.'));
       return armarSesion().then(function (s) {
         if (!s) throw new Error('El link venció. Pedí uno nuevo.');
-        if (s.rol === 'socio' && !aceptoPrivacidad) throw new Error('Para activar tu cuenta tenés que aceptar el aviso de privacidad.');
+        var conAviso = s.rol === 'socio' || s.rol === 'redaccion';
+        if (conAviso && !aceptoPrivacidad) throw new Error('Para activar tu cuenta tenés que aceptar el aviso de privacidad.');
         return sb.auth.updateUser({ password: clave }).then(function (r) {
           if (r.error && !/same password|different from the old/i.test(r.error.message)) throw fallo(r.error);
-          return s.rol === 'socio' ? rpc('aceptar_privacidad') : null;
+          return conAviso ? rpc('aceptar_privacidad') : null;
         }).then(function () { return s; });
       });
     },
 
     miPase: function () {
       return rpc('mi_pase').then(function (p) { if (!p) throw new Error('No encontramos tu pase.'); return p; });
+    },
+
+    // ---- Redacción ----
+    // Credencial de quien ingresó, o null si no es de la redacción.
+    miCredencial: function () { return rpc('mi_credencial'); },
+
+    // ¿Además es parte de la comunidad de pasajeros? (para mostrar su boleto)
+    tambienSocio: function () { return rpc('mi_pase').then(function (p) { return !!p; }, function () { return false; }); },
+
+    portal: function () {
+      return sb.from('portal_enlaces').select('titulo,descripcion,url').eq('activo', true).order('orden')
+        .then(function (r) { if (r.error) throw fallo(r.error); return r.data; });
+    },
+
+    // Página pública del código QR: no hace falta haber ingresado.
+    verificarCredencial: function (codigo) {
+      if (!/^[0-9a-f-]{36}$/i.test(String(codigo || ''))) return Promise.resolve(null);
+      return rpc('verificar_credencial', { c: codigo });
     },
 
     verificarSocio: function (texto) {
@@ -190,7 +215,37 @@
         return sb.from('comercios').update({ activo: !!activo }).eq('id', id).then(function (r) { if (r.error) throw fallo(r.error); return true; });
       },
 
-      busquedas: function () { return rpc('registro_busquedas'); }
+      busquedas: function () { return rpc('registro_busquedas'); },
+
+      redaccion: function () {
+        return sb.from('redaccion').select('id,numero,nombre,apellido,mail,area,seccion,activo,desde,user_id').order('numero')
+          .then(function (r) {
+            if (r.error) throw fallo(r.error);
+            return r.data.map(function (p) {
+              return { id: p.id, numero: p.numero, nombre: p.nombre, apellido: p.apellido, mail: p.mail, area: p.area,
+                seccion: p.seccion, activo: p.activo, desde: p.desde, cuenta_activada: !!p.user_id };
+            });
+          });
+      },
+
+      // Suma a alguien a la redacción y le manda el link para activar su cuenta.
+      agregarRedaccion: function (d) {
+        var mail = String(d.mail || '').trim().toLowerCase();
+        if (!String(d.nombre || '').trim()) return Promise.reject(new Error('Falta el nombre.'));
+        if (!mailValido(mail)) return Promise.reject(new Error('Revisá el mail.'));
+        return sb.from('redaccion').insert({ nombre: d.nombre.trim(), apellido: String(d.apellido || '').trim(), mail: mail,
+          area: d.area || 'Redacción', seccion: String(d.seccion || '').trim() }).then(function (r) {
+          if (r.error) throw (/duplicate|unique/i.test(r.error.message) ? new Error('Ya hay alguien de la redacción con ese mail.') : fallo(r.error));
+          return sb.auth.signInWithOtp({ email: mail, options: { shouldCreateUser: true, emailRedirectTo: urlDeVuelta() } });
+        }).then(function (r) {
+          if (r && r.error) return { enviado_a: mail, aviso: 'Quedó cargada, pero no se pudo mandar el mail (' + fallo(r.error).message + '). Puede activar su cuenta desde mi-pase.html#redaccion con "Activar mi cuenta".' };
+          return { enviado_a: mail };
+        });
+      },
+
+      editarRedaccion: function (id, cambios) {
+        return sb.from('redaccion').update(cambios).eq('id', id).then(function (r) { if (r.error) throw fallo(r.error); return true; });
+      }
     }
   };
 

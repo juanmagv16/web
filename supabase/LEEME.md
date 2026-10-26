@@ -35,13 +35,24 @@ En **Project Settings → API Keys** están:
 - **Project URL** y clave **publishable** (`sb_publishable_…`): son públicas y van dentro de la web.
 - Clave **secret** (`sb_secret_…`): **no se comparte ni se pega en ningún archivo**. Da acceso total a los datos de los socios.
 
+## 5. Credenciales de la redacción (actualización de octubre 2026)
+
+Para sumar las credenciales y el portal de trabajo de la redacción, volvé a correr **todo** `01-estructura.sql` en el SQL Editor (igual que en el paso 1). No borra ni cambia los datos cargados: agrega la tabla `redaccion`, la tabla `portal_enlaces` con 5 accesos de ejemplo y actualiza las funciones.
+
+- Las personas de la redacción se suman desde Mi pase → Equipo Sube → pestaña **Redacción**.
+- Entran desde `mi-pase.html#redaccion` (esa entrada no figura en el menú).
+- Los accesos del portal se editan en **Table Editor → portal_enlaces** (título, descripción, link, orden; `activo` en falso para ocultar uno).
+- El código QR de cada credencial abre `credencial.html`, que muestra si es válida, sin pedir ingreso.
+
 ## Quién ve qué
 
-| | Socio | Comercio | Equipo Sube | Visitante |
-|---|---|---|---|---|
-| Su propio boleto | ✔ | — | — | — |
-| Verificar a un socio (activo / no activo) | — | ✔ | — | — |
-| Lista de socios con mails | — | — | ✔ | — |
-| Cargar el Excel mensual | — | — | ✔ | — |
-| Alta y baja de comercios | — | — | ✔ | — |
-| Registro de búsquedas | — | — | ✔ | — |
+| | Socio | Comercio | Redacción | Equipo Sube | Visitante |
+|---|---|---|---|---|---|
+| Su propio boleto | ✔ | — | ✔ (si además es socio) | — | — |
+| Verificar a un socio (activo / no activo) | — | ✔ | — | — | — |
+| Su credencial y el portal de trabajo | — | — | ✔ | ✔ (si además es de la redacción) | — |
+| Comprobar una credencial con su código QR (nombre, área y sección) | ✔ | ✔ | ✔ | ✔ | ✔ |
+| Lista de socios con mails | — | — | — | ✔ | — |
+| Cargar el Excel mensual | — | — | — | ✔ | — |
+| Alta y baja de comercios y de la redacción | — | — | — | ✔ | — |
+| Registro de búsquedas | — | — | — | ✔ | — |
