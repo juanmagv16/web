@@ -1,0 +1,52 @@
+{
+  "programas": [
+    {
+      "slug": "streaming-copa",
+      "nombre": "Streaming copa",
+      "descripcion": "Viví la pasión del fútbol con toda la previa, el análisis y el aguante. La Copa se juega también desde SUBE.",
+      "logo": "assets/programas/planilla/streaming-copa.png"
+    },
+    {
+      "slug": "marcando-la-cancha",
+      "nombre": "Marcando la cancha",
+      "descripcion": "Toda la pasión del deporte, análisis, debate y las historias que se juegan dentro y fuera de la cancha.",
+      "logo": ""
+    },
+    {
+      "slug": "falopa-informativa-nacional",
+      "nombre": "Falopa informativa nacional",
+      "descripcion": "Rosca política, actualidad y humor; Todo esto y mas en FIN! charlamos de lo que pasa y debatimos lo que otros prefieren esquivar.",
+      "logo": ""
+    },
+    {
+      "slug": "el-amplificador",
+      "nombre": "El amplificador",
+      "descripcion": "Música, artistas y cultura emergente. Le damos volumen a las voces y los sonidos que merecen ser escuchados.",
+      "logo": "assets/programas/planilla/el-amplificador.png"
+    },
+    {
+      "slug": "estacion-freak",
+      "nombre": "Estacion freak",
+      "descripcion": "Anime, cultura geek y todo lo que te vuela la cabeza. Un espacio para compartir pasiones y explorar universos.",
+      "logo": "assets/programas/planilla/estacion-freak.png"
+    },
+    {
+      "slug": "de-que-viven",
+      "nombre": "¿De qué viven?",
+      "descripcion": "Historias, laburos y formas de ganarse la vida. Salimos a descubrir de qué viven quienes hacen girar la city.",
+      "logo": ""
+    },
+    {
+      "slug": "chicha-y-limonada",
+      "nombre": "Chicha y limonada",
+      "descripcion": "Entre la charla y el descontrol, un espacio para debatir, reírse y compartir esas conversaciones que pueden ir para cualquier lado.",
+      "logo": ""
+    },
+    {
+      "slug": "umbrales",
+      "nombre": "Umbrales",
+      "descripcion": "Conversaciones íntimas con personas que se animan a cruzar sus propios límites, explorar nuevas formas de crear y habitar la escena, y compartir aquello que las mueve.",
+      "logo": ""
+    }
+  ]
+}
