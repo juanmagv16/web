@@ -242,8 +242,10 @@
 
     // ---- Socio ----
     miPase: function () {
-      var s = leerSesion(); if (!s || s.rol !== 'socio') return error('Tenés que ingresar.');
-      var u = leer().socios.find(function (x) { return x.id === s.id; });
+      var s = leerSesion(); if (!s) return error('Tenés que ingresar.');
+      // Puede ser una persona del equipo que además aporta a la comunidad
+      var u = leer().socios.find(function (x) { return s.rol === 'socio' ? x.id === s.id : x.mail === s.mail; });
+      if (!u) return error('No encontramos tu pase.');
       return esperar({ nombre: u.nombre, apellido: u.apellido, mail: u.mail,
         al_dia: estaAlDia(u), vigente_hasta: u.vigente_hasta || null });
     },

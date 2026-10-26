@@ -429,7 +429,9 @@
       mostrar(barraSesion(sesion, 'Equipo SUBE') +
         (volverAdmin ? '<button type="button" class="pase-back" data-volver-admin>← Volver al panel del equipo</button>' : '') +
         '<div class="pase-ticket-wrap">' + credencialHtml(c) + '</div>' +
-        (esSocio ? '<p class="pase-note"><button type="button" class="pase-link" data-ver-boleto>Ver mi boleto de la Comunidad de pasajeros</button></p>' : '') +
+        (esSocio ? '<div class="pase-boleto-cta"><button type="button" class="btn btn-primary" data-ver-boleto>' +
+          '<svg class="pase-boleto-cta-icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"></path><path d="M9 6v12" stroke-dasharray="2 2"></path></svg>' +
+          '<span>Ver mi boleto de la comunidad</span></button></div>' : '') +
         portalHtml(enlaces) +
         '<p class="pase-note">Si algún dato de tu credencial es incorrecto, comunicate con la coordinación: <a href="mailto:laplatasube@gmail.com">laplatasube@gmail.com</a>.</p>', true);
       engancharSalir();

@@ -1616,3 +1616,8 @@ a.program-ig-chip:hover{ color: var(--lime); border-color: rgba(193,255,0,0.35);
   .pase-activar-acciones{ align-items: stretch; }
   .pase-activar-acciones .btn{ width: 100%; }
 }
+
+/* Equipo: botón para ver el boleto de la comunidad (si además es suscriptor) */
+.pase-boleto-cta{ display:flex; justify-content: center; margin-top: 18px; }
+.pase-boleto-cta .btn{ width: 100%; max-width: 400px; display:inline-flex; align-items:center; justify-content:center; gap: 10px; text-align: center; white-space: normal; line-height: 1.25; }
+.pase-boleto-cta-icono{ flex: 0 0 auto; }
