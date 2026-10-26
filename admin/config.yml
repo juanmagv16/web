@@ -77,7 +77,7 @@ collections:
         default: "{{now}}"
         date_format: DD/MM/YYYY
         time_format: false
-        picker_utc: true
+        picker_utc: false
       - label: Bajada
         name: bajada
         widget: text
