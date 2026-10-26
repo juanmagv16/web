@@ -4,7 +4,7 @@ titulo: "Boca y Estudiantes van por la gloria: Argentina tendrá finalistas en
 seccion: Deportes
 fecha: 2026-10-25
 imagen: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1F_G6oFJCElTwxtgrG24U1ZKJ6ELT8UX6VFLfczg9pMEFoNEielCt4PQ&s=10
-jerarquia: Normal
+jerarquia: Destacada
 publicar: true
 ---
 **El Xeneize jugará la final de la Sudamericana ante Atlético Mineiro y el Pincha buscará la Libertadores frente a Palmeiras. Las dos definiciones serán en noviembre y marcan el regreso de un equipo argentino a cada final continental después de siete años.**
