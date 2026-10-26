@@ -85,7 +85,7 @@ jobs:
 
       - name: Traer comercios y programación desde Google Sheets
         run: |
-          pip install --quiet pillow pyyaml
+          pip install --quiet pillow pyyaml pillow-heif
           python scripts/sync_planillas.py
 
       - name: Achicar las fotos de las notas

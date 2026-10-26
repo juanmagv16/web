@@ -37,7 +37,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FUENTES = os.path.join(ROOT, "datos", "fuentes.json")
 SALIDA = os.path.join(ROOT, "datos", "comercios.json")
 LOGOS_DIR = os.path.join(ROOT, "assets", "socios", "planilla")
-LOGO_MAX = 320  # px del lado más largo
+LOGO_MAX = 640  # px del lado más largo (nítido también en pantallas de alta densidad)
 PROG_LOGOS_DIR = os.path.join(ROOT, "assets", "programas", "planilla")
 PROG_SALIDA = os.path.join(ROOT, "datos", "programas.json")
 
@@ -123,6 +123,41 @@ def url_imagen(v):
     return v
 
 
+def quitar_cuadriculado(im):
+    """Algunos logos vienen con el "fondo transparente" dibujado como una
+    cuadrícula gris y blanca. Desde las esquinas, vuelve transparente ese
+    fondo (solo grises claros); el dibujo del logo no se toca."""
+    rgb = im.convert("RGB")
+    w, h = rgb.size
+    px = rgb.load()
+
+    def gris_claro(c):
+        return min(c) >= 180 and max(c) - min(c) <= 18
+
+    esquina = [px[x, y] for x in range(min(24, w)) for y in range(min(24, h))]
+    claros = [c for c in esquina if gris_claro(c)]
+    if len(claros) < len(esquina) * 0.95:
+        return im  # la esquina no es un fondo gris claro: no hay nada que hacer
+    tonos = sorted(sum(c) // 3 for c in claros)
+    if tonos[-1] - tonos[0] < 20:
+        return im  # fondo liso (blanco de verdad), no cuadrícula: se respeta
+    rgba = im.convert("RGBA")
+    a = rgba.load()
+    vistos = bytearray(w * h)
+    pila = [(0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)]
+    while pila:
+        x, y = pila.pop()
+        if x < 0 or y < 0 or x >= w or y >= h or vistos[y * w + x]:
+            continue
+        vistos[y * w + x] = 1
+        if not gris_claro(px[x, y]):
+            continue
+        r, g, b, _ = a[x, y]
+        a[x, y] = (r, g, b, 0)
+        pila.extend(((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)))
+    return rgba
+
+
 def guardar_logo(url, slug, carpeta=None):
     from PIL import Image  # se instala en GitHub (pip install pillow)
     carpeta = carpeta or LOGOS_DIR
@@ -143,8 +178,18 @@ def guardar_logo(url, slug, carpeta=None):
         t = re.search(rb"<title>(.*?)</title>", datos, re.S | re.I)
         titulo = t.group(1).decode("utf-8", "replace").strip()[:80] if t else "sin título"
         raise ValueError("Drive devolvió una página («{}») en lugar de la imagen: revisá que el archivo esté compartido con 'Cualquier persona con el vínculo'".format(titulo))
-    im = Image.open(io.BytesIO(datos))
-    im.load()
+    try:
+        im = Image.open(io.BytesIO(datos))
+        im.load()
+    except Exception:  # noqa: BLE001
+        try:  # fotos de iPhone (HEIC) u otros formatos que Pillow no trae de fábrica
+            import pillow_heif
+            pillow_heif.register_heif_opener()
+            im = Image.open(io.BytesIO(datos))
+            im.load()
+        except Exception:  # noqa: BLE001
+            raise ValueError("el archivo no es una imagen que se pueda usar (tipo {}, empieza con {!r}). Subilo como PNG o JPG".format(
+                tipo or "desconocido", datos[:12]))
     if im.mode not in ("RGB", "RGBA"):
         im = im.convert("RGBA")
     ancho, alto = im.size
@@ -155,6 +200,7 @@ def guardar_logo(url, slug, carpeta=None):
             pad = max(2, int(max(caja[2] - caja[0], caja[3] - caja[1]) * 0.03))
             im = im.crop((max(0, caja[0] - pad), max(0, caja[1] - pad), min(ancho, caja[2] + pad), min(alto, caja[3] + pad)))
     im.thumbnail((LOGO_MAX, LOGO_MAX))  # achica sin deformar (mantiene la proporción)
+    im = quitar_cuadriculado(im)
     os.makedirs(carpeta, exist_ok=True)
     # WebP con transparencia: pesa varias veces menos que PNG con la misma calidad visible
     nombre = slug + ".webp"
