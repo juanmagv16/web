@@ -158,6 +158,31 @@ def quitar_cuadriculado(im):
     return rgba
 
 
+def abrir_imagen(datos, tipo):
+    """Abre PNG, JPG, WebP, GIF; también HEIC (fotos de iPhone) y PDF
+    (usa la primera página)."""
+    from PIL import Image
+    if datos[:5] == b"%PDF-":
+        try:
+            import fitz  # pymupdf
+            pagina = fitz.open(stream=datos, filetype="pdf")[0]
+            datos = pagina.get_pixmap(dpi=200, alpha=True).tobytes("png")
+        except Exception:  # noqa: BLE001
+            pass
+    try:
+        import pillow_heif
+        pillow_heif.register_heif_opener()
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        im = Image.open(io.BytesIO(datos))
+        im.load()
+        return im
+    except Exception:  # noqa: BLE001
+        raise ValueError("el archivo no es una imagen que se pueda usar (tipo {}, empieza con {!r}). Subilo como PNG o JPG".format(
+            tipo or "desconocido", datos[:12]))
+
+
 def guardar_logo(url, slug, carpeta=None):
     from PIL import Image  # se instala en GitHub (pip install pillow)
     carpeta = carpeta or LOGOS_DIR
@@ -178,18 +203,7 @@ def guardar_logo(url, slug, carpeta=None):
         t = re.search(rb"<title>(.*?)</title>", datos, re.S | re.I)
         titulo = t.group(1).decode("utf-8", "replace").strip()[:80] if t else "sin título"
         raise ValueError("Drive devolvió una página («{}») en lugar de la imagen: revisá que el archivo esté compartido con 'Cualquier persona con el vínculo'".format(titulo))
-    try:
-        im = Image.open(io.BytesIO(datos))
-        im.load()
-    except Exception:  # noqa: BLE001
-        try:  # fotos de iPhone (HEIC) u otros formatos que Pillow no trae de fábrica
-            import pillow_heif
-            pillow_heif.register_heif_opener()
-            im = Image.open(io.BytesIO(datos))
-            im.load()
-        except Exception:  # noqa: BLE001
-            raise ValueError("el archivo no es una imagen que se pueda usar (tipo {}, empieza con {!r}). Subilo como PNG o JPG".format(
-                tipo or "desconocido", datos[:12]))
+    im = abrir_imagen(datos, tipo)
     if im.mode not in ("RGB", "RGBA"):
         im = im.convert("RGBA")
     ancho, alto = im.size

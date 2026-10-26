@@ -1586,3 +1586,8 @@ a.program-ig-chip:hover{ color: var(--lime); border-color: rgba(193,255,0,0.35);
 .next-stop-program-link:hover, .next-stop-program-link:focus-visible{ color: var(--lime); text-decoration-color: var(--lime); }
 .next-stop-program-arrow{ display:inline-block; margin-left: 8px; color: var(--lime); transition: transform .2s; }
 .next-stop-program-link:hover .next-stop-program-arrow{ transform: translateX(3px); }
+
+/* Banners cuadrados con logos de comercios (Home) */
+.sponsor-slot--logo{ background: var(--card); padding: 12%; }
+.sponsor-slot--logo img{ object-fit: contain; }
+.sponsor-slot--logo:hover{ background: var(--card); border-color: rgba(193,255,0,0.35); }
