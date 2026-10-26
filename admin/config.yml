@@ -11,9 +11,9 @@ backend:
   name: github
   repo: juanmagv16/web          # al pasar al sitio oficial: subecanal/web
   branch: main
-  # Servicio de inicio de sesión con GitHub (Cloudflare Worker).
-  # Reemplazar por la dirección del Worker cuando esté creado.
-  base_url: https://REEMPLAZAR-POR-EL-WORKER.workers.dev
+  # Servicio de inicio de sesión con GitHub (Cloudflare Worker de la cuenta
+  # de Sube; código en github.com/subecanal/sube-redaccion-auth).
+  base_url: https://sube-redaccion-auth.laplatasube.workers.dev
   commit_messages:
     create: "Redacción: nota nueva «{{slug}}»"
     update: "Redacción: nota editada «{{slug}}»"
