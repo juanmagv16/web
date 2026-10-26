@@ -6,7 +6,7 @@ bajada: ''
 autor: Redacción SUBE
 imagen: assets/noticias/oro-argentino-conferencia-economia.jpg
 epigrafe: Conferencia de prensa en el Ministerio de Economía.
-destacada: false
+jerarquia: Normal
 publicar: true
 ---
 El Deutsche Bank, donde trabajaron Luis Caputo y Santiago Bausili, habría sido una de las entidades beneficiadas por las operaciones con el oro del Banco Central que dejaron pérdidas por US$ 1.023 millones, según reveló Página/12.

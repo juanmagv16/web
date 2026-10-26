@@ -6,6 +6,6 @@ bajada: ''
 autor: Redacción SUBE
 imagen: ''
 epigrafe: ''
-destacada: true
+jerarquia: Normal
 publicar: true
 ---

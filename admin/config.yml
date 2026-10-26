@@ -50,14 +50,17 @@ collections:
     create: true
     delete: true
     identifier_field: titulo     # el nombre del archivo y la dirección salen del título
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    slug: "{{slug}}"
     preview_path: "noticias/{{slug}}.html"
-    summary: "{{fecha}} · {{seccion}} · {{titulo}}"
-    sortable_fields: ["fecha", "titulo", "seccion"]
+    summary: "{{fecha}} · {{seccion}} · {{jerarquia}} · {{titulo}}"
+    sortable_fields: ["fecha", "titulo", "seccion", "jerarquia"]
     view_filters:
-      - label: Destacadas en la portada
-        field: destacada
-        pattern: true
+      - label: Principal
+        field: jerarquia
+        pattern: Principal
+      - label: Destacadas
+        field: jerarquia
+        pattern: Destacada
       - label: Despublicadas
         field: publicar
         pattern: false
@@ -97,11 +100,12 @@ collections:
         name: epigrafe
         widget: string
         required: false
-      - label: Destacada en la portada
-        name: destacada
-        widget: boolean
-        default: false
-        hint: "Las destacadas más nuevas ocupan los 3 lugares de «Noticias destacadas» en la home."
+      - label: Jerarquía
+        name: jerarquia
+        widget: select
+        options: ["Principal", "Destacada", "Normal"]
+        default: Normal
+        hint: "Principal: la nota grande de arriba de todo en Noticias (si marcás otra como Principal, la anterior baja a Destacada). Destacada: va después de la principal, antes que las demás. Normal: por fecha. La home muestra las 3 primeras de ese orden."
       - label: Visible en la web
         name: publicar
         widget: boolean

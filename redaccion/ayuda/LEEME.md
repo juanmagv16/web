@@ -1,6 +1,6 @@
 # Redacción SUBE: cómo publicar una nota
 
-Cada nota de la sección **Noticias** es un archivo de texto (`.txt`) dentro de esta carpeta. No hace falta tocar código.
+Cada nota de la sección **Noticias** es un archivo de texto dentro de la carpeta `redaccion/`. No hace falta tocar código.
 
 ## La forma recomendada: el panel de redacción
 
@@ -23,7 +23,7 @@ Sirve si el panel no está disponible. Las notas del panel son archivos `.md` en
 2. En el nombre del archivo escribí `AAAA-MM-DD-palabras-del-titulo.txt`. Por ejemplo: `2026-10-21-paro-docente.txt`.
    - El nombre (sin la fecha) es la dirección de la nota en la web: esa nota queda en `noticias/paro-docente.html`.
    - Minúsculas, sin tildes ni espacios: separá las palabras con guiones.
-3. Abrí [`_plantilla.txt`](_plantilla.txt) en otra pestaña, copiá su contenido, pegalo y completá los datos (ver la tabla).
+3. Abrí [`_plantilla.txt`](../_plantilla.txt) en otra pestaña, copiá su contenido, pegalo y completá los datos (ver la tabla).
 4. Escribí la nota debajo de la línea `---`.
 5. Si tiene foto: entrá a la carpeta **`assets/noticias`**, tocá **Add file → Upload files** y subila con el mismo nombre que pusiste en `imagen:`. Conviene subir la foto **antes** que la nota.
 6. Tocá **Commit changes** (abajo o arriba a la derecha) y confirmá.
@@ -41,7 +41,7 @@ En uno o dos minutos la nota aparece publicada. Podés seguir el progreso en la 
 | `autor` | Quién firma la nota | No (si falta, dice "Redacción SUBE") |
 | `imagen` | Nombre de la foto, que se sube a la carpeta `assets/noticias/`. También puede ser un link completo a una imagen | No |
 | `epigrafe` | Texto debajo de la foto | No |
-| `destacada` | `si` para que aparezca entre las 3 "Noticias destacadas" de la home | No |
+| `jerarquia` | `principal` (la nota grande de arriba de Noticias), `destacada` (va después de la principal, antes que las demás) o `normal` | No (por defecto, `normal`) |
 | `publicar` | `no` para guardar un borrador sin que aparezca en la web | No (por defecto, `si`) |
 
 ## Cómo escribir el cuerpo
@@ -56,8 +56,10 @@ Si una nota todavía no tiene cuerpo, se publica igual y muestra el aviso "Esta 
 
 ## Orden y portada
 
-- La portada de Noticias muestra las notas de la más nueva a la más vieja, según la `fecha`. La más nueva va arriba, en grande.
-- La home muestra 3 notas: primero las marcadas como `destacada: si` (las más nuevas) y, si no alcanzan, se completan con las últimas publicadas.
+- La portada de Noticias ("Todas") ordena así: arriba y en grande, la **principal**; después las **destacadas**; después las **normales**. Dentro de cada grupo, de la más nueva a la más vieja según la `fecha`.
+- Solo puede haber una principal: si marcás otra, la anterior pasa a destacada sola.
+- Las pestañas de sección (Deportes, Política…) respetan ese mismo orden.
+- La home muestra las 3 primeras notas de ese orden.
 
 ## Sacar o corregir una nota
 

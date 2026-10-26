@@ -12,7 +12,7 @@ noticias.html, tienda.html, contacto.html, y todos los archivos
 dentro de programas/ y noticias/.
 
 Las notas de la sección Noticias NO se escriben acá: cada una es un
-archivo de texto en la carpeta redaccion/ (ver redaccion/LEEME.md).
+archivo de texto en la carpeta redaccion/ (ver redaccion/ayuda/LEEME.md).
 
 Para agregar/editar el contenido de un programa, buscar el diccionario
 PROGRAMS más abajo.
@@ -545,7 +545,7 @@ CONTENIDOS_BODY = '''  <section class="content">
 # NOTICIAS (noticias.html + noticias/*.html)
 # ============================================================
 # Cada nota es un archivo de texto dentro de la carpeta redaccion/.
-# El formato está explicado en redaccion/LEEME.md y hay una plantilla
+# El formato está explicado en redaccion/ayuda/LEEME.md y hay una plantilla
 # lista para copiar en redaccion/_plantilla.txt. Los archivos que
 # empiezan con "_" o que no terminan en .txt se ignoran.
 NEWS_SOURCE_DIR = os.path.join(ROOT, "redaccion")
@@ -620,6 +620,19 @@ def parse_note(path):
     return _armar_nota(meta, body, path)
 
 
+JERARQUIAS = ("principal", "destacada", "normal")
+
+
+def _jerarquia(meta):
+    """Lugar de la nota en la portada de Noticias y en la home:
+    'principal' (la grande de arriba), 'destacada' o 'normal'.
+    Las notas viejas con 'destacada: si' cuentan como destacadas."""
+    j = _slugify(meta.get("jerarquia", ""))
+    if j in JERARQUIAS:
+        return j
+    return "destacada" if meta.get("destacada", "").lower() in SI else "normal"
+
+
 def _armar_nota(meta, body, path):
     name = os.path.splitext(os.path.basename(path))[0]
     if not meta.get("titulo"):
@@ -636,7 +649,7 @@ def _armar_nota(meta, body, path):
         "fecha": fecha,
         "imagen": meta.get("imagen", ""),
         "epigrafe": meta.get("epigrafe", ""),
-        "destacada": meta.get("destacada", "").lower() in SI,
+        "jerarquia": _jerarquia(meta),
         "publicar": meta.get("publicar", "si").lower() in SI,
         "cuerpo": body.strip(),
     }
@@ -654,6 +667,12 @@ def load_news():
         if note["publicar"]:
             notes.append(note)
     notes.sort(key=lambda n: (n["fecha"], n["slug"]), reverse=True)
+    # Solo la principal más nueva va arriba; las principales anteriores
+    # pasan a contar como destacadas.
+    principales = [n for n in notes if n["jerarquia"] == "principal"]
+    for n in principales[1:]:
+        n["jerarquia"] = "destacada"
+    notes.sort(key=lambda n: JERARQUIAS.index(n["jerarquia"]))  # estable: mantiene la fecha
     seen = set()
     for n in notes:
         if n["slug"] in seen:
@@ -870,10 +889,10 @@ def news_article_body(note, notes):
 
 
 def home_featured_news_html(notes):
-    """Las 3 tarjetas de 'Noticias destacadas' de la home: primero las
-    marcadas como destacadas, y si faltan se completan con las más nuevas."""
-    picked = [n for n in notes if n["destacada"]][:3]
-    picked += [n for n in notes if n not in picked][:3 - len(picked)]
+    """Las 3 tarjetas de 'Noticias destacadas' de la home: el mismo orden
+    de la portada de Noticias (principal, destacadas y después las más
+    nuevas)."""
+    picked = notes[:3]
     cards = []
     for n in picked:
         cards.append('''        <a class="news-card" href="{url}">

@@ -1,7 +1,7 @@
 titulo: Acá va el título de la nota
 seccion: Política
 fecha: 2026-10-19
-destacada: no
+jerarquia: normal
 bajada: Una o dos oraciones que resumen la nota. Aparece debajo del título y en la portada de Noticias.
 autor: Nombre Apellido
 imagen: nombre-de-la-foto.jpg
