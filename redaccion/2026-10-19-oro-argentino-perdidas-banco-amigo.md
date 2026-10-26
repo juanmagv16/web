@@ -1,12 +1,12 @@
 ---
 titulo: El oro argentino, pérdidas millonarias y un banco amigo del Gobierno
 seccion: Política
-fecha: '2026-10-19'
-bajada: ''
+fecha: 2026-10-19
+bajada: ""
 autor: Redacción SUBE
 imagen: assets/noticias/oro-argentino-conferencia-economia.jpg
 epigrafe: Conferencia de prensa en el Ministerio de Economía.
-jerarquia: Normal
+jerarquia: Principal
 publicar: true
 ---
 El Deutsche Bank, donde trabajaron Luis Caputo y Santiago Bausili, habría sido una de las entidades beneficiadas por las operaciones con el oro del Banco Central que dejaron pérdidas por US$ 1.023 millones, según reveló Página/12.
