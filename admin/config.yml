@@ -104,7 +104,14 @@ collections:
         name: video
         widget: string
         required: false
-        hint: "Pegá el link del video (youtube.com/watch?v=… o youtu.be/…). Se muestra debajo de la foto. Para poner un video en medio del texto, pegá el link solo, en un párrafo aparte."
+        hint: "Pegá el link del video (youtube.com/watch?v=… o youtu.be/…). Para poner otro video en medio del texto, pegá el link solo, en un párrafo aparte."
+      - label: Portada de la nota
+        name: portada
+        widget: select
+        options: ["Foto", "Video"]
+        default: Foto
+        required: false
+        hint: "Elegí «Video» para que el video de YouTube vaya arriba, en lugar de la foto (ideal para recortes de los programas). Si la nota no tiene foto, el video va arriba solo. En la portada de Noticias se ve la miniatura del video con un botón de play."
       - label: Jerarquía
         name: jerarquia
         widget: select

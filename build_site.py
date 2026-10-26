@@ -663,6 +663,9 @@ def _armar_nota(meta, body, path):
         "imagen": meta.get("imagen", ""),
         "epigrafe": meta.get("epigrafe", ""),
         "video": meta.get("video", ""),
+        # La portada es el video si así se eligió, o si hay video y no hay foto
+        "portada_video": bool(youtube_id(meta.get("video"))) and (
+            _slugify(meta.get("portada", "")).startswith("video") or not meta.get("imagen")),
         "jerarquia": _jerarquia(meta),
         "publicar": meta.get("publicar", "si").lower() in SI,
         "cuerpo": body.strip(),
@@ -798,7 +801,12 @@ def news_url(note, depth):
 def news_card_html(note, depth, lead=False):
     e = html.escape
     src = _img_src(note, depth)
-    media = ('<span class="nc-media"><img src="{}" alt="" loading="lazy"></span>'.format(e(src))
+    play = ""
+    if note.get("portada_video"):
+        # Tarjeta con la miniatura del video (o la foto, si la hay) y un botón de play
+        src = src or "https://i.ytimg.com/vi/{}/hqdefault.jpg".format(youtube_id(note["video"]))
+        play = '<span class="nc-play" aria-hidden="true"></span>'
+    media = ('<span class="nc-media"><img src="{}" alt="" loading="lazy">{}</span>'.format(e(src), play)
              if src else '<span class="nc-media nc-media--empty" aria-hidden="true"><span>{}</span></span>'.format(e(note["seccion"])))
     bajada = '<span class="nc-bajada">{}</span>'.format(e(note["bajada"])) if note["bajada"] else ""
     return '''<a class="nc{lead}" href="{url}" data-seccion="{sec_key}">
@@ -861,7 +869,13 @@ def news_article_body(note, notes):
     e = html.escape
     src = _img_src(note, 1)
     figure = ""
-    if src:
+    video = video_html(note["video"], note["titulo"])
+    if note.get("portada_video"):
+        # El video ocupa el lugar de la foto principal, con el epígrafe debajo
+        caption = '<figcaption>{}</figcaption>'.format(e(note["epigrafe"])) if note["epigrafe"] else ""
+        figure = '<figure class="article-figure article-figure--video">{}{}</figure>'.format(video, caption)
+        video = ""
+    elif src:
         caption = '<figcaption>{}</figcaption>'.format(e(note["epigrafe"])) if note["epigrafe"] else ""
         figure = '<figure class="article-figure"><img src="{}" alt="{}">{}</figure>'.format(
             e(src), e(note["epigrafe"] or note["titulo"]), caption)
@@ -915,7 +929,7 @@ def news_article_body(note, notes):
         bajada=bajada,
         autor=e(note["autor"]),
         figure=figure,
-        video=video_html(note["video"], note["titulo"]),
+        video=video,
         body=body,
         wa=WHATSAPP_ICON,
         x=X_ICON,

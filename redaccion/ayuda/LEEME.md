@@ -41,7 +41,8 @@ En uno o dos minutos la nota aparece publicada. Podés seguir el progreso en la 
 | `autor` | Quién firma la nota | No (si falta, dice "Redacción SUBE") |
 | `imagen` | Nombre de la foto, que se sube a la carpeta `assets/noticias/`. También puede ser un link completo a una imagen | No |
 | `epigrafe` | Texto debajo de la foto | No |
-| `video` | Link de un video de YouTube; se muestra debajo de la foto | No |
+| `video` | Link de un video de YouTube | No |
+| `portada` | `video` para que el video vaya arriba en lugar de la foto (si no hay foto, va arriba solo) | No (por defecto, `foto`) |
 | `jerarquia` | `principal` (la nota grande de arriba de Noticias), `destacada` (va después de la principal, antes que las demás) o `normal` | No (por defecto, `normal`) |
 | `publicar` | `no` para guardar un borrador sin que aparezca en la web | No (por defecto, `si`) |
 
