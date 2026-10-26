@@ -159,10 +159,28 @@
       '<span class="pase-door-title">Verificar membresías</span>' +
       '<span class="pase-door-desc">Buscá a una persona por nombre y apellido para confirmar que es socia activa de la comunidad.</span>' +
       '<span class="pase-door-arrow">→</span></button>' +
-      '</div>'
+      '</div>' +
+      // Primera vez: activar la cuenta, a la vista de todos
+      '<section class="pase-activar" aria-labelledby="pase-activar-titulo">' +
+      '<div class="pase-activar-texto">' +
+      '<p class="pase-activar-eyebrow">¿Primera vez en Mi pase?</p>' +
+      '<h2 id="pase-activar-titulo">Activá tu cuenta en un minuto</h2>' +
+      '<p>Si aportás a la Comunidad de pasajeros, ya estás en la lista: no hace falta registrarte.</p>' +
+      '<ol class="pase-activar-pasos">' +
+      '<li><span>1</span>Escribí el mail con el que aportás.</li>' +
+      '<li><span>2</span>Abrí el link que te llega y elegí tu contraseña.</li>' +
+      '<li><span>3</span>Listo: mostrá tu boleto en los comercios adheridos.</li>' +
+      '</ol></div>' +
+      '<div class="pase-activar-acciones">' +
+      '<button type="button" class="btn btn-primary" data-activar="socio">Activar mi cuenta</button>' +
+      '<button type="button" class="pase-link" data-activar="comercio">Soy comercio: activar la cuenta del local</button>' +
+      '</div></section>'
     );
     app.querySelectorAll('[data-go]').forEach(function (b) {
       b.addEventListener('click', function () { ingreso(b.getAttribute('data-go')); });
+    });
+    app.querySelectorAll('[data-activar]').forEach(function (b) {
+      b.addEventListener('click', function () { pedirEnlace(b.getAttribute('data-activar'), false, inicio); });
     });
   }
 
@@ -212,7 +230,8 @@
   }
 
   // ---------- Activar cuenta / olvidé mi contraseña ----------
-  function pedirEnlace(rol, olvido) {
+  function pedirEnlace(rol, olvido, volver) {
+    volver = volver || function () { ingreso(rol); };
     var eq = rol === 'redaccion';
     mostrar(
       '<div class="pase-card">' +
@@ -230,7 +249,7 @@
       '<button class="btn btn-primary" type="submit">' + (eq ? 'Enviar enlace' : 'Enviarme el link') + '</button>' +
       '</form></div>', eq
     );
-    on('[data-volver]', 'click', function () { ingreso(rol); });
+    on('[data-volver]', 'click', volver);
     on('#f-enlace', 'submit', function (e) {
       e.preventDefault();
       var btn = e.target.querySelector('button[type=submit]'); ocupado(btn, true);

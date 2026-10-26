@@ -1591,3 +1591,28 @@ a.program-ig-chip:hover{ color: var(--lime); border-color: rgba(193,255,0,0.35);
 .sponsor-slot--logo{ background: var(--card); padding: 12%; }
 .sponsor-slot--logo img{ object-fit: contain; }
 .sponsor-slot--logo:hover{ background: var(--card); border-color: rgba(193,255,0,0.35); }
+
+/* Mi pase: bloque «Activá tu cuenta» en la pantalla inicial */
+.pase-activar{
+  display:grid; grid-template-columns: minmax(0,1fr) auto; gap: 24px 40px; align-items: center;
+  margin-top: 20px; padding: 28px 30px;
+  background: var(--card); border: 1px dashed rgba(193,255,0,0.45); border-radius: var(--radius);
+}
+.pase-activar-eyebrow{ margin: 0 0 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--lime); }
+.pase-activar h2{ font-family: var(--ff-display); text-transform: uppercase; font-size: clamp(1.5rem, 4vw, 2rem); line-height: 1; margin: 0 0 10px; color: var(--white); }
+.pase-activar-texto > p:not(.pase-activar-eyebrow){ margin: 0 0 14px; color: var(--grey); font-size: 0.95rem; line-height: 1.5; }
+.pase-activar-pasos{ list-style: none; margin: 0; padding: 0; display:flex; flex-wrap: wrap; gap: 10px 22px; }
+.pase-activar-pasos li{ display:flex; align-items: center; gap: 10px; font-size: 0.88rem; color: var(--white); }
+.pase-activar-pasos span{
+  flex: 0 0 26px; width: 26px; height: 26px; border-radius: 50%;
+  display:inline-flex; align-items:center; justify-content:center;
+  background: var(--lime); color: var(--black); font-weight: 700; font-size: 0.8rem;
+}
+.pase-activar-acciones{ display:flex; flex-direction: column; align-items: center; gap: 12px; }
+.pase-activar-acciones .btn{ white-space: nowrap; }
+@media (max-width: 760px){
+  .pase-activar{ grid-template-columns: 1fr; padding: 22px 20px; }
+  .pase-activar-pasos{ flex-direction: column; }
+  .pase-activar-acciones{ align-items: stretch; }
+  .pase-activar-acciones .btn{ width: 100%; }
+}
