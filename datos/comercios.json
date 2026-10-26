@@ -10,7 +10,7 @@
       ],
       "ubicacion": "",
       "tipo": "adherido",
-      "logo": ""
+      "logo": "assets/socios/planilla/puntoexe-informatica.webp"
     },
     {
       "slug": "lamparas-aurora",
@@ -22,7 +22,7 @@
       ],
       "ubicacion": "",
       "tipo": "adherido",
-      "logo": ""
+      "logo": "assets/socios/planilla/lamparas-aurora.webp"
     },
     {
       "slug": "carpincho-indumentaria",
@@ -34,7 +34,7 @@
       ],
       "ubicacion": "",
       "tipo": "adherido",
-      "logo": ""
+      "logo": "assets/socios/planilla/carpincho-indumentaria.webp"
     },
     {
       "slug": "casachicha-lp",
@@ -47,7 +47,7 @@
       ],
       "ubicacion": "33C2+7J La Plata, Provincia de Buenos Aires",
       "tipo": "adherido",
-      "logo": ""
+      "logo": "assets/socios/planilla/casachicha-lp.webp"
     },
     {
       "slug": "estacionquenoma",
@@ -59,7 +59,7 @@
       ],
       "ubicacion": "33M3+2X La Plata, Provincia de Buenos Aires",
       "tipo": "adherido",
-      "logo": ""
+      "logo": "assets/socios/planilla/estacionquenoma.webp"
     },
     {
       "slug": "la-compostera",
@@ -71,7 +71,7 @@
       ],
       "ubicacion": "33H4+8V La Plata, Provincia de Buenos Aires",
       "tipo": "adherido",
-      "logo": ""
+      "logo": "assets/socios/planilla/la-compostera.webp"
     },
     {
       "slug": "laola-indie",
@@ -83,7 +83,7 @@
       ],
       "ubicacion": "",
       "tipo": "adherido",
-      "logo": ""
+      "logo": "assets/socios/planilla/laola-indie.webp"
     },
     {
       "slug": "libreriamascaro",
@@ -95,7 +95,7 @@
       ],
       "ubicacion": "33H7+JF La Plata, Provincia de Buenos Aires",
       "tipo": "adherido",
-      "logo": ""
+      "logo": "assets/socios/planilla/libreriamascaro.webp"
     },
     {
       "slug": "munayarena",
@@ -119,7 +119,7 @@
       ],
       "ubicacion": "",
       "tipo": "adherido",
-      "logo": ""
+      "logo": "assets/socios/planilla/mundo-semilla.webp"
     },
     {
       "slug": "pao-tatt",
@@ -131,7 +131,7 @@
       ],
       "ubicacion": "",
       "tipo": "adherido",
-      "logo": ""
+      "logo": "assets/socios/planilla/pao-tatt.webp"
     },
     {
       "slug": "refugio62",
@@ -143,7 +143,7 @@
       ],
       "ubicacion": "33F5+V2 La Plata, Provincia de Buenos Aires",
       "tipo": "adherido",
-      "logo": ""
+      "logo": "assets/socios/planilla/refugio62.webp"
     },
     {
       "slug": "roots-cooperativa",
@@ -155,7 +155,7 @@
       ],
       "ubicacion": "33H2+JP La Plata, Provincia de Buenos Aires",
       "tipo": "adherido",
-      "logo": ""
+      "logo": "assets/socios/planilla/roots-cooperativa.webp"
     },
     {
       "slug": "tatana-ar",
@@ -167,7 +167,7 @@
       ],
       "ubicacion": "33H6+R6 La Plata, Provincia de Buenos Aires",
       "tipo": "adherido",
-      "logo": ""
+      "logo": "assets/socios/planilla/tatana-ar.webp"
     },
     {
       "slug": "ve-gui",
@@ -179,7 +179,7 @@
       ],
       "ubicacion": "",
       "tipo": "adherido",
-      "logo": ""
+      "logo": "assets/socios/planilla/ve-gui.webp"
     },
     {
       "slug": "vaga-arg",
@@ -191,7 +191,7 @@
       ],
       "ubicacion": "33C4+XR La Plata, Provincia de Buenos Aires",
       "tipo": "adherido",
-      "logo": ""
+      "logo": "assets/socios/planilla/vaga-arg.webp"
     },
     {
       "slug": "cuatrogatoslocos",
@@ -203,7 +203,7 @@
       ],
       "ubicacion": "",
       "tipo": "adherido",
-      "logo": ""
+      "logo": "assets/socios/planilla/cuatrogatoslocos.webp"
     }
   ]
 }
