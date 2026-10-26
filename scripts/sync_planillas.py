@@ -18,7 +18,7 @@ Requisitos de la planilla:
   - Compartida como "Cualquier persona con el vínculo: Lector".
   - Fila 1 con los títulos. Se reconocen (sin importar mayúsculas ni tildes):
       Nombre · Rubro · Instagram · Beneficio (y Beneficio 2, 3…) ·
-      Ubicación · Logo · Tipo (opcional) · Activo (opcional)
+      Ubicación · Logo o Gráficas · Tipo (opcional) · Activo (opcional)
   - Los logos: link de Drive (compartido igual que la planilla) o link
     directo a una imagen.
 
@@ -38,6 +38,13 @@ FUENTES = os.path.join(ROOT, "datos", "fuentes.json")
 SALIDA = os.path.join(ROOT, "datos", "comercios.json")
 LOGOS_DIR = os.path.join(ROOT, "assets", "socios", "planilla")
 LOGO_MAX = 320  # px del lado más largo
+PROG_LOGOS_DIR = os.path.join(ROOT, "assets", "programas", "planilla")
+PROG_SALIDA = os.path.join(ROOT, "datos", "programas.json")
+
+
+def nota(msg):
+    # Resumen visible en GitHub (pestaña Actions) sin ser una advertencia.
+    print("::notice::" + msg if os.environ.get("GITHUB_ACTIONS") else msg)
 
 
 def aviso(msg):
@@ -91,7 +98,7 @@ def columnas(titulos):
         "instagram": una("link de instagram", "instagram", "ig"),
         "beneficios": [i for i, h in enumerate(t) if h.startswith("beneficio") or h.startswith("descuento")],
         "ubicacion": una("ubicacion", "direccion", "domicilio"),
-        "logo": una("logo", "imagen"),
+        "logo": una("logo", "imagen", "grafica"),
         "tipo": una("tipo"),
         "activo": una("activo", "visible", "publicar"),
     }
@@ -116,8 +123,9 @@ def url_imagen(v):
     return v
 
 
-def guardar_logo(url, slug):
+def guardar_logo(url, slug, carpeta=None):
     from PIL import Image  # se instala en GitHub (pip install pillow)
+    carpeta = carpeta or LOGOS_DIR
     datos, tipo = descargar(url)
     if "text/html" in tipo:
         raise ValueError("Drive devolvió una página en lugar de la imagen (¿el archivo está compartido con 'Cualquier persona con el vínculo'?)")
@@ -125,11 +133,13 @@ def guardar_logo(url, slug):
     im.load()
     if im.mode not in ("RGB", "RGBA"):
         im = im.convert("RGBA")
-    im.thumbnail((LOGO_MAX, LOGO_MAX))
-    os.makedirs(LOGOS_DIR, exist_ok=True)
+    ancho, alto = im.size
+    im.thumbnail((LOGO_MAX, LOGO_MAX))  # achica sin deformar (mantiene la proporción)
+    os.makedirs(carpeta, exist_ok=True)
     nombre = slug + ".png"
-    im.save(os.path.join(LOGOS_DIR, nombre), optimize=True)
-    return "assets/socios/planilla/" + nombre
+    im.save(os.path.join(carpeta, nombre), optimize=True)
+    guardar_logo.ultimo = "{}x{} → {}x{}".format(ancho, alto, im.size[0], im.size[1])
+    return os.path.relpath(os.path.join(carpeta, nombre), ROOT).replace(os.sep, "/")
 
 
 def leer_csv(cfg):
@@ -147,7 +157,9 @@ def leer_csv(cfg):
 
 
 def sync_programacion(cfg):
-    """Guarda la pestaña de programación tal cual (assets/schedule.js la interpreta)."""
+    """Guarda la pestaña de programación tal cual (assets/schedule.js la
+    interpreta) y arma datos/programas.json con la descripción y el logo
+    de cada programa (los usa build_site.py en Contenidos)."""
     destino = os.path.join(ROOT, "datos", "programacion.csv")
     try:
         texto = leer_csv(cfg)
@@ -155,19 +167,51 @@ def sync_programacion(cfg):
         aviso("No se pudo leer la planilla de programación ({}). La web sigue con los datos anteriores.".format(e))
         return
     filas = list(csv.reader(io.StringIO(texto)))
-    ok = False
-    for f in filas[:10]:
+    head = None
+    for i, f in enumerate(filas[:10]):
         t = [norm(x) for x in f]
-        if any(h.startswith("programa") for h in t) and any(h.startswith("hora") for h in t):
-            ok = True
+        if any(h in ("programa", "nombre") for h in t) and any(h.startswith("hora") for h in t):
+            head = i
             break
     datos = [f for f in filas if any(c.strip() for c in f)]
-    if not ok or len(datos) < 2:
-        aviso("En la planilla de programación no encontramos los títulos (Programa, Hora…) o no tiene programas. La web sigue con los datos anteriores.")
+    if head is None or len(datos) < 2:
+        aviso("En la planilla de programación no encontramos los títulos (Nombre o Programa, Hora…) o no tiene programas. La web sigue con los datos anteriores.")
         return
     with open(destino, "w", encoding="utf-8", newline="") as fh:
         fh.write(texto if texto.endswith("\n") else texto + "\n")
-    print("Programación: {} filas guardadas.".format(len(datos) - 1))
+    titulos = [norm(x) for x in filas[head]]
+    nota("Programación: {} filas guardadas. Columnas: {}".format(len(datos) - 1, " | ".join(filas[head])))
+
+    def col(*nombres):
+        for n in nombres:
+            if n in titulos:
+                return titulos.index(n)
+        return -1
+    c_nombre, c_desc, c_logo = col("nombre", "programa"), col("descripcion"), col("logo")
+    programas, usados = [], set()
+    for n, f in enumerate(filas[head + 1:], start=head + 2):
+        nombre = f[c_nombre].strip() if 0 <= c_nombre < len(f) else ""
+        if not nombre:
+            continue
+        slug = slugify(nombre)
+        p = {"slug": slug, "nombre": nombre,
+             "descripcion": f[c_desc].strip() if 0 <= c_desc < len(f) else "", "logo": ""}
+        url = url_imagen(f[c_logo]) if 0 <= c_logo < len(f) else ""
+        if url:
+            try:
+                p["logo"] = guardar_logo(url, slug, PROG_LOGOS_DIR)
+                usados.add(slug + ".png")
+                nota("Logo de programa OK, fila {} ({}): {}".format(n, nombre, guardar_logo.ultimo))
+            except Exception as e:  # noqa: BLE001
+                aviso("Programación, fila {} ({}): no se pudo usar el logo: {}".format(n, nombre, e))
+        programas.append(p)
+    if os.path.isdir(PROG_LOGOS_DIR):
+        for fn in os.listdir(PROG_LOGOS_DIR):
+            if fn not in usados:
+                os.remove(os.path.join(PROG_LOGOS_DIR, fn))
+    with open(PROG_SALIDA, "w", encoding="utf-8") as fh:
+        json.dump({"programas": programas}, fh, ensure_ascii=False, indent=2)
+        fh.write("\n")
 
 
 def main():
@@ -236,8 +280,11 @@ def sync_comercios(cfg):
         if url:
             try:
                 c["logo"] = guardar_logo(url, slug)
+                nota("Logo de comercio OK, fila {} ({}): {}".format(n, nombre, guardar_logo.ultimo))
             except Exception as e:  # noqa: BLE001
                 problemas.append("fila {} ({}): no se pudo usar el logo: {}".format(n, nombre, e))
+        elif celda(f, cols["logo"]):
+            problemas.append("fila {} ({}): la columna de logo no tiene un link válido".format(n, nombre))
         if c["tipo"] != "auspiciante" and not beneficios:
             problemas.append("fila {} ({}): no tiene beneficio cargado".format(n, nombre))
         comercios.append(c)
@@ -257,8 +304,7 @@ def sync_comercios(cfg):
         json.dump({"comercios": comercios}, fh, ensure_ascii=False, indent=2)
         fh.write("\n")
     con_logo = sum(1 for c in comercios if c["logo"])
-    print("Comercios leídos de la planilla: {} ({} con logo).".format(len(comercios), con_logo))
-    print("Columnas reconocidas: " + ", ".join(k for k, v in cols.items() if (v >= 0 if isinstance(v, int) else v)))
+    nota("Comercios leídos de la planilla: {} ({} con logo). Columnas: {}".format(len(comercios), con_logo, " | ".join(filas[head])))
     for p in problemas:
         aviso(p)
     return
