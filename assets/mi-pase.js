@@ -56,8 +56,24 @@
   function on(sel, ev, fn) { var el = $(sel); if (el) el.addEventListener(ev, fn); }
   function pararReloj() { if (relojTimer) { clearInterval(relojTimer); relojTimer = null; } }
 
-  function mostrar(html) {
+  // La cabecera de la página cambia cuando la usa el equipo de trabajo.
+  var CAB = (function () {
+    var h = document.querySelector('.pase-head');
+    if (!h) return null;
+    var el = { eyebrow: h.querySelector('.eyebrow'), h1: h.querySelector('h1'), p: h.querySelector('p') };
+    return { el: el, orig: { eyebrow: el.eyebrow.textContent, h1: el.h1.textContent, p: el.p.textContent, title: document.title } };
+  })();
+  function cabecera(equipo) {
+    if (!CAB) return;
+    CAB.el.eyebrow.textContent = equipo ? 'Equipo de trabajo · SUBE' : CAB.orig.eyebrow;
+    CAB.el.h1.textContent = equipo ? 'Acceso del equipo' : CAB.orig.h1;
+    CAB.el.p.textContent = equipo ? 'Credencial y herramientas de trabajo para quienes integran SUBE.' : CAB.orig.p;
+    document.title = equipo ? 'Acceso del equipo · SUBE' : CAB.orig.title;
+  }
+
+  function mostrar(html, equipo) {
     pararReloj();
+    cabecera(!!equipo);
     app.innerHTML = (DEMO ? avisoDemo() : '') + html;
     on('[data-reiniciar-demo]', 'click', function () {
       if (confirm('¿Volver a los datos de ejemplo? Se borran las pruebas que hiciste.')) API.reiniciarDemo().then(inicio);
@@ -104,7 +120,7 @@
       '<li><b>Persona sin activar:</b> bruno.ejemplo@ejemplo.com (tocá "Activar mi cuenta")</li>' +
       '<li><b>Comercio:</b> casachicha@demo.subecanal.com.ar · clave <code>sube1234</code></li>' +
       '<li><b>Equipo Sube:</b> finanzas@demo.subecanal.com.ar · clave <code>sube1234</code></li>' +
-      '<li><b>Redacción</b> (entrada oculta, <a href="mi-pase.html?demo#redaccion">mi-pase.html#redaccion</a>): redaccion@demo.subecanal.com.ar · clave <code>sube1234</code></li>' +
+      '<li><b>Equipo de trabajo</b> (entrada oculta, <a href="mi-pase.html?demo#redaccion">mi-pase.html#redaccion</a>): redaccion@demo.subecanal.com.ar · clave <code>sube1234</code></li>' +
       '</ul>' +
       '<button type="button" class="pase-link" data-reiniciar-demo>Volver a los datos de ejemplo</button>' +
       '</details></div>';
@@ -151,13 +167,13 @@
       ayuda: '¿Es la primera vez que entrás? Activá tu cuenta con el mail con el que te suscribiste.' },
     comercio: { titulo: 'Ingreso de comercios', eyebrow: 'Comercio adherido',
       ayuda: '¿Primera vez? Activá la cuenta con el mail que le diste a Sube.' },
-    redaccion: { titulo: 'Portal de la redacción', eyebrow: 'Redacción SUBE',
-      ayuda: '¿Primera vez? Activá tu cuenta con el mail que le diste a la coordinación.' },
+    redaccion: { titulo: 'Ingreso del equipo', eyebrow: 'Equipo de trabajo · SUBE',
+      ayuda: 'Si es tu primer ingreso, activá tu cuenta con el mail que registró la coordinación.' },
     admin: { titulo: 'Equipo Sube', eyebrow: 'Administración', ayuda: '' }
   };
 
   function ingreso(rol) {
-    var t = TEXTOS[rol];
+    var t = TEXTOS[rol], eq = rol === 'redaccion';
     mostrar(
       '<div class="pase-card">' +
       '<button type="button" class="pase-back" data-volver>← Volver</button>' +
@@ -170,10 +186,10 @@
       '</form>' +
       (rol !== 'admin'
         ? '<div class="pase-alt"><p>' + t.ayuda + '</p>' +
-          '<button type="button" class="btn btn-ghost" data-activar>Activar mi cuenta</button>' +
-          '<button type="button" class="pase-link" data-olvide>Olvidé mi contraseña</button></div>'
+          '<button type="button" class="btn btn-ghost" data-activar>' + (eq ? 'Activar cuenta' : 'Activar mi cuenta') + '</button>' +
+          '<button type="button" class="pase-link" data-olvide>' + (eq ? 'Restablecer contraseña' : 'Olvidé mi contraseña') + '</button></div>'
         : '') +
-      '</div>'
+      '</div>', eq
     );
     on('[data-volver]', 'click', inicio);
     on('[data-activar]', 'click', function () { pedirEnlace(rol, false); });
@@ -190,21 +206,22 @@
 
   // ---------- Activar cuenta / olvidé mi contraseña ----------
   function pedirEnlace(rol, olvido) {
+    var eq = rol === 'redaccion';
     mostrar(
       '<div class="pase-card">' +
       '<button type="button" class="pase-back" data-volver>← Volver</button>' +
       '<p class="eyebrow">' + TEXTOS[rol].eyebrow + '</p>' +
-      '<h2>' + (olvido ? 'Recuperar contraseña' : 'Activar mi cuenta') + '</h2>' +
+      '<h2>' + (eq ? (olvido ? 'Restablecer contraseña' : 'Activación de cuenta') : (olvido ? 'Recuperar contraseña' : 'Activar mi cuenta')) + '</h2>' +
       '<p class="pase-sub">' + (rol === 'socio'
         ? 'Escribí el mail con el que te suscribiste en Mercado Pago. Te vamos a mandar un link para que elijas tu contraseña.'
         : rol === 'redaccion'
-          ? 'Escribí el mail con el que te sumaron a la redacción. Te vamos a mandar un link para que elijas tu contraseña.'
+          ? 'Ingresá el mail que registró la coordinación. Vas a recibir un enlace para definir tu contraseña.'
           : 'Escribí el mail del comercio. Te vamos a mandar un link para que elijas la contraseña.') + '</p>' +
       '<form class="pase-form" id="f-enlace" novalidate>' +
       '<label>Mail<input type="email" name="mail" autocomplete="email" required autofocus></label>' +
       '<div id="f-error"></div>' +
-      '<button class="btn btn-primary" type="submit">Enviarme el link</button>' +
-      '</form></div>'
+      '<button class="btn btn-primary" type="submit">' + (eq ? 'Enviar enlace' : 'Enviarme el link') + '</button>' +
+      '</form></div>', eq
     );
     on('[data-volver]', 'click', function () { ingreso(rol); });
     on('#f-enlace', 'submit', function (e) {
@@ -221,25 +238,29 @@
   }
 
   function enlaceEnviado(rol, r) {
+    var eq = rol === 'redaccion';
     mostrar(
       '<div class="pase-card pase-card--center">' +
       '<div class="pase-icon" aria-hidden="true">✉</div>' +
-      '<h2>Revisá tu mail</h2>' +
-      '<p class="pase-sub">Te mandamos un link a <strong>' + esc(r.enviado_a) + '</strong>. Abrilo desde este mismo dispositivo para elegir tu contraseña. Si no lo ves, fijate en spam o promociones.</p>' +
+      '<h2>' + (eq ? 'Revisá tu correo' : 'Revisá tu mail') + '</h2>' +
+      (eq
+        ? '<p class="pase-sub">Enviamos un enlace a <strong>' + esc(r.enviado_a) + '</strong>. Abrilo desde este mismo dispositivo para definir tu contraseña. El enlace vence en una hora; si no lo encontrás, revisá la carpeta de correo no deseado.</p>'
+        : '<p class="pase-sub">Te mandamos un link a <strong>' + esc(r.enviado_a) + '</strong>. Abrilo desde este mismo dispositivo para elegir tu contraseña. Si no lo ves, fijate en spam o promociones.</p>') +
       (DEMO && r.enlace_demo
         ? '<div class="pase-demo pase-demo--inline"><strong>Demostración:</strong> todavía no se mandan mails de verdad. Tocá el botón para seguir como si hubieras abierto el link.' +
           '<button type="button" class="btn btn-primary" data-abrir>Abrir el link</button></div>'
         : '') +
-      '<button type="button" class="pase-link" data-volver>Volver al ingreso</button></div>'
+      '<button type="button" class="pase-link" data-volver>Volver al ingreso</button></div>', eq
     );
     on('[data-volver]', 'click', function () { ingreso(rol); });
     on('[data-abrir]', 'click', function () { elegirClave(rol, r.enlace_demo); });
   }
 
   function elegirClave(rol, token) {
+    var eq = rol === 'redaccion';
     mostrar(
       '<div class="pase-card">' +
-      '<p class="eyebrow">' + TEXTOS[rol].eyebrow + '</p><h2>Elegí tu contraseña</h2>' +
+      '<p class="eyebrow">' + TEXTOS[rol].eyebrow + '</p><h2>' + (eq ? 'Definí tu contraseña' : 'Elegí tu contraseña') + '</h2>' +
       '<form class="pase-form" id="f-clave" novalidate>' +
       '<label>Contraseña nueva<input type="password" name="clave" autocomplete="new-password" minlength="8" required autofocus>' +
       '<span class="pase-hint">Al menos 8 caracteres.</span></label>' +
@@ -247,11 +268,11 @@
       (rol === 'socio'
         ? '<label class="pase-check"><input type="checkbox" name="privacidad"> <span>Leí y acepto el aviso de privacidad de Sube.</span></label>' + PRIVACIDAD
         : rol === 'redaccion'
-          ? '<label class="pase-check"><input type="checkbox" name="privacidad"> <span>Acepto que mi nombre, mi área y mi sección se muestren a quien verifique mi credencial con el código QR.</span></label>'
+          ? '<label class="pase-check"><input type="checkbox" name="privacidad"> <span>Autorizo que mi nombre, mi área y mi sección se muestren a quien verifique mi credencial mediante el código QR.</span></label>'
           : '') +
       '<div id="f-error"></div>' +
-      '<button class="btn btn-primary" type="submit">Guardar y entrar</button>' +
-      '</form></div>'
+      '<button class="btn btn-primary" type="submit">' + (eq ? 'Guardar e ingresar' : 'Guardar y entrar') + '</button>' +
+      '</form></div>', eq
     );
     on('#f-clave', 'submit', function (e) {
       e.preventDefault();
@@ -350,7 +371,7 @@
     return '<div class="credencial" aria-live="polite">' +
       '<div class="cred-band" aria-hidden="true"><span>PRENSA</span></div>' +
       '<div class="cred-body">' +
-      '<div class="ticket-head"><img src="assets/logo.png" alt="SUBE"><span>Redacción SUBE</span></div>' +
+      '<div class="ticket-head"><img src="assets/logo.png" alt="SUBE"><span>Equipo de trabajo</span></div>' +
       '<div class="ticket-status"><span class="ticket-dot" aria-hidden="true"></span>Credencial vigente</div>' +
       '<div class="ticket-name">' + esc(nombrePropio(c.nombre + ' ' + c.apellido)) + '</div>' +
       '<div class="cred-area">' + area + '</div>' +
@@ -358,12 +379,13 @@
       '<div><span>Desde</span><strong>' + fechaCorta(c.desde) + '</strong></div></div>' +
       '<div class="cred-qr-wrap"><div class="cred-qr" id="cred-qr" role="img" aria-label="Código QR para verificar la credencial"></div>' +
       '<div class="ticket-clock"><span class="ticket-time" id="t-hora">--:--:--</span><span class="ticket-date" id="t-fecha"></span></div></div>' +
-      '<p class="ticket-foot">Mostrá esta credencial en coberturas. Con el código QR, cualquiera puede comprobar que es válida.</p>' +
+      '<p class="ticket-foot">Presentá esta credencial para acreditarte en coberturas y actividades. El código QR permite verificar su vigencia en el momento.</p>' +
       '</div></div>';
   }
   function portalHtml(enlaces) {
     if (!enlaces.length) return '';
-    return '<section class="portal"><h3 class="pase-h3">Portal de trabajo</h3><div class="portal-grid">' +
+    return '<section class="portal"><h3 class="pase-h3">Portal de trabajo</h3>' +
+      '<p class="pase-sub">Herramientas y accesos de uso interno del equipo.</p><div class="portal-grid">' +
       enlaces.map(function (l) {
         var externo = /^https?:/.test(l.url);
         return '<a class="portal-link" href="' + esc(l.url) + '"' + (externo ? ' target="_blank" rel="noopener"' : '') + '>' +
@@ -378,12 +400,12 @@
     Promise.all([API.miCredencial(), API.portal().catch(function () { return []; }), API.tambienSocio()]).then(function (r) {
       var c = r[0], enlaces = r[1], esSocio = r[2];
       if (!c) { API.salir().then(inicio); return; }
-      mostrar(barraSesion(sesion, 'Redacción') +
+      mostrar(barraSesion(sesion, 'Equipo SUBE') +
         (volverAdmin ? '<button type="button" class="pase-back" data-volver-admin>← Volver al panel del equipo</button>' : '') +
         '<div class="pase-ticket-wrap">' + credencialHtml(c) + '</div>' +
-        (esSocio ? '<p class="pase-note"><button type="button" class="pase-link" data-ver-boleto>Ver mi boleto de la comunidad de pasajeros</button></p>' : '') +
+        (esSocio ? '<p class="pase-note"><button type="button" class="pase-link" data-ver-boleto>Ver mi boleto de la Comunidad de pasajeros</button></p>' : '') +
         portalHtml(enlaces) +
-        '<p class="pase-note">¿Algún dato de tu credencial está mal? Escribinos a <a href="mailto:laplatasube@gmail.com">laplatasube@gmail.com</a>.</p>');
+        '<p class="pase-note">Si algún dato de tu credencial es incorrecto, comunicate con la coordinación: <a href="mailto:laplatasube@gmail.com">laplatasube@gmail.com</a>.</p>', true);
       engancharSalir();
       on('[data-volver-admin]', 'click', function () { panelAdmin(sesion, 'redaccion'); });
       on('[data-ver-boleto]', 'click', function () { panelSocio(sesion, function () { panelRedaccion(sesion, volverAdmin); }); });
@@ -433,7 +455,7 @@
   // ============================================
   // ADMINISTRACIÓN
   // ============================================
-  var PESTANAS = [['socios', 'Comunidad'], ['excel', 'Cargar Excel'], ['comercios', 'Comercios'], ['redaccion', 'Redacción'], ['registro', 'Registro de búsquedas']];
+  var PESTANAS = [['socios', 'Comunidad'], ['excel', 'Cargar Excel'], ['comercios', 'Comercios'], ['redaccion', 'Credenciales del equipo'], ['registro', 'Registro de búsquedas']];
 
   function panelAdmin(sesion, pestana) {
     mostrar(barraSesion(sesion, 'Equipo Sube') +
@@ -738,17 +760,17 @@
     API.admin.redaccion().then(function (lista) {
       var activas = lista.filter(function (p) { return p.activo; });
       $('#admin-body').innerHTML =
-        '<div class="pase-stats">' + stat(activas.length, 'personas con credencial vigente') +
-        stat(activas.filter(function (p) { return p.cuenta_activada; }).length, 'activaron su cuenta') + '</div>' +
-        '<div class="pase-card pase-card--flat"><h3>Sumar a alguien de la redacción</h3>' +
-        '<p class="pase-sub">Le llega un mail para activar su cuenta. Después entra desde <strong>mi-pase.html#redaccion</strong> (esa entrada no figura en la web) y ve su credencial y el portal de trabajo.</p>' +
+        '<div class="pase-stats">' + stat(activas.length, 'credenciales vigentes') +
+        stat(activas.filter(function (p) { return p.cuenta_activada; }).length, 'cuentas activadas') + '</div>' +
+        '<div class="pase-card pase-card--flat"><h3>Alta de integrantes del equipo</h3>' +
+        '<p class="pase-sub">La persona recibe un mail para activar su cuenta. Ingresa desde <strong>mi-pase.html#redaccion</strong> (acceso no publicado en el menú), donde ve su credencial y el portal de trabajo.</p>' +
         '<form class="pase-form pase-form--row" id="f-redaccion" novalidate>' +
         '<label>Nombre<input name="nombre" required></label>' +
         '<label>Apellido<input name="apellido"></label>' +
         '<label>Mail<input name="mail" type="email" required placeholder="nombre@mail.com"></label>' +
         '<label>Área' + selectArea('area', 'Redacción') + '</label>' +
         '<label>Sección<input name="seccion" placeholder="Ej: Deportes"></label>' +
-        '<button class="btn btn-primary" type="submit">Sumar</button></form><div id="f-error"></div></div>' +
+        '<button class="btn btn-primary" type="submit">Dar de alta</button></form><div id="f-error"></div></div>' +
         '<div class="pase-table-wrap"><table class="pase-table"><thead><tr><th>N.º</th><th>Nombre</th><th>Área</th><th>Sección</th><th>Desde</th><th>Cuenta</th><th>Estado</th><th></th></tr></thead><tbody>' +
         (lista.map(function (p) {
           return '<tr data-id="' + p.id + '"><td>' + numeroCredencial(p.numero) + '</td><td>' + esc(nombrePropio(p.nombre + ' ' + p.apellido)) +
@@ -759,7 +781,7 @@
             '<button type="button" class="pase-link" data-guardar="' + p.id + '" hidden>Guardar</button>' +
             '<button type="button" class="pase-link" data-baja="' + p.id + '" data-activo="' + (p.activo ? '1' : '0') + '">' +
             (p.activo ? 'Dar de baja' : 'Reactivar') + '</button></td></tr>';
-        }).join('') || '<tr><td colspan="8" class="pase-muted">Todavía no hay nadie cargado.</td></tr>') +
+        }).join('') || '<tr><td colspan="8" class="pase-muted">Todavía no hay integrantes cargados.</td></tr>') +
         '</tbody></table></div>' +
         '<p class="pase-note">Los accesos del portal de trabajo se editan en Supabase: Table Editor → <strong>portal_enlaces</strong>.</p>';
       app.querySelectorAll('tr[data-id]').forEach(function (tr) {
@@ -777,7 +799,7 @@
       app.querySelectorAll('[data-baja]').forEach(function (b) {
         b.addEventListener('click', function () {
           var activo = b.getAttribute('data-activo') === '1';
-          if (activo && !confirm('¿Dar de baja esta credencial? Deja de ser válida al instante y la persona ya no puede entrar al portal.')) return;
+          if (activo && !confirm('¿Dar de baja esta credencial? Deja de ser válida en el momento y la persona pierde el acceso al portal de trabajo.')) return;
           API.admin.editarRedaccion(b.getAttribute('data-baja'), { activo: !activo }).then(function () { adminRedaccion(sesion); });
         });
       });

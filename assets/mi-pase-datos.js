@@ -196,7 +196,7 @@
       if (!u || !u.clave) return error(u ? 'Tu cuenta todavía no está activada. Tocá "Activar mi cuenta".' : 'El mail o la contraseña no son correctos.');
       if (u.clave !== clave) return error('El mail o la contraseña no son correctos.');
       if (rol === 'comercio' && !u.activo) return error('La cuenta de este comercio está dada de baja. Escribinos a laplatasube@gmail.com.');
-      if (rol === 'redaccion' && !u.activo) return error('Tu credencial de redacción está dada de baja. Si creés que es un error, escribinos a laplatasube@gmail.com.');
+      if (rol === 'redaccion' && !u.activo) return error('Tu credencial no está vigente. Para más información, comunicate con la coordinación: laplatasube@gmail.com.');
       var s = { rol: rol, id: u.id, nombre: rol === 'socio' ? u.nombre : u.nombre, mail: u.mail };
       guardarSesion(s);
       return esperar(copia(s));
@@ -215,7 +215,7 @@
         return error(rol === 'socio'
           ? 'No encontramos ese mail en la comunidad.'
           : rol === 'redaccion'
-            ? 'Ese mail no figura en la redacción. Pedile a la coordinación que te sume.'
+            ? 'Ese mail no está registrado en el equipo de trabajo. Consultá con la coordinación.'
             : 'Ese mail no corresponde a ningún comercio adherido.');
       }
       if ((rol === 'comercio' || rol === 'redaccion') && !u.activo) return error('Esa cuenta está dada de baja.');
@@ -333,7 +333,7 @@
         var db = leer(), mail = normalizarMail(d.mail);
         if (!String(d.nombre || '').trim()) return error('Falta el nombre.');
         if (!mailValido(mail)) return error('Revisá el mail.');
-        if (db.redaccion.some(function (r) { return r.mail === mail; })) return error('Ya hay alguien de la redacción con ese mail.');
+        if (db.redaccion.some(function (r) { return r.mail === mail; })) return error('Ya hay una persona del equipo registrada con ese mail.');
         var n = db.redaccion.reduce(function (m, r) { return Math.max(m, r.numero); }, 0) + 1;
         var r = { id: 'r' + Date.now().toString(36), numero: n, nombre: d.nombre.trim(), apellido: String(d.apellido || '').trim(),
           mail: mail, area: d.area || 'Redacción', seccion: String(d.seccion || '').trim(), activo: true, clave: null,

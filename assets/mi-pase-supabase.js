@@ -57,7 +57,7 @@
           return sb.auth.signOut().then(function () { throw new Error('La cuenta de este comercio está dada de baja. Escribinos a laplatasube@gmail.com.'); });
         }
         if (rol === 'redaccion_baja') {
-          return sb.auth.signOut().then(function () { throw new Error('Tu credencial de redacción está dada de baja. Si creés que es un error, escribinos a laplatasube@gmail.com.'); });
+          return sb.auth.signOut().then(function () { throw new Error('Tu credencial no está vigente. Para más información, comunicate con la coordinación: laplatasube@gmail.com.'); });
         }
         if (!rol) {
           return sb.auth.signOut().then(function () { throw new Error('Tu mail ya no figura en la comunidad. Si creés que es un error, escribinos a laplatasube@gmail.com.'); });
@@ -107,14 +107,16 @@
     pedirEnlace: function (rol, mail) {
       mail = String(mail || '').trim().toLowerCase();
       if (!mailValido(mail)) return Promise.reject(new Error('Revisá el mail: parece estar mal escrito.'));
-      return sb.auth.signInWithOtp({ email: mail, options: { shouldCreateUser: true, emailRedirectTo: urlDeVuelta() } })
+      var opciones = { shouldCreateUser: true, emailRedirectTo: urlDeVuelta() };
+      if (rol === 'redaccion') opciones.data = { equipo: true }; // el mail sale con el texto del equipo
+      return sb.auth.signInWithOtp({ email: mail, options: opciones })
         .then(function (r) {
           if (r.error) {
             if (/No encontramos/.test(r.error.message)) {
               throw new Error(rol === 'socio'
                 ? 'No encontramos ese mail en la comunidad.'
                 : rol === 'redaccion'
-                  ? 'Ese mail no figura en la redacción. Pedile a la coordinación que te sume.'
+                  ? 'Ese mail no está registrado en el equipo de trabajo. Consultá con la coordinación.'
                   : 'Ese mail no corresponde a ningún comercio adherido.');
             }
             throw fallo(r.error);
@@ -235,10 +237,10 @@
         if (!mailValido(mail)) return Promise.reject(new Error('Revisá el mail.'));
         return sb.from('redaccion').insert({ nombre: d.nombre.trim(), apellido: String(d.apellido || '').trim(), mail: mail,
           area: d.area || 'Redacción', seccion: String(d.seccion || '').trim() }).then(function (r) {
-          if (r.error) throw (/duplicate|unique/i.test(r.error.message) ? new Error('Ya hay alguien de la redacción con ese mail.') : fallo(r.error));
-          return sb.auth.signInWithOtp({ email: mail, options: { shouldCreateUser: true, emailRedirectTo: urlDeVuelta() } });
+          if (r.error) throw (/duplicate|unique/i.test(r.error.message) ? new Error('Ya hay una persona del equipo registrada con ese mail.') : fallo(r.error));
+          return sb.auth.signInWithOtp({ email: mail, options: { shouldCreateUser: true, emailRedirectTo: urlDeVuelta(), data: { equipo: true } } });
         }).then(function (r) {
-          if (r && r.error) return { enviado_a: mail, aviso: 'Quedó cargada, pero no se pudo mandar el mail (' + fallo(r.error).message + '). Puede activar su cuenta desde mi-pase.html#redaccion con "Activar mi cuenta".' };
+          if (r && r.error) return { enviado_a: mail, aviso: 'El alta quedó registrada, pero no se pudo enviar el mail (' + fallo(r.error).message + '). La persona puede activar su cuenta desde mi-pase.html#redaccion con "Activar cuenta".' };
           return { enviado_a: mail };
         });
       },

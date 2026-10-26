@@ -41,7 +41,7 @@
   var codigo = new URLSearchParams(window.location.search).get('c');
   if (!codigo) {
     resultado('muted', '?', 'Escaneá el código QR de una credencial',
-      '<span>Cada persona de la redacción de SUBE tiene una credencial con un código QR. Al escanearlo, esta página muestra si es válida.</span>');
+      '<span>Cada integrante del equipo de SUBE tiene una credencial con un código QR. Al escanearlo, esta página confirma si está vigente.</span>');
     return;
   }
 
@@ -50,16 +50,16 @@
       var area = esc(c.area) + (c.seccion ? ' · ' + esc(c.seccion) : '');
       resultado('ok', '✔', 'Credencial válida',
         '<span class="cred-verif-name">' + esc(nombrePropio(c.nombre + ' ' + c.apellido)) + '</span>' +
-        '<span>Integra la redacción de SUBE · ' + area + '</span>' +
+        '<span>Integra el equipo de trabajo de SUBE · ' + area + '</span>' +
         '<span>Credencial N.º R-' + ('000' + c.numero).slice(-4) + ' · desde el ' + fechaLarga(c.desde) + '</span>' +
         '<span class="pase-muted" id="cred-hora">Comprobado el ' + ahora() + '</span>');
       setInterval(function () { var h = document.getElementById('cred-hora'); if (h) h.textContent = 'Comprobado el ' + ahora(); }, 1000);
     } else if (c) {
-      resultado('no', '✘', 'Credencial dada de baja', '<span>Esta credencial ya no es válida. Ante cualquier duda, escribinos a <a href="mailto:laplatasube@gmail.com">laplatasube@gmail.com</a>.</span>');
+      resultado('no', '✘', 'Credencial no vigente', '<span>Esta credencial fue dada de baja y no acredita pertenencia al equipo de SUBE. Para consultas: <a href="mailto:laplatasube@gmail.com">laplatasube@gmail.com</a>.</span>');
     } else {
-      resultado('no', '✘', 'Credencial no válida', '<span>Este código no corresponde a ninguna credencial de la redacción de SUBE.</span>');
+      resultado('no', '✘', 'Credencial no válida', '<span>El código no corresponde a ninguna credencial emitida por SUBE.</span>');
     }
   }, function () {
-    resultado('warn', '!', 'No pudimos comprobarla ahora', '<span>Revisá la conexión a internet y volvé a escanear el código.</span>');
+    resultado('warn', '!', 'No se pudo verificar en este momento', '<span>Revisá la conexión a internet y volvé a escanear el código.</span>');
   });
 })();

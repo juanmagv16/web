@@ -968,12 +968,12 @@ MI_PASE_BODY = '''  <section class="pase-page">
 CREDENCIAL_BODY = '''  <section class="pase-page">
     <div class="wrap">
       <div class="pase-head">
-        <span class="eyebrow">Redacción SUBE</span>
+        <span class="eyebrow">Equipo de trabajo · SUBE</span>
         <h1>Verificar credencial</h1>
-        <p>Comprobá si una credencial de prensa de SUBE es válida.</p>
+        <p>Verificación de credenciales emitidas por SUBE a integrantes de su equipo de trabajo.</p>
       </div>
       <div id="cred-verif" class="cred-verif" aria-live="polite">
-        <p class="pase-loading">Comprobando…</p>
+        <p class="pase-loading">Verificando…</p>
         <noscript><p class="pase-error">Para comprobar la credencial necesitás tener JavaScript activado.</p></noscript>
       </div>
     </div>
@@ -1310,8 +1310,8 @@ if __name__ == "__main__":
     write(
         "credencial.html",
         page_html(
-            "Verificar credencial · Redacción SUBE",
-            "Verificación de credenciales de prensa de la redacción de SUBE.",
+            "Verificar credencial · SUBE",
+            "Verificación de credenciales del equipo de trabajo de SUBE.",
             CREDENCIAL_BODY,
             depth=0,
             active=None,
