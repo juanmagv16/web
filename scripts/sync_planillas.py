@@ -156,8 +156,9 @@ def guardar_logo(url, slug, carpeta=None):
             im = im.crop((max(0, caja[0] - pad), max(0, caja[1] - pad), min(ancho, caja[2] + pad), min(alto, caja[3] + pad)))
     im.thumbnail((LOGO_MAX, LOGO_MAX))  # achica sin deformar (mantiene la proporción)
     os.makedirs(carpeta, exist_ok=True)
-    nombre = slug + ".png"
-    im.save(os.path.join(carpeta, nombre), optimize=True)
+    # WebP con transparencia: pesa varias veces menos que PNG con la misma calidad visible
+    nombre = slug + ".webp"
+    im.save(os.path.join(carpeta, nombre), "WEBP", quality=86, method=6)
     guardar_logo.ultimo = "{}x{} → {}x{}".format(ancho, alto, im.size[0], im.size[1])
     return os.path.relpath(os.path.join(carpeta, nombre), ROOT).replace(os.sep, "/")
 
@@ -220,7 +221,7 @@ def sync_programacion(cfg):
         if url:
             try:
                 p["logo"] = guardar_logo(url, slug, PROG_LOGOS_DIR)
-                usados.add(slug + ".png")
+                usados.add(os.path.basename(p["logo"]))
                 nota("Logo de programa OK, fila {} ({}): {}".format(n, nombre, guardar_logo.ultimo))
             except Exception as e:  # noqa: BLE001
                 aviso("Programación, fila {} ({}): no se pudo usar el logo: {}".format(n, nombre, e))

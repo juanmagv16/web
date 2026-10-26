@@ -4,7 +4,7 @@
       "slug": "streaming-copa",
       "nombre": "Streaming copa",
       "descripcion": "Viví la pasión del fútbol con toda la previa, el análisis y el aguante. La Copa se juega también desde SUBE.",
-      "logo": "assets/programas/planilla/streaming-copa.png"
+      "logo": "assets/programas/planilla/streaming-copa.webp"
     },
     {
       "slug": "marcando-la-cancha",
@@ -22,13 +22,13 @@
       "slug": "el-amplificador",
       "nombre": "El amplificador",
       "descripcion": "Música, artistas y cultura emergente. Le damos volumen a las voces y los sonidos que merecen ser escuchados.",
-      "logo": "assets/programas/planilla/el-amplificador.png"
+      "logo": "assets/programas/planilla/el-amplificador.webp"
     },
     {
       "slug": "estacion-freak",
       "nombre": "Estacion freak",
       "descripcion": "Anime, cultura geek y todo lo que te vuela la cabeza. Un espacio para compartir pasiones y explorar universos.",
-      "logo": "assets/programas/planilla/estacion-freak.png"
+      "logo": "assets/programas/planilla/estacion-freak.webp"
     },
     {
       "slug": "de-que-viven",
