@@ -1571,11 +1571,11 @@ a.program-ig-chip:hover{ color: var(--lime); border-color: rgba(193,255,0,0.35);
 
 /* Contenidos: descripción y logo de cada programa (desde la planilla) */
 .schedule-info{ width: 100%; display:flex; align-items: flex-start; gap: 14px; padding-left: 64px; margin-top: 6px; }
-.schedule-logo{ flex: 0 0 auto; width: 64px; height: 64px; object-fit: contain; border-radius: 10px; background: var(--black-soft); padding: 4px; }
+.schedule-logo{ flex: 0 0 auto; height: 60px; width: auto; max-width: 120px; object-fit: contain; border-radius: 10px; background: var(--black-soft); padding: 6px; }
 .schedule-desc{ margin: 0; font-size: 0.88rem; line-height: 1.55; color: var(--grey); }
 @media (max-width: 720px){
   .schedule-info{ padding-left: 0; }
-  .schedule-logo{ width: 56px; height: 56px; }
+  .schedule-logo{ height: 52px; max-width: 104px; }
 }
 
 /* Próxima parada: el nombre enlaza al perfil del programa */

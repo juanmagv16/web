@@ -39,8 +39,8 @@ En **Project Settings → API Keys** están:
 
 Para sumar las credenciales y el portal de trabajo de la redacción, volvé a correr **todo** `01-estructura.sql` en el SQL Editor (igual que en el paso 1). No borra ni cambia los datos cargados: agrega la tabla `redaccion`, la tabla `portal_enlaces` con 5 accesos de ejemplo y actualiza las funciones.
 
-- Las personas de la redacción se suman desde Mi pase → Equipo Sube → pestaña **Redacción**.
-- Entran desde `mi-pase.html#redaccion` (esa entrada no figura en el menú).
+- Las personas del equipo se suman desde la administración → pestaña **Credenciales del equipo**.
+- Entran desde el acceso del equipo, una página no publicada (su dirección está en `ACCESO_EQUIPO`, dentro de `build_site.py`). La administración tiene su propia página no publicada (`ACCESO_GESTION`).
 - Los accesos del portal se editan en **Table Editor → portal_enlaces** (título, descripción, link, orden; `activo` en falso para ocultar uno).
 - El código QR de cada credencial abre `credencial.html`, que muestra si es válida, sin pedir ingreso.
 
