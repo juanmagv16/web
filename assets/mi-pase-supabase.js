@@ -44,7 +44,9 @@
       .toLowerCase().replace(/[^a-z0-9ñ@._+\- ]/g, ' ').replace(/\s+/g, ' ').trim();
   }
   function mailValido(m) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m); }
-  function urlDeVuelta() { return window.location.origin + window.location.pathname; }
+  // Los links de los mails siempre vuelven a mi-pase.html (dirección habilitada en
+  // Supabase). Desde ahí, cada cuenta ve su pantalla según su tipo.
+  function urlDeVuelta() { return window.location.origin + window.location.pathname.replace(/[^\/]*$/, '') + 'mi-pase.html'; }
 
   // Arma la sesión que usan las pantallas: { rol, nombre, mail }
   function armarSesion() {
@@ -240,7 +242,7 @@
           if (r.error) throw (/duplicate|unique/i.test(r.error.message) ? new Error('Ya hay una persona del equipo registrada con ese mail.') : fallo(r.error));
           return sb.auth.signInWithOtp({ email: mail, options: { shouldCreateUser: true, emailRedirectTo: urlDeVuelta(), data: { equipo: true } } });
         }).then(function (r) {
-          if (r && r.error) return { enviado_a: mail, aviso: 'El alta quedó registrada, pero no se pudo enviar el mail (' + fallo(r.error).message + '). La persona puede activar su cuenta desde mi-pase.html#redaccion con "Activar cuenta".' };
+          if (r && r.error) return { enviado_a: mail, aviso: 'El alta quedó registrada, pero no se pudo enviar el mail (' + fallo(r.error).message + '). La persona puede activar su cuenta desde el acceso del equipo con "Activar cuenta".' };
           return { enviado_a: mail };
         });
       },

@@ -127,13 +127,33 @@ def guardar_logo(url, slug, carpeta=None):
     from PIL import Image  # se instala en GitHub (pip install pillow)
     carpeta = carpeta or LOGOS_DIR
     datos, tipo = descargar(url)
+    m = re.search(r"[?&]id=([a-zA-Z0-9_-]+)", url) if "drive.google.com" in url else None
+    if "text/html" in tipo and m:
+        # Otras dos formas de pedirle la imagen a Drive (archivos grandes o
+        # con aviso de "no se pudo analizar"): la descarga directa y la miniatura.
+        for alt in ("https://drive.usercontent.google.com/download?id={}&export=download&confirm=t".format(m.group(1)),
+                    "https://drive.google.com/thumbnail?id={}&sz=w1000".format(m.group(1))):
+            try:
+                datos, tipo = descargar(alt)
+            except Exception:  # noqa: BLE001
+                continue
+            if "text/html" not in tipo:
+                break
     if "text/html" in tipo:
-        raise ValueError("Drive devolvió una página en lugar de la imagen (¿el archivo está compartido con 'Cualquier persona con el vínculo'?)")
+        t = re.search(rb"<title>(.*?)</title>", datos, re.S | re.I)
+        titulo = t.group(1).decode("utf-8", "replace").strip()[:80] if t else "sin título"
+        raise ValueError("Drive devolvió una página («{}») en lugar de la imagen: revisá que el archivo esté compartido con 'Cualquier persona con el vínculo'".format(titulo))
     im = Image.open(io.BytesIO(datos))
     im.load()
     if im.mode not in ("RGB", "RGBA"):
         im = im.convert("RGBA")
     ancho, alto = im.size
+    if im.mode == "RGBA":
+        # Recorta el margen transparente sobrante para que el logo se vea más grande
+        caja = im.split()[3].getbbox()
+        if caja:
+            pad = max(2, int(max(caja[2] - caja[0], caja[3] - caja[1]) * 0.03))
+            im = im.crop((max(0, caja[0] - pad), max(0, caja[1] - pad), min(ancho, caja[2] + pad), min(alto, caja[3] + pad)))
     im.thumbnail((LOGO_MAX, LOGO_MAX))  # achica sin deformar (mantiene la proporción)
     os.makedirs(carpeta, exist_ok=True)
     nombre = slug + ".png"
@@ -305,6 +325,8 @@ def sync_comercios(cfg):
         fh.write("\n")
     con_logo = sum(1 for c in comercios if c["logo"])
     nota("Comercios leídos de la planilla: {} ({} con logo). Columnas: {}".format(len(comercios), con_logo, " | ".join(filas[head])))
+    if problemas:
+        nota("Comercios con problemas ({}): {}".format(len(problemas), " · ".join(problemas)))
     for p in problemas:
         aviso(p)
     return

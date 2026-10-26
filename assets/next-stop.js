@@ -1,6 +1,8 @@
 /* ============================================
    SUBE — bloque "PRÓXIMA PARADA" (Home)
    ------------------------------------------------------
+   El nombre del programa enlaza a su perfil en Contenidos
+   (programas/<slug>.html) cuando ese perfil existe.
    No lee ni calcula nada por su cuenta: solo consume
    window.SubeSchedule (assets/schedule.js) y dibuja el
    resultado. schedule.js ya se encarga de tener un
@@ -54,7 +56,31 @@
   }
 
   var timerId = null;
-  var enVivo = false;
+
+  // Perfiles de Contenidos (programas/<slug>.html) que existen en el sitio.
+  // Los escribe build_site.py en data-perfiles: { slug: "nombre del perfil" }.
+  var PERFILES = {};
+  // El slug se arma igual que en scripts/sync_planillas.py: sin tildes,
+  // minúsculas y guiones. "¿De qué viven?" → "de-que-viven".
+  function slugDe(nombre) {
+    return String(nombre || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+  function programaHtml(nombre) {
+    var slug = slugDe(nombre);
+    if (PERFILES.hasOwnProperty(slug)) {
+      return (
+        '<a class="next-stop-program-link" href="programas/' + slug + '.html">' +
+        escapeHtml(PERFILES[slug] || nombre) +
+        '<span class="next-stop-program-arrow" aria-hidden="true">→</span></a>'
+      );
+    }
+    return escapeHtml(nombre); // sin perfil: solo el nombre, sin link
+  }
 
   function pintarInicial(container, stop) {
     var cuando = fechaYHoraArgentina(stop.utc);
@@ -62,7 +88,7 @@
     container.innerHTML =
       '<p class="next-stop-label">Próxima parada</p>' +
       '<p class="next-stop-program">' +
-      escapeHtml(stop.programa) +
+      programaHtml(stop.programa) +
       "</p>" +
       '<p class="next-stop-when">' +
       cuando.diaSemana +
@@ -74,26 +100,19 @@
       '<div class="next-stop-countdown" id="next-stop-countdown"></div>';
   }
 
-  function pintarEnVivo(container, stop) {
-    container.innerHTML =
-      '<p class="next-stop-label next-stop-label--live">Ahora en SUBE</p>' +
-      '<p class="next-stop-program">' +
-      escapeHtml(stop.programa) +
-      "</p>";
-  }
-
   function tick(container, stop) {
     var diff = stop.utc - Date.now();
 
     if (diff <= 0) {
-      if (!enVivo) {
-        enVivo = true;
-        pintarEnVivo(container, stop);
-        if (timerId) {
-          clearInterval(timerId);
-          timerId = null;
-        }
+      // Llegó la hora: la planilla no dice cuánto dura cada programa, así
+      // que no se muestra "en vivo". Se pasa directo a la próxima emisión.
+      if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
       }
+      var siguiente = window.SubeSchedule.getNextStop();
+      if (siguiente && siguiente.utc > Date.now()) iniciar(container, siguiente);
+      else pintarSinDatos(container);
       return;
     }
 
@@ -131,6 +150,11 @@
   document.addEventListener("DOMContentLoaded", function () {
     var container = document.getElementById("next-stop");
     if (!container || !window.SubeSchedule) return;
+    try {
+      PERFILES = JSON.parse(container.getAttribute("data-perfiles") || "{}");
+    } catch (e) {
+      PERFILES = {};
+    }
 
     window.SubeSchedule.ready.then(function () {
       var stop = window.SubeSchedule.getNextStop();

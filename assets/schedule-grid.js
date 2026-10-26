@@ -127,6 +127,9 @@
     var container = document.getElementById("content-schedule");
     var ondemandBlock = document.getElementById("schedule-ondemand-block");
     if (!container || !ondemandBlock || !window.SubeSchedule) return;
+    // La grilla ya viene armada desde la planilla (con descripción y logo):
+    // no hace falta volver a dibujarla.
+    if (container.getAttribute("data-origen") === "planilla") return;
 
     window.SubeSchedule.ready.then(function () {
       var programas = window.SubeSchedule.getAllPrograms();

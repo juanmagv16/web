@@ -32,7 +32,7 @@ No borres `{{ .ConfirmationURL }}` ni las líneas `{{ if … }}`, `{{ else }}` y
     <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#d6d6d0;">La coordinación te dio de alta en el equipo de trabajo de SUBE. Con el botón vas a activar tu cuenta y definir tu contraseña. Después vas a tener acceso a tu credencial y al portal de trabajo.</p>
     <p style="margin:0 0 28px;"><a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#c1ff00;color:#0b0b0b;text-decoration:none;font-weight:bold;font-size:15px;padding:14px 28px;border-radius:999px;">Activar cuenta</a></p>
     <p style="margin:0 0 8px;font-size:13px;line-height:1.5;color:#a8a8a2;">Abrí el enlace desde el mismo dispositivo en el que lo vas a usar. Vence en una hora.</p>
-    <p style="margin:0;font-size:13px;line-height:1.5;color:#a8a8a2;">Para ingresar más adelante, guardá esta dirección: {{ .RedirectTo }}#redaccion. Si no esperabas este mail, ignoralo.</p>
+    <p style="margin:0;font-size:13px;line-height:1.5;color:#a8a8a2;">Para ingresar más adelante, usá el acceso del equipo que te compartió la coordinación. Si no esperabas este mail, ignoralo.</p>
 {{ else }}
     <p style="margin:0 0 8px;font-size:12px;font-weight:bold;letter-spacing:2px;color:#c1ff00;">COMUNIDAD DE PASAJEROS</p>
     <h1 style="margin:0 0 16px;font-size:26px;line-height:1.2;color:#f5f5f0;">Activá tu cuenta de Mi pase</h1>

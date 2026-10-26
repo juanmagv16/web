@@ -104,7 +104,7 @@ def footer_html(depth):
 </footer>'''.format(u=u, mail=MAIL_ICON, ig=IG_ICON_16, tiktok=TIKTOK_ICON, x=X_ICON, yt=YOUTUBE_ICON)
 
 
-def page_html(title, description, body, depth, active, extra_scripts=None, body_id=None):
+def page_html(title, description, body, depth, active, extra_scripts=None, body_id=None, noindex=False):
     extra_scripts = extra_scripts or []
     scripts = "\n".join('<script src="{u}assets/{s}"></script>'.format(u=up(depth), s=s) for s in extra_scripts)
     return '''<!DOCTYPE html>
@@ -113,7 +113,7 @@ def page_html(title, description, body, depth, active, extra_scripts=None, body_
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{title}</title>
-<meta name="description" content="{description}">
+<meta name="description" content="{description}">{robots}
 <link rel="icon" href="{u}assets/logo.png">
 <link rel="stylesheet" href="{u}style.css">
 </head>
@@ -135,6 +135,7 @@ def page_html(title, description, body, depth, active, extra_scripts=None, body_
 '''.format(
         title=title,
         description=description,
+        robots='\n<meta name="robots" content="noindex, nofollow">' if noindex else "",
         u=up(depth),
         header=header_html(depth, active),
         body_id_attr=(' id="' + body_id + '"') if body_id else "",
@@ -155,7 +156,7 @@ def write(path, html):
 # ============================================================
 # HOME (index.html)
 # ============================================================
-LIVE_PLAYLIST_ID = "PLYT7ujTIBmWat3a4FBqiq8kWbAD_kybd5"
+LIVE_PLAYLIST_ID = "PLYT7ujTIBmWat3a4FBqiq8kWbAD_kybd5"  # playlist «Último programa»
 
 HOME_BODY_TEMPLATE = '''  <section class="hero">
     <div class="wrap">
@@ -172,18 +173,18 @@ HOME_BODY_TEMPLATE = '''  <section class="hero">
       </div>
 
       <div class="hero-player">
-        <p class="hero-player-label">En vivo / último programa</p>
+        <p class="hero-player-label">Último programa</p>
         <div class="video-embed">
           <iframe
             src="https://www.youtube.com/embed/videoseries?list={list_id}"
-            title="SUBE — en vivo"
+            title="SUBE — último programa"
             loading="lazy"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen>
           </iframe>
         </div>
 
-        <div class="next-stop" id="next-stop" aria-live="polite" hidden></div>
+        <div class="next-stop" id="next-stop" aria-live="polite" data-perfiles="{perfiles}" hidden></div>
       </div>
     </div>
   </section>
@@ -327,6 +328,13 @@ def benefit_cards_html():
     return "\n\n".join(benefit_card_html(*c) for c in BENEFIT_CARDS)
 
 
+# Geolocalización de comercios ("Ver qué tan cerca están"): apagada por
+# ahora. Para volver a activarla, poner True. Los datos de ubicación de cada
+# comercio (data-location) y assets/geo.js siguen intactos.
+GEOLOCALIZACION_ACTIVA = False
+BOTON_UBICACION = '''      <button class="btn btn-ghost btn-location" id="activate-location" type="button">{pin} Ver qué tan cerca están</button>
+'''
+
 COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
     <div class="wrap">
       <div class="section-head">
@@ -346,8 +354,7 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
         <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Ver más beneficios">{arrow_right}</button>
       </div>
 
-      <button class="btn btn-ghost btn-location" id="activate-location" type="button">{pin} Ver qué tan cerca están</button>
-
+{{boton_ubicacion}}
       <p class="benefits-note">Los descuentos y condiciones de cada beneficio son definidos por cada espacio adherido y pueden cambiar sin aviso previo.</p>
 
       <a class="partner-cta" href="mailto:laplatasube@gmail.com?subject=Quiero%20sumar%20mi%20comercio%20a%20SUBE">
@@ -445,19 +452,8 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
 # ============================================================
 # CONTENIDOS — Programación inline + Noticias como antes (card)
 # ============================================================
-CONTENIDOS_BODY = '''  <section class="content">
-    <div class="wrap">
-      <div class="section-head">
-        <h2>Contenidos</h2>
-        <p>Todo lo que produce SUBE, en un solo lugar.</p>
-      </div>
-
-      <div class="content-subhead">
-        <span class="content-subhead-eyebrow">En vivo y on demand</span>
-        <h3>Programación</h3>
-      </div>
-
-      <div class="content-schedule" id="content-schedule">
+# Grilla de respaldo (la de siempre), por si todavía no hay copia de la planilla.
+GRILLA_RESPALDO = '''      <div class="content-schedule" id="content-schedule">
 
         <div class="schedule-day">
           <h3>Lunes</h3>
@@ -526,6 +522,21 @@ CONTENIDOS_BODY = '''  <section class="content">
 
       </div>
 
+'''
+
+CONTENIDOS_BODY = '''  <section class="content">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Contenidos</h2>
+        <p>Todo lo que produce SUBE, en un solo lugar.</p>
+      </div>
+
+      <div class="content-subhead">
+        <span class="content-subhead-eyebrow">En vivo y on demand</span>
+        <h3>Programación</h3>
+      </div>
+
+{grilla}
       <div class="content-subhead">
         <span class="content-subhead-eyebrow">Redacción SUBE</span>
         <h3>Noticias</h3>
@@ -940,15 +951,21 @@ AVISO_PRIVACIDAD = '''<h3>Aviso de privacidad de Mi pase</h3>
 <p><strong>Comercios adheridos.</strong> Los comercios de la red pueden buscarte por nombre y apellido para confirmar si estás al día. Solo ven la respuesta (al día o no), nunca tu mail ni otros datos. Sube registra qué comercio hizo cada verificación y cuándo, para cuidar el buen uso de la herramienta y conocer cómo se usan los beneficios.</p>
 <p><strong>Tus derechos.</strong> Podés pedir ver, corregir o borrar tus datos escribiéndonos al mail de arriba, según la Ley 25.326 de Protección de Datos Personales. La Agencia de Acceso a la Información Pública es el organismo de control de esta ley.</p>'''
 
+# Accesos no publicados (no figuran en el menú ni en ninguna página).
+# Quien tenga la dirección igual tiene que ingresar con su cuenta: lo que
+# protege los datos es el inicio de sesión, no que la dirección sea secreta.
+ACCESO_EQUIPO = "equipo-pqgywm1wqr.html"     # equipo de trabajo: credencial y portal
+ACCESO_GESTION = "gestion-chnqrjwuq6.html"   # administración del equipo Sube (finanzas)
+
 MI_PASE_BODY = '''  <section class="pase-page">
     <div class="wrap">
       <div class="pase-head">
-        <span class="eyebrow">Comunidad de pasajeros</span>
-        <h1>Mi pase</h1>
-        <p>Tu boleto para usar los beneficios de la comunidad, y la herramienta de verificación para los comercios adheridos.</p>
+        <span class="eyebrow">{eyebrow}</span>
+        <h1>{titulo}</h1>
+        <p>{bajada}</p>
       </div>
 
-      <div id="pase-app" class="pase-app" aria-live="polite">
+      <div id="pase-app" class="pase-app" aria-live="polite" data-modo="{modo}" data-acceso-equipo="{acceso_equipo}">
         <noscript><p class="pase-error">Para usar Mi pase necesitás tener JavaScript activado en el navegador.</p></noscript>
       </div>
 
@@ -960,7 +977,20 @@ MI_PASE_BODY = '''  <section class="pase-page">
       </details>
     </div>
   </section>
-'''.format(aviso=AVISO_PRIVACIDAD)
+'''
+
+
+def mi_pase_body(modo="publico"):
+    textos = {
+        "publico": ("Comunidad de pasajeros", "Mi pase",
+                    "Tu boleto para usar los beneficios de la comunidad, y la herramienta de verificación para los comercios adheridos."),
+        "equipo": ("Equipo de trabajo · SUBE", "Acceso del equipo",
+                   "Credencial y herramientas de trabajo para quienes integran SUBE."),
+        "admin": ("Administración · SUBE", "Gestión de Mi pase",
+                  "Comunidad de pasajeros, comercios adheridos y credenciales del equipo."),
+    }[modo]
+    return MI_PASE_BODY.format(eyebrow=textos[0], titulo=textos[1], bajada=textos[2], modo=modo,
+                               acceso_equipo=ACCESO_EQUIPO, aviso=AVISO_PRIVACIDAD)
 
 
 # Página pública que abre el código QR de las credenciales de la redacción.
@@ -1132,6 +1162,151 @@ PROGRAMS = [
 ]
 
 
+# ------------------------------------------------------------
+# Programación desde la planilla (datos/programacion.csv y
+# datos/programas.json, que trae scripts/sync_planillas.py).
+# ------------------------------------------------------------
+DIAS_SEMANA = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"]
+
+
+def programacion_planilla():
+    """Filas de la planilla de programación como diccionarios (títulos
+    normalizados). Devuelve [] si todavía no hay copia."""
+    import csv
+    ruta = os.path.join(ROOT, "datos", "programacion.csv")
+    if not os.path.exists(ruta):
+        return []
+    with open(ruta, encoding="utf-8") as fh:
+        filas = [f for f in csv.reader(fh) if any(c.strip() for c in f)]
+    if len(filas) < 2:
+        return []
+    titulos = [_slugify(t).replace("-", "_") for t in filas[0]]
+    out = []
+    for f in filas[1:]:
+        d = {t: (f[k].strip() if k < len(f) else "") for k, t in enumerate(titulos)}
+        d["nombre"] = d.get("nombre") or d.get("programa", "")
+        if d["nombre"] and (d.get("activo", "si").lower() in SI):
+            d["slug"] = _slugify(d["nombre"])
+            out.append(d)
+    return out
+
+
+def programas_extra():
+    """slug → {descripcion, logo} desde datos/programas.json."""
+    import json
+    ruta = os.path.join(ROOT, "datos", "programas.json")
+    if not os.path.exists(ruta):
+        return {}
+    with open(ruta, encoding="utf-8") as fh:
+        return {p["slug"]: p for p in json.load(fh).get("programas", [])}
+
+
+def perfiles():
+    """Perfiles de programa que existen en Contenidos: slug → nombre."""
+    return {p["slug"]: p["name"] for p in PROGRAMS}
+
+
+def nombre_programa(fila):
+    return perfiles().get(fila["slug"], fila["nombre"])
+
+
+def link_programa(fila, clase=""):
+    e = html.escape
+    if fila["slug"] in perfiles():
+        return '<a{} href="programas/{}.html">{}</a>'.format(clase, fila["slug"], e(nombre_programa(fila)))
+    return "<span{}>{}</span>".format(clase, e(fila["nombre"]))
+
+
+def info_programa_html(fila, extra):
+    e = html.escape
+    x = extra.get(fila["slug"], {})
+    desc = fila.get("descripcion") or x.get("descripcion", "")
+    logo = x.get("logo", "")
+    if logo and not os.path.exists(os.path.join(ROOT, logo)):
+        logo = ""
+    if not desc and not logo:
+        return ""
+    img = ('<img class="schedule-logo" src="{}" alt="{}" loading="lazy">'.format(e(logo), e("Logo de " + nombre_programa(fila)))
+           if logo else "")
+    return '<div class="schedule-info">{}{}</div>'.format(img, '<p class="schedule-desc">{}</p>'.format(e(desc)) if desc else "")
+
+
+def grilla_contenidos_html():
+    filas = programacion_planilla()
+    if not filas:
+        return GRILLA_RESPALDO
+    extra = programas_extra()
+    e = html.escape
+    por_dia = {}
+    for f in filas:
+        dia = _slugify(f.get("dia_semana", ""))
+        if dia in DIAS_SEMANA and re.match(r"^\d{1,2}:\d{2}$", f.get("hora", "")):
+            por_dia.setdefault(dia, []).append(f)
+    bloques = []
+    for dia in DIAS_SEMANA:
+        if dia not in por_dia:
+            continue
+        items = []
+        lista = sorted(por_dia[dia], key=lambda f: [int(x) for x in f["hora"].split(":")])
+        for f in lista:
+            alt = ""
+            if f.get("frecuencia_dias") == "14":
+                pareja = [o for o in lista if o is not f and o.get("frecuencia_dias") == "14"]
+                alt = '<span class="schedule-alt">Cada dos semanas{}</span>'.format(
+                    ", alterna con " + e(nombre_programa(pareja[0])) if len(pareja) == 1 else "")
+            items.append("""            <li>
+              <span class="schedule-time">{hora}</span>
+              {link}
+              {alt}{info}
+            </li>""".format(hora=e(f["hora"]), link=link_programa(f), alt=alt, info=info_programa_html(f, extra)))
+        bloques.append("""        <div class="schedule-day">
+          <h3>{}</h3>
+          <ul class="schedule-list">
+{}
+          </ul>
+        </div>""".format(DIA_LABEL_ES[dia], "\n".join(items)))
+    ondemand = []
+    for f in filas:
+        if _slugify(f.get("frecuencia", "")) == "on-demand" and f["slug"] in perfiles():
+            desc = f.get("descripcion") or extra.get(f["slug"], {}).get("descripcion", "")
+            ondemand.append("""            <li>
+              <a href="programas/{slug}.html">
+                <span class="ondemand-main">
+                  <span class="ondemand-name">{nombre}</span>{desc}
+                </span>
+                <span class="ondemand-tag">Programa</span>
+              </a>
+            </li>""".format(slug=f["slug"], nombre=e(nombre_programa(f)),
+                            desc='\n                  <span class="ondemand-desc">{}</span>'.format(e(desc)) if desc else ""))
+    ondemand.append("""            <li>
+              <a href="https://www.youtube.com/watch?v=2E0gkC1fRDY&list=PLYT7ujTIBmWbglZ7Mmi-r4RnP1NqsDMt6" target="_blank" rel="noopener">
+                <span class="ondemand-main">
+                  <span class="ondemand-name">Especiales</span>
+                  <span class="ondemand-desc">Navegá en todos nuestros especiales</span>
+                </span>
+                <span class="ondemand-tag">Playlist</span>
+              </a>
+            </li>""")
+    return """      <div class="content-schedule" id="content-schedule" data-origen="planilla">
+
+{dias}
+
+        <div class="schedule-day" id="schedule-ondemand-block">
+          <h3>On demand</h3>
+          <ul class="ondemand-list">
+{od}
+          </ul>
+        </div>
+
+      </div>
+
+""".format(dias="\n\n".join(bloques), od="\n".join(ondemand))
+
+
+DIA_LABEL_ES = {"lunes": "Lunes", "martes": "Martes", "miercoles": "Miércoles", "jueves": "Jueves",
+                "viernes": "Viernes", "sabado": "Sábado", "domingo": "Domingo"}
+
+
 def ig_url(handle):
     return "https://www.instagram.com/" + handle.lstrip("@") + "/"
 
@@ -1249,6 +1424,7 @@ if __name__ == "__main__":
     HOME_BODY = HOME_BODY_TEMPLATE.format(
         list_id=LIVE_PLAYLIST_ID,
         featured_news=home_featured_news_html(NEWS),
+        perfiles=html.escape(__import__("json").dumps(perfiles(), ensure_ascii=False)),
     )
 
     write(
@@ -1267,10 +1443,10 @@ if __name__ == "__main__":
         page_html(
             "Comunidad · SUBE",
             "La Comunidad de pasajeros de SUBE: beneficios en comercios amigos y cómo sumarte con tu aporte.",
-            COMUNIDAD_BODY,
+            COMUNIDAD_BODY.replace("{boton_ubicacion}", BOTON_UBICACION.format(pin=PIN_ICON) if GEOLOCALIZACION_ACTIVA else ""),
             depth=0,
             active="comunidad",
-            extra_scripts=["logo-autoload.js", "geo.js", "carousel.js"],
+            extra_scripts=["logo-autoload.js", "geo.js", "carousel.js"] if GEOLOCALIZACION_ACTIVA else ["logo-autoload.js", "carousel.js"],
         ),
     )
     write(
@@ -1278,7 +1454,7 @@ if __name__ == "__main__":
         page_html(
             "Contenidos · SUBE",
             "Programación y noticias de SUBE.",
-            CONTENIDOS_BODY,
+            CONTENIDOS_BODY.replace("{grilla}", grilla_contenidos_html()),
             depth=0,
             active="contenidos",
             extra_scripts=["schedule.js", "schedule-grid.js"],
@@ -1301,12 +1477,16 @@ if __name__ == "__main__":
         page_html(
             "Mi pase · SUBE",
             "Mi pase: el boleto de la Comunidad de pasajeros de SUBE y la verificación de membresías para comercios adheridos.",
-            MI_PASE_BODY,
+            mi_pase_body("publico"),
             depth=0,
             active="mipase",
             extra_scripts=["mi-pase-config.js", "mi-pase-inicio.js"],
         ),
     )
+    for ruta, modo, titulo in ((ACCESO_EQUIPO, "equipo", "Acceso del equipo · SUBE"),
+                               (ACCESO_GESTION, "admin", "Gestión de Mi pase · SUBE")):
+        write(ruta, page_html(titulo, "Acceso interno de SUBE.", mi_pase_body(modo), depth=0, active=None,
+                              extra_scripts=["mi-pase-config.js", "mi-pase-inicio.js"], noindex=True))
     write(
         "credencial.html",
         page_html(

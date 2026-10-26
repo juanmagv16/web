@@ -5,7 +5,10 @@
    y ven su boleto "vivo" (nombre, vigencia y hora en tiempo real).
    Comercios adheridos: buscan a una persona por nombre y apellido
    y ven si está activo o no.
-   Redacción (entrada oculta: mi-pase.html#redaccion): credencial con
+   Accesos no publicados (no figuran en el menú):
+     equipo-pqgywm1wqr.html  → equipo de trabajo (credencial y portal)
+     gestion-chnqrjwuq6.html → administración del equipo Sube
+   Equipo de trabajo: credencial con
    código QR para verificarla y portal de trabajo del equipo.
    Equipo de Sube: carga el Excel mensual de la comunidad, da de alta
    y de baja comercios y personas de la redacción, y ve el registro
@@ -18,6 +21,9 @@
   if (!app || !window.SubePase) return;
   var API = window.SubePase;
   var DEMO = API.modo === 'demo';
+  // 'publico' (mi-pase.html), 'equipo' o 'admin' (páginas no publicadas)
+  var MODO = app.getAttribute('data-modo') || 'publico';
+  var ACCESO_EQUIPO = app.getAttribute('data-acceso-equipo') || '';
   var MP_LINK = 'comunidad.html#asociate';
   var XLSX_URL = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
   var QR_URL = 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js';
@@ -119,8 +125,8 @@
       '<li><b>Persona con el pase vencido:</b> carla.prueba@ejemplo.com · clave <code>sube1234</code></li>' +
       '<li><b>Persona sin activar:</b> bruno.ejemplo@ejemplo.com (tocá "Activar mi cuenta")</li>' +
       '<li><b>Comercio:</b> casachicha@demo.subecanal.com.ar · clave <code>sube1234</code></li>' +
-      '<li><b>Equipo Sube:</b> finanzas@demo.subecanal.com.ar · clave <code>sube1234</code></li>' +
-      '<li><b>Equipo de trabajo</b> (entrada oculta, <a href="mi-pase.html?demo#redaccion">mi-pase.html#redaccion</a>): redaccion@demo.subecanal.com.ar · clave <code>sube1234</code></li>' +
+      (MODO === 'admin' ? '<li><b>Equipo Sube:</b> finanzas@demo.subecanal.com.ar · clave <code>sube1234</code></li>' : '') +
+      (MODO === 'equipo' ? '<li><b>Equipo de trabajo:</b> redaccion@demo.subecanal.com.ar · clave <code>sube1234</code></li>' : '') +
       '</ul>' +
       '<button type="button" class="pase-link" data-reiniciar-demo>Volver a los datos de ejemplo</button>' +
       '</details></div>';
@@ -139,6 +145,8 @@
   // INICIO: dos puertas
   // ============================================
   function inicio() {
+    if (MODO === 'equipo') return ingreso('redaccion');
+    if (MODO === 'admin') return ingreso('admin');
     mostrar(
       '<div class="pase-doors">' +
       '<button type="button" class="pase-door" data-go="socio">' +
@@ -151,8 +159,7 @@
       '<span class="pase-door-title">Verificar membresías</span>' +
       '<span class="pase-door-desc">Buscá a una persona por nombre y apellido para confirmar que es socia activa de la comunidad.</span>' +
       '<span class="pase-door-arrow">→</span></button>' +
-      '</div>' +
-      '<p class="pase-admin-link"><button type="button" class="pase-link" data-go="admin">Acceso equipo Sube</button></p>'
+      '</div>'
     );
     app.querySelectorAll('[data-go]').forEach(function (b) {
       b.addEventListener('click', function () { ingreso(b.getAttribute('data-go')); });
@@ -176,7 +183,7 @@
     var t = TEXTOS[rol], eq = rol === 'redaccion';
     mostrar(
       '<div class="pase-card">' +
-      '<button type="button" class="pase-back" data-volver>← Volver</button>' +
+      (MODO === 'publico' ? '<button type="button" class="pase-back" data-volver>← Volver</button>' : '') +
       '<p class="eyebrow">' + t.eyebrow + '</p><h2>' + t.titulo + '</h2>' +
       '<form class="pase-form" id="f-ingreso" novalidate>' +
       '<label>Mail<input type="email" name="mail" autocomplete="email" required autofocus></label>' +
@@ -763,7 +770,8 @@
         '<div class="pase-stats">' + stat(activas.length, 'credenciales vigentes') +
         stat(activas.filter(function (p) { return p.cuenta_activada; }).length, 'cuentas activadas') + '</div>' +
         '<div class="pase-card pase-card--flat"><h3>Alta de integrantes del equipo</h3>' +
-        '<p class="pase-sub">La persona recibe un mail para activar su cuenta. Ingresa desde <strong>mi-pase.html#redaccion</strong> (acceso no publicado en el menú), donde ve su credencial y el portal de trabajo.</p>' +
+        '<p class="pase-sub">La persona recibe un mail para activar su cuenta. Después ingresa desde el acceso del equipo (no publicado en el menú), donde ve su credencial y el portal de trabajo: ' +
+        (ACCESO_EQUIPO ? '<strong>' + esc(new URL(ACCESO_EQUIPO, window.location.href).href) + '</strong>' : '') + '. Compartiselo solo a quienes integran el equipo.</p>' +
         '<form class="pase-form pase-form--row" id="f-redaccion" novalidate>' +
         '<label>Nombre<input name="nombre" required></label>' +
         '<label>Apellido<input name="apellido"></label>' +
@@ -884,7 +892,7 @@
     return API.sesionActual().then(function (s) {
       if (s) return panel(s);
       var h = (location.hash || '').replace('#', '');
-      if (h === 'comercio' || h === 'socio' || h === 'admin' || h === 'redaccion') return ingreso(h);
+      if (MODO === 'publico' && (h === 'comercio' || h === 'socio')) return ingreso(h);
       inicio();
     });
   });

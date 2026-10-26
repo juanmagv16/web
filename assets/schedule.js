@@ -264,19 +264,19 @@
   }
 
   // ---------- Copia local de respaldo (fallback) ----------
-  // Última programación validada manualmente en la conversación con SUBE.
+  // Copia de la planilla de programación del 26/10/2026 (mismas columnas).
   // Está escrita como CSV, con las mismas columnas exactas que la hoja
   // real, para que pase por el mismo parseo y las mismas validaciones
   // que el dato en vivo — cero lógica duplicada. Para actualizarla,
   // alcanza con editar este texto (no hay que tocar ninguna función).
   var FALLBACK_CSV =
-    "programa,dia_semana,hora,frecuencia,frecuencia_dias,fecha_referencia,temporada,activo\n" +
-    "Streaming Copa,lunes,18:00,semanal,7,2026-08-24,2026,si\n" +
+    "nombre,dia_semana,hora,frecuencia,frecuencia_dias,fecha_referencia,temporada,activo\n" +
+    "Streaming copa,lunes,18:00,semanal,7,2026-08-24,2026,si\n" +
     "Marcando la cancha,lunes,19:30,semanal,7,2026-08-24,2026,si\n" +
-    "F@lopa informativa nacional,lunes,21:00,semanal,7,2026-08-24,2026,si\n" +
+    "Falopa informativa nacional,lunes,21:00,semanal,7,2026-08-24,2026,si\n" +
     "El amplificador,jueves,18:00,semanal,7,2026-08-27,2026,si\n" +
     "Estacion freak,jueves,19:30,quincenal,14,2026-09-03,2026,si\n" +
-    "De que viven,jueves,20:00,quincenal,14,2026-08-27,2026,si\n" +
+    "¿De qué viven?,jueves,20:00,quincenal,14,2026-08-27,2026,si\n" +
     "Chicha y limonada,jueves,21:30,semanal,7,2026-08-27,2026,si\n";
 
   var FETCH_TIMEOUT_MS = 6000; // no bloquea la Home: a los 6s se corta y se usa el fallback
@@ -314,7 +314,9 @@
     var cols = null;
     for (var h = 0; h < Math.min(rows.length, 6); h++) {
       var candidate = rows[h];
+      // La planilla actual titula la columna "nombre"; versiones anteriores, "programa".
       var progCol = findCol(candidate, ["programa"]);
+      if (progCol === -1) progCol = findColExact(candidate.map(normalizeHeader), ["nombre"]);
       var diaCol = findCol(candidate, ["dia_semana", "dia semana", "diasemana"]);
       if (progCol !== -1 && diaCol !== -1) {
         cols = {

@@ -1568,3 +1568,21 @@ a.program-ig-chip:hover{ color: var(--lime); border-color: rgba(193,255,0,0.35);
 .pase-result--muted{ background: var(--card); border: 1px solid var(--card-border); color: var(--grey); }
 .pase-result--muted .pase-result-icon{ background: rgba(255,255,255,0.08); color: var(--white); }
 .pase-result--muted strong{ color: var(--white); }
+
+/* Contenidos: descripción y logo de cada programa (desde la planilla) */
+.schedule-info{ width: 100%; display:flex; align-items: flex-start; gap: 14px; padding-left: 64px; margin-top: 6px; }
+.schedule-logo{ flex: 0 0 auto; width: 64px; height: 64px; object-fit: contain; border-radius: 10px; background: var(--black-soft); padding: 4px; }
+.schedule-desc{ margin: 0; font-size: 0.88rem; line-height: 1.55; color: var(--grey); }
+@media (max-width: 720px){
+  .schedule-info{ padding-left: 0; }
+  .schedule-logo{ width: 56px; height: 56px; }
+}
+
+/* Próxima parada: el nombre enlaza al perfil del programa */
+.next-stop-program-link{
+  color: var(--white); text-decoration: underline; text-decoration-color: rgba(193,255,0,0.55);
+  text-decoration-thickness: 2px; text-underline-offset: 4px; transition: color .2s, text-decoration-color .2s;
+}
+.next-stop-program-link:hover, .next-stop-program-link:focus-visible{ color: var(--lime); text-decoration-color: var(--lime); }
+.next-stop-program-arrow{ display:inline-block; margin-left: 8px; color: var(--lime); transition: transform .2s; }
+.next-stop-program-link:hover .next-stop-program-arrow{ transform: translateX(3px); }
