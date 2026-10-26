@@ -651,6 +651,8 @@ def _armar_nota(meta, body, path):
     fecha = meta.get("fecha", "")
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
         raise SystemExit("ERROR en redaccion/{}: la fecha tiene que tener el formato AAAA-MM-DD (por ejemplo 2026-10-19)".format(os.path.basename(path)))
+    if meta.get("video") and not youtube_id(meta["video"]):
+        avisar("la nota '{}' tiene un video que no es un link de YouTube: no se muestra.".format(os.path.basename(path)))
     return {
         "slug": _slugify(meta.get("slug") or re.sub(r"^\d{4}-\d{2}-\d{2}-?", "", name)),
         "titulo": meta["titulo"],
@@ -660,6 +662,7 @@ def _armar_nota(meta, body, path):
         "fecha": fecha,
         "imagen": meta.get("imagen", ""),
         "epigrafe": meta.get("epigrafe", ""),
+        "video": meta.get("video", ""),
         "jerarquia": _jerarquia(meta),
         "publicar": meta.get("publicar", "si").lower() in SI,
         "cuerpo": body.strip(),
@@ -723,6 +726,22 @@ def _src_relativa(src, depth):
     return up(depth) + src.lstrip("/")
 
 
+def youtube_id(url):
+    """ID de un video de YouTube a partir de cualquier link habitual
+    (youtube.com/watch?v=, youtu.be/, /shorts/, /live/, /embed/). '' si no es."""
+    m = re.search(r"(?:youtube\.com/(?:watch\?(?:[^#\s]*&)?v=|shorts/|live/|embed/)|youtu\.be/)([A-Za-z0-9_-]{11})", str(url or ""))
+    return m.group(1) if m else ""
+
+
+def video_html(url, titulo=""):
+    vid = youtube_id(url)
+    if not vid:
+        return ""
+    return ('<div class="video-embed article-video"><iframe src="https://www.youtube-nocookie.com/embed/{}" title="{}" '
+            'loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" '
+            'allowfullscreen></iframe></div>').format(vid, html.escape(titulo or "Video de YouTube"))
+
+
 def body_to_html(body, depth=1):
     """Convierte el cuerpo de la nota: párrafos separados por una línea en
     blanco, '## ' para un intertítulo, '> ' para una cita destacada, listas
@@ -732,7 +751,11 @@ def body_to_html(body, depth=1):
     for b in blocks:
         lineas = [l.rstrip() for l in b.split("\n")]
         img = re.fullmatch(r"!\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)", b)
-        if img:
+        # Un link de YouTube solo en su párrafo (o como [texto](link)) se muestra como video
+        solo = re.fullmatch(r"<?(https?://\S+)>?|\[[^\]]*\]\((https?://[^)\s]+)\)", b.replace("\\_", "_"))
+        if solo and youtube_id(solo.group(1) or solo.group(2)):
+            out.append(video_html(solo.group(1) or solo.group(2)))
+        elif img:
             alt = html.escape(img.group(1))
             cap = "<figcaption>{}</figcaption>".format(alt) if alt else ""
             out.append('<figure class="article-figure"><img src="{}" alt="{}" loading="lazy">{}</figure>'.format(
@@ -870,6 +893,7 @@ def news_article_body(note, notes):
         <p class="article-byline">Por {autor}</p>
       </header>
       {figure}
+      {video}
       <div class="article-body">
         {body}
       </div>
@@ -891,6 +915,7 @@ def news_article_body(note, notes):
         bajada=bajada,
         autor=e(note["autor"]),
         figure=figure,
+        video=video_html(note["video"], note["titulo"]),
         body=body,
         wa=WHATSAPP_ICON,
         x=X_ICON,

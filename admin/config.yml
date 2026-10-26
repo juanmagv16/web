@@ -100,6 +100,11 @@ collections:
         name: epigrafe
         widget: string
         required: false
+      - label: Video de YouTube
+        name: video
+        widget: string
+        required: false
+        hint: "Pegá el link del video (youtube.com/watch?v=… o youtu.be/…). Se muestra debajo de la foto. Para poner un video en medio del texto, pegá el link solo, en un párrafo aparte."
       - label: Jerarquía
         name: jerarquia
         widget: select
