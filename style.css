@@ -9,12 +9,15 @@
 
 @font-face{
   font-family: 'Anton';
-  src: url('assets/fonts/Anton-Regular.ttf') format('truetype');
+  /* WOFF2 (solo caracteres latinos, 1/6 del peso); el TTF queda de respaldo */
+  src: url('assets/fonts/Anton-Regular.woff2') format('woff2'),
+       url('assets/fonts/Anton-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+/* Roboto se carga desde el <head> de cada página (un @import ubicado acá
+   no funcionaba: el navegador lo ignora si no está al principio del archivo). */
 
 :root{
   --black: #0b0b0b;
@@ -47,6 +50,10 @@ body{
   background-image:
     linear-gradient(180deg, rgba(11,11,11,0.88) 0%, rgba(11,11,11,0.94) 100%),
     url('assets/textura.jpg');
+  /* Navegadores actuales: la misma textura en WebP (menos de la mitad de peso) */
+  background-image:
+    linear-gradient(180deg, rgba(11,11,11,0.88) 0%, rgba(11,11,11,0.94) 100%),
+    image-set(url('assets/textura.webp') type('image/webp'), url('assets/textura.jpg') type('image/jpeg'));
   background-repeat: repeat;
   background-size: 620px;
   background-attachment: fixed;
@@ -985,3 +992,28 @@ a.program-ig-chip:hover{ color: var(--lime); border-color: rgba(193,255,0,0.35);
 
 /* back-link también usado en Noticias/Tienda, fuera del contexto de programa */
 .soon .back-link{ margin-bottom: 24px; }
+
+/* ============================================
+   Contenidos: descripción y logo de cada programa (desde la planilla)
+   ============================================ */
+.schedule-info{ width: 100%; display:flex; align-items: flex-start; gap: 14px; padding-left: 64px; margin-top: 6px; text-align: left; }
+.schedule-logo{ flex: 0 0 auto; height: 60px; width: auto; max-width: 120px; object-fit: contain; border-radius: 10px; background: var(--black-soft); padding: 6px; }
+.schedule-desc{ margin: 0; font-size: 0.88rem; line-height: 1.55; color: var(--grey); }
+@media (max-width: 720px){
+  .schedule-info{ padding-left: 0; }
+  .schedule-logo{ height: 52px; max-width: 104px; }
+}
+
+/* Próxima parada: el nombre del programa enlaza a su perfil */
+.next-stop-program-link{
+  color: var(--white); text-decoration: underline; text-decoration-color: rgba(193,255,0,0.55);
+  text-decoration-thickness: 2px; text-underline-offset: 4px; transition: color .2s, text-decoration-color .2s;
+}
+.next-stop-program-link:hover, .next-stop-program-link:focus-visible{ color: var(--lime); text-decoration-color: var(--lime); }
+.next-stop-program-arrow{ display:inline-block; margin-left: 8px; color: var(--lime); transition: transform .2s; }
+.next-stop-program-link:hover .next-stop-program-arrow{ transform: translateX(3px); }
+.footer-strip picture{ display:block; line-height: 0; }
+
+/* Logos de comercios (de la planilla): se muestran completos, sin recortar
+   ni deformar, aunque no sean cuadrados. */
+.benefit-logo img{ object-fit: contain; }

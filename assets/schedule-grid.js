@@ -55,8 +55,25 @@
       .trim();
   }
 
+  // Perfiles que existen en Contenidos (programas/<slug>.html): los
+  // escribe build_site.py en data-perfiles = { slug: "nombre del perfil" }.
+  var PERFILES = {};
+  function slugDe(nombre) {
+    return String(nombre || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
   function slugPara(nombrePrograma) {
+    var s = slugDe(nombrePrograma);
+    if (PERFILES.hasOwnProperty(s)) return s;
     return SLUGS[normalizar(nombrePrograma)] || null;
+  }
+  function nombrePara(p) {
+    var s = slugPara(p.programa);
+    return s && PERFILES[s] ? PERFILES[s] : p.programa;
   }
 
   function pad(n) {
@@ -70,15 +87,32 @@
       .replace(/>/g, "&gt;");
   }
 
-  function itemHtml(p) {
+  function infoHtml(p) {
+    var src = p.logo && window.SubePlanillas ? window.SubePlanillas.logo(p.logo) : "";
+    if (!src && !p.descripcion) return "";
+    return (
+      '<div class="schedule-info">' +
+      (src ? '<img class="schedule-logo" src="' + escapeHtml(src) + '" alt="Logo de ' + escapeHtml(nombrePara(p)) + '" loading="lazy" decoding="async">' : "") +
+      (p.descripcion ? '<p class="schedule-desc">' + escapeHtml(p.descripcion) + "</p>" : "") +
+      "</div>"
+    );
+  }
+
+  function itemHtml(p, items) {
     var slug = slugPara(p.programa);
     var horaTexto = pad(p.hora.h) + ":" + pad(p.hora.m);
     var nombreHtml = slug
-      ? '<a href="programas/' + slug + '.html">' + escapeHtml(p.programa) + "</a>"
+      ? '<a href="programas/' + slug + '.html">' + escapeHtml(nombrePara(p)) + "</a>"
       : "<span>" + escapeHtml(p.programa) + "</span>";
-    var alt = p.frecuencia_dias >= 14 ? '<span class="schedule-alt">Cada dos semanas</span>' : "";
+    var alt = "";
+    if (p.frecuencia_dias >= 14) {
+      // Si hay otro programa quincenal el mismo día, se alternan semana por medio
+      var pareja = items.filter(function (o) { return o !== p && o.frecuencia_dias >= 14; });
+      alt = '<span class="schedule-alt">Cada dos semanas' +
+        (pareja.length === 1 ? ", alterna con " + escapeHtml(nombrePara(pareja[0])) : "") + "</span>";
+    }
     return (
-      "<li><span class=\"schedule-time\">" + horaTexto + "</span>" + nombreHtml + alt + "</li>"
+      "<li><span class=\"schedule-time\">" + horaTexto + "</span>" + nombreHtml + alt + infoHtml(p) + "</li>"
     );
   }
 
@@ -90,7 +124,7 @@
       '<div class="schedule-day"><h3>' +
       DIAS_LABEL[dia] +
       '</h3><ul class="schedule-list">' +
-      items.map(itemHtml).join("") +
+      items.map(function (p) { return itemHtml(p, items); }).join("") +
       "</ul></div>"
     );
   }
@@ -127,6 +161,11 @@
     var container = document.getElementById("content-schedule");
     var ondemandBlock = document.getElementById("schedule-ondemand-block");
     if (!container || !ondemandBlock || !window.SubeSchedule) return;
+    try {
+      PERFILES = JSON.parse(container.getAttribute("data-perfiles") || "{}");
+    } catch (e) {
+      PERFILES = {};
+    }
 
     window.SubeSchedule.ready.then(function () {
       var programas = window.SubeSchedule.getAllPrograms();

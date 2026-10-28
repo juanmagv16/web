@@ -13,6 +13,8 @@ Para agregar/editar el contenido de un programa, buscar el diccionario
 PROGRAMS más abajo.
 """
 import os
+import html
+import re
 
 ROOT = os.path.dirname(__file__)
 
@@ -42,6 +44,16 @@ NAV_ITEMS = [
     ("contacto", "Contacto", "contacto.html"),
 ]
 
+# Secciones ocultas al público por ahora. Para volver a mostrar una,
+# sacala de esta lista y regenerá el sitio (python3 build_site.py):
+# vuelven su link en el menú, sus accesos y su página completa.
+# Mientras está oculta, su página redirige a la Home y no aparece en Google.
+SECCIONES_OCULTAS = {"noticias", "tienda"}
+
+
+def visible(seccion):
+    return seccion not in SECCIONES_OCULTAS
+
 
 def up(depth):
     """Prefijo relativo según la profundidad de la página (0 = raíz)."""
@@ -51,6 +63,8 @@ def up(depth):
 def nav_links_html(depth, active):
     links = []
     for key, label, href in NAV_ITEMS:
+        if not visible(key):
+            continue
         cls = ' class="is-current"' if key == active else ""
         links.append('<a href="{u}{href}"{cls}>{label}</a>'.format(u=up(depth), href=href, cls=cls, label=label))
     return "\n      ".join(links)
@@ -60,7 +74,7 @@ def header_html(depth, active):
     return '''<header class="site-header">
   <div class="wrap">
     <div class="header-weather" id="header-weather" aria-live="polite" hidden></div>
-    <a href="{u}index.html" class="brand"><img src="{u}assets/logo.png" alt="Sube Canal"></a>
+    <a href="{u}index.html" class="brand"><img src="{u}assets/logo.png" alt="Sube Canal" width="269" height="104"></a>
     <nav class="nav-links" id="nav-links">
       {links}
     </nav>
@@ -76,7 +90,10 @@ def footer_html(depth):
     return '''<footer>
   <div class="wrap">
     <div class="footer-strip">
-      <img class="footer-bus" src="{u}assets/colectivo.png" alt="Sube Canal — un viaje colectivo">
+      <picture>
+        <source srcset="{u}assets/colectivo.webp" type="image/webp">
+        <img class="footer-bus" src="{u}assets/colectivo.png" alt="Sube Canal — un viaje colectivo" width="919" height="288" loading="lazy" decoding="async">
+      </picture>
       <div class="footer-channels">
         <a href="mailto:laplatasube@gmail.com">{mail}<span>laplatasube@gmail.com</span></a>
         <a href="https://www.instagram.com/subecanal" target="_blank" rel="noopener">{ig}<span>Instagram</span></a>
@@ -100,6 +117,10 @@ def page_html(title, description, body, depth, active, extra_scripts=None, body_
 <title>{title}</title>
 <meta name="description" content="{description}">
 <link rel="icon" href="{u}assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="{u}assets/fonts/Anton-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="{u}style.css">
 </head>
 <body>
@@ -157,23 +178,48 @@ HOME_BODY = '''  <section class="hero">
       </div>
 
       <div class="hero-player">
-        <p class="hero-player-label">En vivo / último programa</p>
+        <p class="hero-player-label">Último programa</p>
         <div class="video-embed">
           <iframe
             src="https://www.youtube.com/embed/videoseries?list={list_id}"
-            title="SUBE — en vivo"
+            title="SUBE — último programa"
             loading="lazy"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen>
           </iframe>
         </div>
 
-        <div class="next-stop" id="next-stop" aria-live="polite" hidden></div>
+        <div class="next-stop" id="next-stop" aria-live="polite" data-perfiles="{perfiles}" hidden></div>
       </div>
     </div>
   </section>
 
-  <section class="featured-news">
+{noticias_destacadas}  <section class="sponsors">
+    <div class="wrap">
+      <div class="sponsor-slots">
+        <a class="sponsor-slot sponsor-slot--banner" href="contacto.html">
+          <span class="sponsor-slot-label">Banner horizontal</span>
+        </a>
+
+        <div class="sponsor-slot-row">
+          <a class="sponsor-slot sponsor-slot--square" href="contacto.html">
+            <span class="sponsor-slot-label">Cuadrado</span>
+          </a>
+          <a class="sponsor-slot sponsor-slot--square" href="contacto.html">
+            <span class="sponsor-slot-label">Cuadrado</span>
+          </a>
+          <a class="sponsor-slot sponsor-slot--square" href="contacto.html">
+            <span class="sponsor-slot-label">Cuadrado</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+'''
+
+# "Noticias destacadas" de la Home: se muestra solo si la sección Noticias
+# está visible (ver SECCIONES_OCULTAS).
+NOTICIAS_DESTACADAS = '''  <section class="featured-news">
     <div class="wrap">
       <div class="section-head">
         <h2>Noticias destacadas</h2>
@@ -195,37 +241,7 @@ HOME_BODY = '''  <section class="hero">
     </div>
   </section>
 
-  <section class="sponsors">
-    <div class="wrap">
-      <div class="sponsor-slots">
-        <a class="sponsor-slot sponsor-slot--banner" href="contacto.html">
-          <span class="sponsor-slot-label">Banner horizontal</span>
-        </a>
-
-        <div class="sponsor-slot-row">
-          <a class="sponsor-slot sponsor-slot--square" href="contacto.html">
-            <span class="sponsor-slot-label">Cuadrado</span>
-          </a>
-          <a class="sponsor-slot sponsor-slot--square" href="contacto.html">
-            <span class="sponsor-slot-label">Cuadrado</span>
-          </a>
-          <a class="sponsor-slot sponsor-slot--square" href="contacto.html">
-            <span class="sponsor-slot-label">Cuadrado</span>
-          </a>
-        </div>
-
-        <div class="sponsor-slot-row sponsor-slot-row--2">
-          <a class="sponsor-slot sponsor-slot--banner" href="contacto.html">
-            <span class="sponsor-slot-label">Banner horizontal</span>
-          </a>
-          <a class="sponsor-slot sponsor-slot--banner" href="contacto.html">
-            <span class="sponsor-slot-label">Banner horizontal</span>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-'''.format(list_id=LIVE_PLAYLIST_ID)
+'''
 
 # ============================================================
 # BENEFICIOS (beneficios.html) — grilla tal cual estaba
@@ -268,6 +284,64 @@ def benefit_card_html(slug, initial, name, cat, perks, ig, ubicacion=None):
         </article>'''.format(slug=slug, name=name, initial=initial, cat=cat, perks=perks_html, ig=ig, icon=IG_ICON, loc_attr=loc_attr)
 
 
+# Geolocalización de comercios ("Ver qué tan cerca están"): apagada por
+# ahora. Para volver a activarla, poné True. Los datos de ubicación de cada
+# comercio y assets/geo.js siguen intactos.
+GEOLOCALIZACION_ACTIVA = False
+BOTON_UBICACION = '''      <button class="btn btn-ghost btn-location" id="activate-location" type="button">{pin} Ver qué tan cerca están</button>
+'''
+
+
+def comercios_planilla():
+    """Copia de la planilla de comercios (datos/comercios.json). Se usa para
+    que la página ya salga con los datos y logos correctos; después
+    assets/benefits.js la actualiza en vivo desde la planilla."""
+    import json
+    ruta = os.path.join(ROOT, "datos", "comercios.json")
+    if not os.path.exists(ruta):
+        return None
+    with open(ruta, encoding="utf-8") as fh:
+        return json.load(fh).get("comercios") or None
+
+
+def benefit_card_from_sheet(c):
+    e = html.escape
+    nombre = c["nombre"]
+    logo_path = "assets/socios/planilla/{}.webp".format(c["slug"])
+    if os.path.exists(os.path.join(ROOT, logo_path)):
+        logo = '<div class="benefit-logo"><img src="{}" alt="{}" width="68" height="68" loading="lazy" decoding="async"></div>'.format(e(logo_path), e(nombre))
+    else:
+        logo = '<div class="benefit-logo mono" data-slug="{}" data-name="{}">{}</div>'.format(
+            e(c.get("instagram") or c["slug"]), e(nombre), e(nombre[:1].upper()))
+    perks = "".join("<li>{}</li>".format(e(b)) for b in c.get("beneficios", []))
+    ig = c.get("instagram")
+    foot = ('<a class="benefit-ig" href="https://www.instagram.com/{0}/" target="_blank" rel="noopener">{1}<span>@{0}</span></a>'.format(e(ig), IG_ICON)
+            if ig else "")
+    loc = ' data-location="{}"'.format(e(c["ubicacion"])) if c.get("ubicacion") else ""
+    return """        <article class="benefit-card"{loc}>
+          <div class="benefit-top">
+            {logo}
+            <div>
+              <div class="benefit-name">{nombre}</div>
+              <div class="benefit-cat">{rubro}</div>
+            </div>
+          </div>
+          <ul class="benefit-perks">
+            {perks}
+          </ul>
+          <div class="benefit-foot">
+            {foot}
+          </div>
+        </article>""".format(loc=loc, logo=logo, nombre=e(nombre), rubro=e(c.get("rubro", "")), perks=perks, foot=foot)
+
+
+def benefit_cards_html():
+    comercios = comercios_planilla()
+    if comercios:
+        return "\n\n".join(benefit_card_from_sheet(c) for c in comercios if c.get("tipo") != "auspiciante")
+    return "\n\n".join(benefit_card_html(*c) for c in BENEFIT_CARDS)
+
+
 COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
     <div class="wrap">
       <div class="section-head">
@@ -287,8 +361,7 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
         <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Ver más beneficios">{arrow_right}</button>
       </div>
 
-      <button class="btn btn-ghost btn-location" id="activate-location" type="button">{pin} Ver qué tan cerca están</button>
-
+{{boton_ubicacion}}
       <p class="benefits-note">Los descuentos y condiciones de cada beneficio son definidos por cada espacio adherido y pueden cambiar sin aviso previo.</p>
 
       <a class="partner-cta" href="mailto:laplatasube@gmail.com?subject=Quiero%20sumar%20mi%20comercio%20a%20SUBE">
@@ -359,7 +432,7 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
     </div>
   </section>
 '''.format(
-    cards="\n\n".join(benefit_card_html(*c) for c in BENEFIT_CARDS),
+    cards=benefit_cards_html(),
     chevron=CHEVRON_ICON,
     arrow_left=ARROW_LEFT_ICON,
     arrow_right=ARROW_RIGHT_ICON,
@@ -369,19 +442,8 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
 # ============================================================
 # CONTENIDOS — Programación inline + Noticias como antes (card)
 # ============================================================
-CONTENIDOS_BODY = '''  <section class="content">
-    <div class="wrap">
-      <div class="section-head">
-        <h2>Contenidos</h2>
-        <p>Todo lo que produce SUBE, en un solo lugar.</p>
-      </div>
-
-      <div class="content-subhead">
-        <span class="content-subhead-eyebrow">En vivo y on demand</span>
-        <h3>Programación</h3>
-      </div>
-
-      <div class="content-schedule" id="content-schedule">
+# Grilla de respaldo (la de siempre), por si falta la copia de la planilla.
+GRILLA_RESPALDO = '''      <div class="content-schedule" id="content-schedule">
 
         <div class="schedule-day">
           <h3>Lunes</h3>
@@ -450,7 +512,10 @@ CONTENIDOS_BODY = '''  <section class="content">
 
       </div>
 
-      <div class="content-subhead content-subhead--noticias">
+'''
+
+# Bloque "Noticias" de Contenidos: se muestra solo si Noticias está visible.
+BLOQUE_NOTICIAS = '''      <div class="content-subhead content-subhead--noticias">
         <span class="content-subhead-eyebrow">Próximamente</span>
         <h3>Noticias</h3>
       </div>
@@ -464,6 +529,21 @@ CONTENIDOS_BODY = '''  <section class="content">
     </div>
   </section>
 '''
+
+CONTENIDOS_BODY = '''  <section class="content">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Contenidos</h2>
+        <p>Todo lo que produce SUBE, en un solo lugar.</p>
+      </div>
+
+      <div class="content-subhead">
+        <span class="content-subhead-eyebrow">En vivo y on demand</span>
+        <h3>Programación</h3>
+      </div>
+
+{grilla}
+{bloque_noticias}'''
 
 NOTICIAS_BODY = '''  <section class="soon">
     <div class="wrap">
@@ -627,6 +707,167 @@ PROGRAMS = [
 ]
 
 
+# ------------------------------------------------------------
+# Programación desde la copia de la planilla (datos/programacion.csv).
+# Sirve para que Contenidos ya salga con descripciones y logos; después
+# assets/schedule-grid.js la actualiza en vivo desde la planilla.
+# ------------------------------------------------------------
+DIAS_SEMANA = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"]
+DIA_LABEL_ES = {"lunes": "Lunes", "martes": "Martes", "miercoles": "Miércoles", "jueves": "Jueves",
+                "viernes": "Viernes", "sabado": "Sábado", "domingo": "Domingo"}
+
+
+def _slugify(text):
+    import unicodedata
+    t = unicodedata.normalize("NFD", str(text or ""))
+    t = "".join(c for c in t if unicodedata.category(c) != "Mn").lower()
+    return re.sub(r"[^a-z0-9]+", "-", t).strip("-")
+
+
+def perfiles():
+    """Perfiles de programa que existen en Contenidos: slug → nombre."""
+    return {p["slug"]: p["name"] for p in PROGRAMS}
+
+
+def perfiles_json():
+    import json
+    return html.escape(json.dumps(perfiles(), ensure_ascii=False))
+
+
+def programacion_planilla():
+    import csv
+    ruta = os.path.join(ROOT, "datos", "programacion.csv")
+    if not os.path.exists(ruta):
+        return []
+    with open(ruta, encoding="utf-8") as fh:
+        filas = [f for f in csv.reader(fh) if any(c.strip() for c in f)]
+    if len(filas) < 2:
+        return []
+    titulos = [_slugify(t).replace("-", "_") for t in filas[0]]
+    out = []
+    for f in filas[1:]:
+        d = {t: (f[k].strip() if k < len(f) else "") for k, t in enumerate(titulos)}
+        d["nombre"] = d.get("nombre") or d.get("programa", "")
+        if d["nombre"] and d.get("activo", "si").lower() in ("si", "sí"):
+            d["slug"] = _slugify(d["nombre"])
+            out.append(d)
+    return out
+
+
+def nombre_programa(fila):
+    return perfiles().get(fila["slug"], fila["nombre"])
+
+
+def link_programa(fila):
+    e = html.escape
+    if fila["slug"] in perfiles():
+        return '<a href="programas/{}.html">{}</a>'.format(fila["slug"], e(nombre_programa(fila)))
+    return "<span>{}</span>".format(e(fila["nombre"]))
+
+
+def info_programa_html(fila):
+    e = html.escape
+    desc = fila.get("descripcion", "")
+    logo = "assets/programas/{}.webp".format(fila["slug"])
+    tiene_logo = bool(fila.get("logo")) and os.path.exists(os.path.join(ROOT, logo))
+    if not desc and not tiene_logo:
+        return ""
+    img = ('<img class="schedule-logo" src="{}" alt="{}" loading="lazy" decoding="async">'.format(logo, e("Logo de " + nombre_programa(fila)))
+           if tiene_logo else "")
+    return '<div class="schedule-info">{}{}</div>'.format(img, '<p class="schedule-desc">{}</p>'.format(e(desc)) if desc else "")
+
+
+def grilla_contenidos_html():
+    filas = programacion_planilla()
+    if not filas:
+        return GRILLA_RESPALDO.replace('id="content-schedule"', 'id="content-schedule" data-perfiles="{}"'.format(perfiles_json()))
+    e = html.escape
+    por_dia = {}
+    for f in filas:
+        dia = _slugify(f.get("dia_semana", ""))
+        if dia in DIAS_SEMANA and re.match(r"^\d{1,2}:\d{2}", f.get("hora", "")):
+            por_dia.setdefault(dia, []).append(f)
+    bloques = []
+    for dia in DIAS_SEMANA:
+        if dia not in por_dia:
+            continue
+        lista = sorted(por_dia[dia], key=lambda f: [int(x) for x in f["hora"].split(":")[:2]])
+        items = []
+        for f in lista:
+            alt = ""
+            if f.get("frecuencia_dias") == "14":
+                pareja = [o for o in lista if o is not f and o.get("frecuencia_dias") == "14"]
+                alt = '\n              <span class="schedule-alt">Cada dos semanas{}</span>'.format(
+                    ", alterna con " + e(nombre_programa(pareja[0])) if len(pareja) == 1 else "")
+            info = info_programa_html(f)
+            items.append("""            <li>
+              <span class="schedule-time">{hora}</span>
+              {link}{alt}{info}
+            </li>""".format(hora=e(f["hora"][:5]), link=link_programa(f), alt=alt,
+                            info=("\n              " + info) if info else ""))
+        bloques.append("""        <div class="schedule-day">
+          <h3>{}</h3>
+          <ul class="schedule-list">
+{}
+          </ul>
+        </div>""".format(DIA_LABEL_ES[dia], "\n".join(items)))
+    ondemand = []
+    for f in filas:
+        if _slugify(f.get("frecuencia", "")) == "on-demand" and f["slug"] in perfiles():
+            desc = f.get("descripcion", "")
+            ondemand.append("""            <li>
+              <a href="programas/{slug}.html">
+                <span class="ondemand-main">
+                  <span class="ondemand-name">{nombre}</span>{desc}
+                </span>
+                <span class="ondemand-tag">Programa</span>
+              </a>
+            </li>""".format(slug=f["slug"], nombre=e(nombre_programa(f)),
+                            desc='\n                  <span class="ondemand-desc">{}</span>'.format(e(desc)) if desc else ""))
+    ondemand.append("""            <li>
+              <a href="https://www.youtube.com/watch?v=2E0gkC1fRDY&list=PLYT7ujTIBmWbglZ7Mmi-r4RnP1NqsDMt6" target="_blank" rel="noopener">
+                <span class="ondemand-main">
+                  <span class="ondemand-name">Especiales</span>
+                  <span class="ondemand-desc">Navegá en todos nuestros especiales</span>
+                </span>
+                <span class="ondemand-tag">Playlist</span>
+              </a>
+            </li>""")
+    return """      <div class="content-schedule" id="content-schedule" data-perfiles="{perfiles}">
+
+{dias}
+
+        <div class="schedule-day" id="schedule-ondemand-block">
+          <h3>On demand</h3>
+          <ul class="ondemand-list">
+{od}
+          </ul>
+        </div>
+
+      </div>
+""".format(perfiles=perfiles_json(), dias="\n\n".join(bloques), od="\n".join(ondemand))
+
+
+def pagina_oculta(titulo):
+    """Página de una sección oculta: no aparece en buscadores y lleva a la Home."""
+    return """<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="refresh" content="0; url=index.html">
+<title>{} · SUBE</title>
+<link rel="canonical" href="index.html">
+<script>location.replace("index.html");</script>
+</head>
+<body>
+<p>Esta sección no está disponible por ahora. <a href="index.html">Ir al inicio de SUBE</a>.</p>
+</body>
+</html>
+""".format(titulo)
+
+
 def ig_url(handle):
     return "https://www.instagram.com/" + handle.lstrip("@") + "/"
 
@@ -745,10 +986,14 @@ if __name__ == "__main__":
         page_html(
             "SUBE :: Un viaje colectivo por La Plata",
             "SUBE es un medio de comunicación autogestivo con identidad platense. Conocé los beneficios de la Comunidad de Pasajerxs y sumate como socix.",
-            HOME_BODY,
+            HOME_BODY.format(
+                list_id=LIVE_PLAYLIST_ID,
+                perfiles=perfiles_json(),
+                noticias_destacadas=NOTICIAS_DESTACADAS if visible("noticias") else "",
+            ),
             depth=0,
             active=None,
-            extra_scripts=["schedule.js", "next-stop.js"],
+            extra_scripts=["planillas.js", "schedule.js", "next-stop.js"],
         ),
     )
     write(
@@ -756,10 +1001,11 @@ if __name__ == "__main__":
         page_html(
             "Comunidad · SUBE",
             "La Comunidad de Pasajerxs de SUBE: beneficios en comercios amigos y cómo sumarte con tu aporte.",
-            COMUNIDAD_BODY,
+            COMUNIDAD_BODY.replace("{boton_ubicacion}", BOTON_UBICACION.format(pin=PIN_ICON) if GEOLOCALIZACION_ACTIVA else ""),
             depth=0,
             active="comunidad",
-            extra_scripts=["logo-autoload.js", "geo.js", "benefits.js", "carousel.js"],
+            extra_scripts=(["logo-autoload.js", "geo.js", "planillas.js", "benefits.js", "carousel.js"] if GEOLOCALIZACION_ACTIVA
+                           else ["logo-autoload.js", "planillas.js", "benefits.js", "carousel.js"]),
         ),
     )
     write(
@@ -767,10 +1013,11 @@ if __name__ == "__main__":
         page_html(
             "Contenidos · SUBE",
             "Programación y noticias de SUBE.",
-            CONTENIDOS_BODY,
+            CONTENIDOS_BODY.replace("{grilla}", grilla_contenidos_html()).replace(
+                "{bloque_noticias}", BLOQUE_NOTICIAS if visible("noticias") else ""),
             depth=0,
             active="contenidos",
-            extra_scripts=["schedule.js", "schedule-grid.js"],
+            extra_scripts=["planillas.js", "schedule.js", "schedule-grid.js"],
         ),
     )
     write(
@@ -781,7 +1028,7 @@ if __name__ == "__main__":
             NOTICIAS_BODY,
             depth=0,
             active="contenidos",
-        ),
+        ) if visible("noticias") else pagina_oculta("Noticias"),
     )
     write(
         "tienda.html",
@@ -791,7 +1038,7 @@ if __name__ == "__main__":
             TIENDA_BODY,
             depth=0,
             active="tienda",
-        ),
+        ) if visible("tienda") else pagina_oculta("Tienda"),
     )
     write(
         "contacto.html",

@@ -6,6 +6,10 @@
 <title>Contenidos · SUBE</title>
 <meta name="description" content="Programación y noticias de SUBE.">
 <link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="assets/fonts/Anton-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,11 +17,10 @@
 <header class="site-header">
   <div class="wrap">
     <div class="header-weather" id="header-weather" aria-live="polite" hidden></div>
-    <a href="index.html" class="brand"><img src="assets/logo.png" alt="Sube Canal"></a>
+    <a href="index.html" class="brand"><img src="assets/logo.png" alt="Sube Canal" width="269" height="104"></a>
     <nav class="nav-links" id="nav-links">
       <a href="comunidad.html">Comunidad</a>
       <a href="contenidos.html" class="is-current">Contenidos</a>
-      <a href="tienda.html">Tienda</a>
       <a href="contacto.html">Contacto</a>
     </nav>
     <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-links">
@@ -42,7 +45,7 @@
         <h3>Programación</h3>
       </div>
 
-      <div class="content-schedule" id="content-schedule">
+      <div class="content-schedule" id="content-schedule" data-perfiles="{&quot;streaming-copa&quot;: &quot;Streaming Copa&quot;, &quot;marcando-la-cancha&quot;: &quot;Marcando la cancha&quot;, &quot;falopa-informativa-nacional&quot;: &quot;FIN! F@lopa informativa nacional&quot;, &quot;el-amplificador&quot;: &quot;El Amplificador – 10ma temporada&quot;, &quot;estacion-freak&quot;: &quot;Estación Freak&quot;, &quot;de-que-viven&quot;: &quot;¿De qué viven?&quot;, &quot;chicha-y-limonada&quot;: &quot;Chicha y limonada&quot;, &quot;umbrales&quot;: &quot;Umbrales&quot;}">
 
         <div class="schedule-day">
           <h3>Lunes</h3>
@@ -50,14 +53,17 @@
             <li>
               <span class="schedule-time">18:00</span>
               <a href="programas/streaming-copa.html">Streaming Copa</a>
+              <div class="schedule-info"><img class="schedule-logo" src="assets/programas/streaming-copa.webp" alt="Logo de Streaming Copa" loading="lazy" decoding="async"><p class="schedule-desc">Viví la pasión del fútbol con toda la previa, el análisis y el aguante. La Copa se juega también desde SUBE.</p></div>
             </li>
             <li>
               <span class="schedule-time">19:30</span>
               <a href="programas/marcando-la-cancha.html">Marcando la cancha</a>
+              <div class="schedule-info"><p class="schedule-desc">Toda la pasión del deporte, análisis, debate y las historias que se juegan dentro y fuera de la cancha.</p></div>
             </li>
             <li>
               <span class="schedule-time">21:00</span>
               <a href="programas/falopa-informativa-nacional.html">FIN! F@lopa informativa nacional</a>
+              <div class="schedule-info"><p class="schedule-desc">Rosca política, actualidad y humor; Todo esto y mas en FIN! charlamos de lo que pasa y debatimos lo que otros prefieren esquivar.</p></div>
             </li>
           </ul>
         </div>
@@ -68,20 +74,24 @@
             <li>
               <span class="schedule-time">18:00</span>
               <a href="programas/el-amplificador.html">El Amplificador – 10ma temporada</a>
+              <div class="schedule-info"><img class="schedule-logo" src="assets/programas/el-amplificador.webp" alt="Logo de El Amplificador – 10ma temporada" loading="lazy" decoding="async"><p class="schedule-desc">Música, artistas y cultura emergente. Le damos volumen a las voces y los sonidos que merecen ser escuchados.</p></div>
             </li>
             <li>
               <span class="schedule-time">19:30</span>
               <a href="programas/estacion-freak.html">Estación Freak</a>
               <span class="schedule-alt">Cada dos semanas, alterna con ¿De qué viven?</span>
+              <div class="schedule-info"><img class="schedule-logo" src="assets/programas/estacion-freak.webp" alt="Logo de Estación Freak" loading="lazy" decoding="async"><p class="schedule-desc">Anime, cultura geek y todo lo que te vuela la cabeza. Un espacio para compartir pasiones y explorar universos.</p></div>
             </li>
             <li>
               <span class="schedule-time">20:00</span>
               <a href="programas/de-que-viven.html">¿De qué viven?</a>
               <span class="schedule-alt">Cada dos semanas, alterna con Estación Freak</span>
+              <div class="schedule-info"><p class="schedule-desc">Historias, laburos y formas de ganarse la vida. Salimos a descubrir de qué viven quienes hacen girar la city.</p></div>
             </li>
             <li>
               <span class="schedule-time">21:30</span>
               <a href="programas/chicha-y-limonada.html">Chicha y limonada</a>
+              <div class="schedule-info"><p class="schedule-desc">Entre la charla y el descontrol, un espacio para debatir, reírse y compartir esas conversaciones que pueden ir para cualquier lado.</p></div>
             </li>
           </ul>
         </div>
@@ -93,6 +103,7 @@
               <a href="programas/umbrales.html">
                 <span class="ondemand-main">
                   <span class="ondemand-name">Umbrales</span>
+                  <span class="ondemand-desc">Conversaciones íntimas con personas que se animan a cruzar sus propios límites, explorar nuevas formas de crear y habitar la escena, y compartir aquello que las mueve.</span>
                 </span>
                 <span class="ondemand-tag">Programa</span>
               </a>
@@ -111,26 +122,15 @@
 
       </div>
 
-      <div class="content-subhead content-subhead--noticias">
-        <span class="content-subhead-eyebrow">Próximamente</span>
-        <h3>Noticias</h3>
-      </div>
-
-      <a class="hub-card" href="noticias.html">
-        <span class="hub-card-title">Coberturas, notas y actualidad</span>
-        <span class="hub-card-desc">Estamos preparando esta sección — todavía no tiene contenido cargado.</span>
-        <span class="hub-card-arrow">→</span>
-      </a>
-
-    </div>
-  </section>
-
 </main>
 
 <footer>
   <div class="wrap">
     <div class="footer-strip">
-      <img class="footer-bus" src="assets/colectivo.png" alt="Sube Canal — un viaje colectivo">
+      <picture>
+        <source srcset="assets/colectivo.webp" type="image/webp">
+        <img class="footer-bus" src="assets/colectivo.png" alt="Sube Canal — un viaje colectivo" width="919" height="288" loading="lazy" decoding="async">
+      </picture>
       <div class="footer-channels">
         <a href="mailto:laplatasube@gmail.com"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg><span>laplatasube@gmail.com</span></a>
         <a href="https://www.instagram.com/subecanal" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Instagram</span></a>
@@ -144,6 +144,7 @@
 
 <script src="assets/nav.js"></script>
 <script src="assets/weather.js"></script>
+<script src="assets/planillas.js"></script>
 <script src="assets/schedule.js"></script>
 <script src="assets/schedule-grid.js"></script>
 </body>

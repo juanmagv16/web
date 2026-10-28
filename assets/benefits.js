@@ -10,9 +10,10 @@
 (function () {
   "use strict";
 
-  // Link de "Publicar en la web" de la planilla, exportado como CSV.
-  var SHEET_CSV_URL =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFybsjITyt2XR-XYTWibjY4PItJ46VK27XJOuHQ0JrJ-tZujG6duyDrwlsTdZLRbJusM-rZyMqxtky/pub?output=csv";
+  // Planilla de comercios (links en assets/planillas.js).
+  var FUENTES = window.SubePlanillas
+    ? window.SubePlanillas.fuentes("comercios")
+    : ["https://docs.google.com/spreadsheets/d/1T7-2AKnZ1Ss7LwBhUYtFCkPZxjxFTJ3yF6EhMgFnD7M/gviz/tq?tqx=out:csv&headers=1&gid=0"];
 
   function stripAccents(s) {
     return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -124,12 +125,13 @@
     // tampoco existe, se queda el círculo con la inicial.
     var slug = slugFromIg(item.ig);
     var initial = escapeHtml((item.nombre || "?").trim().charAt(0).toUpperCase());
-    var logo = item.logo
+    var src = window.SubePlanillas ? window.SubePlanillas.logo(item.logo) : item.logo;
+    var logo = src
       ? '<div class="benefit-logo"><img src="' +
-        escapeHtml(item.logo) +
+        escapeHtml(src) +
         '" alt="' +
         escapeHtml(item.nombre) +
-        '" loading="lazy"></div>'
+        '" loading="lazy" decoding="async" data-inicial="' + initial + '"></div>'
       : '<div class="benefit-logo mono" data-slug="' +
         escapeHtml(slug) +
         '" data-name="' +
@@ -179,20 +181,38 @@
     );
   }
 
+  // Si una imagen de Drive no carga, se vuelve al círculo con la inicial
+  function sinImagenRota(grid) {
+    Array.prototype.forEach.call(grid.querySelectorAll(".benefit-logo img[data-inicial]"), function (img) {
+      img.addEventListener("error", function () {
+        var box = img.parentNode;
+        box.classList.add("mono");
+        box.textContent = img.getAttribute("data-inicial");
+      });
+    });
+  }
+
   function render(items) {
     var grid = document.getElementById("benefit-grid");
     if (!grid || !items.length) return;
     grid.innerHTML = items.map(cardHTML).join("");
+    sinImagenRota(grid);
     grid.setAttribute("data-fallback", "false");
     if (window.SubeAutoLogos) window.SubeAutoLogos(grid);
     if (window.SubeGeo) window.SubeGeo.repaint();
   }
 
-  fetch(SHEET_CSV_URL)
-    .then(function (res) {
+  function leer(i) {
+    return fetch(FUENTES[i]).then(function (res) {
       if (!res.ok) throw new Error("status " + res.status);
       return res.text();
-    })
+    }).catch(function (err) {
+      if (i + 1 < FUENTES.length) return leer(i + 1);
+      throw err;
+    });
+  }
+
+  leer(0)
     .then(function (text) {
       var rows = parseCSV(text);
       if (rows.length < 2) return;
@@ -218,7 +238,7 @@
           beneficioCols = bCols;
           catCol = findCol(candidateHeaders, ["rubro", "categoria"]);
           igCol = findCol(candidateHeaders, ["instagram", " ig", "ig "]);
-          logoCol = findCol(candidateHeaders, ["logo", "imagen"]);
+          logoCol = findCol(candidateHeaders, ["logo", "imagen", "grafica"]);
           ubicacionCol = findCol(candidateHeaders, ["ubicacion", "direccion", "domicilio"]);
           break;
         }
