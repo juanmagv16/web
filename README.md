@@ -92,7 +92,7 @@ Los colores y tipografías están centralizados como variables al principio de `
   contenido sigue en `build_site.py`. Para volver a mostrarlas, sacalas de
   `SECCIONES_OCULTAS` en `build_site.py` y regenerá el sitio
   (`python3 build_site.py`).
-- **Planillas de Google Sheets:** los links están en `assets/planillas.js`.
+- **Planillas de Google Sheets:** desde noviembre, GitHub las lee cada hora y regenera el sitio (ver `INSTRUCCIONES.md`, `scripts/sync_planillas.py` y `datos/fuentes.json`). Como respaldo, los links también están en `assets/planillas.js`.
   Las planillas tienen que estar compartidas como "Cualquier persona con el
   vínculo: Lector".
   - Programación (Próxima parada y Contenidos): `assets/schedule.js` y

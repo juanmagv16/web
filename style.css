@@ -47,16 +47,6 @@ html, body{
 body{
   margin:0;
   background-color: var(--black);
-  background-image:
-    linear-gradient(180deg, rgba(11,11,11,0.88) 0%, rgba(11,11,11,0.94) 100%),
-    url('assets/textura.jpg');
-  /* Navegadores actuales: la misma textura en WebP (menos de la mitad de peso) */
-  background-image:
-    linear-gradient(180deg, rgba(11,11,11,0.88) 0%, rgba(11,11,11,0.94) 100%),
-    image-set(url('assets/textura.webp') type('image/webp'), url('assets/textura.jpg') type('image/jpeg'));
-  background-repeat: repeat;
-  background-size: 620px;
-  background-attachment: fixed;
   color: var(--white);
   font-family: var(--ff-body);
   font-size: 16px;
@@ -65,11 +55,33 @@ body{
   -webkit-font-smoothing: antialiased;
 }
 
+/* Fondo: la textura (assets/textura.jpg) en una capa fija que cubre toda la
+   pantalla, sin repetirse (antes, al repetirse, se notaban las uniones) y
+   sin deformarse. Una capa oscura encima mantiene la legibilidad.
+   Funciona igual en celulares, donde el fondo "fijo" clásico no anda. */
+body::before{
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--black);
+  background-image:
+    linear-gradient(180deg, rgba(11,11,11,0.62) 0%, rgba(11,11,11,0.74) 100%),
+    url('assets/textura.jpg');
+  background-image:
+    linear-gradient(180deg, rgba(11,11,11,0.62) 0%, rgba(11,11,11,0.74) 100%),
+    image-set(url('assets/textura.webp') type('image/webp'), url('assets/textura.jpg') type('image/jpeg'));
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 /* Anchor links (menú) no deben quedar tapados por el header sticky */
 section, main{ scroll-margin-top: 90px; }
 
 @media (max-width: 700px){
-  body{ background-attachment: scroll; background-size: 420px; }
+  body{ }
 }
 
 img{ max-width:100%; display:block; }
@@ -131,7 +143,7 @@ a:focus-visible, button:focus-visible{
   height: 76px;
 }
 .brand{ grid-column: 2; justify-self: center; }
-.brand img{ height: 26px; width:auto; }
+.brand img{ height: 40px; width:auto; }
 .header-weather{
   grid-column: 1;
   justify-self: start;
@@ -1017,3 +1029,101 @@ a.program-ig-chip:hover{ color: var(--lime); border-color: rgba(193,255,0,0.35);
 /* Logos de comercios (de la planilla): se muestran completos, sin recortar
    ni deformar, aunque no sean cuadrados. */
 .benefit-logo img{ object-fit: contain; }
+
+/* ============================================
+   Ajustes de noviembre 2026
+   ============================================ */
+
+/* Tipografía: Anton en títulos, menú, botones, etiquetas y horarios.
+   Roboto queda solo para los textos largos (párrafos, descripciones). */
+.nav-links a, .btn, .eyebrow, .hero-player-label, .next-stop-label, .cd-label,
+.content-subhead-eyebrow, .ondemand-tag, .program-schedule, .program-info-card h2,
+.plan h3, .plan-tag, .benefits-note-title{
+  font-family: var(--ff-display);
+  font-weight: 400;
+}
+.nav-links a{ font-size: 1.05rem; letter-spacing: 0.02em; }
+.btn{ font-size: 1.05rem; letter-spacing: 0.03em; }
+.eyebrow, .hero-player-label, .next-stop-label, .content-subhead-eyebrow{ letter-spacing: 0.1em; font-size: 0.85rem; }
+.plan h3{ font-size: 1.25rem; }
+
+/* Logo del header: más grande, sin deformar */
+@media (max-width: 860px){
+  .brand img{ height: 32px; }
+}
+
+/* Utilidad: texto solo para lectores de pantalla */
+.sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+
+/* ---------- Comunidad ---------- */
+/* En celulares la tarjeta ocupaba el 82% de la pantalla, pero el espacio
+   entre las flechas es menor: el texto quedaba cortado. Ahora mide el
+   ancho visible del carrusel. */
+@media (max-width: 640px){
+  .benefit-card{ flex-basis: 100%; padding: 20px; }
+  .carousel{ gap: 8px; }
+  .carousel-arrow{ width: 36px; height: 36px; }
+}
+
+/* Botón para sumar comercios: fondo destacado */
+.partner-cta{ background: var(--lime); border-color: var(--lime); color: var(--black); position: relative; padding-right: 64px; }
+.partner-cta::after{ content: "→"; position: absolute; right: 26px; top: 50%; transform: translateY(-50%); font-family: var(--ff-display); font-size: 1.6rem; transition: transform .2s; }
+.partner-cta:hover{ background: #d4ff4d; border-color: #d4ff4d; }
+.partner-cta:hover::after{ transform: translate(4px, -50%); }
+.partner-cta-title{ color: var(--black); }
+.partner-cta-desc{ color: rgba(11,11,11,0.78); }
+@media (max-width: 640px){
+  .partner-cta{ padding: 22px 52px 22px 20px; }
+  .partner-cta::after{ right: 18px; }
+}
+
+/* Tarjeta de sorteos mensuales */
+.raffle-card{
+  display:flex; align-items:center; gap: 20px; flex-wrap: wrap;
+  margin-top: 32px; padding: 24px 28px; text-align: left;
+  background: var(--card); border: 1px dashed rgba(193,255,0,0.5); border-radius: var(--radius);
+}
+.raffle-icon{ flex: 0 0 56px; height: 56px; border-radius: 50%; display:flex; align-items:center; justify-content:center; background: rgba(193,255,0,0.12); color: var(--lime); }
+.raffle-text{ flex: 1 1 260px; }
+.raffle-eyebrow{ margin: 0 0 4px; font-family: var(--ff-display); font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--lime); }
+.raffle-text h3{ margin: 0 0 4px; font-size: 1.4rem; }
+.raffle-text p:last-child{ margin: 0; color: var(--grey); }
+.raffle-btn{ flex: 0 0 auto; }
+@media (max-width: 640px){
+  .raffle-card{ padding: 20px; }
+  .raffle-btn{ width: 100%; }
+}
+
+/* ---------- Programación ---------- */
+/* Horario destacado */
+.schedule-time{ font-family: var(--ff-display); font-size: 1.35rem; color: var(--lime); min-width: 70px; line-height: 1; }
+/* Nombres de los programas en mayúsculas (la planilla no se modifica) */
+.schedule-list a, .schedule-list li > span:not([class]), .ondemand-name, .next-stop-program, .program-hero h1{
+  text-transform: uppercase;
+}
+.schedule-list a{ font-family: var(--ff-display); font-weight: 400; font-size: 1.2rem; letter-spacing: 0.02em; }
+.schedule-conduce{ width: 100%; margin: 2px 0 0; padding-left: 82px; font-size: 0.88rem; color: var(--white); opacity: 0.85; text-align: left; }
+.schedule-alt{ padding-left: 82px; }
+.schedule-info{ padding-left: 82px; }
+@media (max-width: 720px){
+  .schedule-conduce, .schedule-alt, .schedule-info{ padding-left: 0; }
+}
+
+/* Perfil del programa: logo junto al título */
+.program-title{ display:flex; align-items:center; gap: 18px; }
+.program-logo{ flex: 0 0 auto; height: 84px; width: auto; max-width: 140px; object-fit: contain; border-radius: 14px; background: var(--black-soft); padding: 8px; }
+@media (max-width: 560px){
+  .program-logo{ height: 64px; max-width: 104px; }
+}
+
+/* Franja con los logos de los programas (Home) — apagada hasta su aprobación */
+.program-strip{ border-bottom: 1px solid var(--card-border); background: rgba(11,11,11,0.55); }
+.program-strip-row{ display:flex; gap: 14px; justify-content: center; padding-top: 12px; padding-bottom: 12px; overflow-x: auto; scrollbar-width: none; }
+.program-strip-row::-webkit-scrollbar{ display:none; }
+.program-strip-item{ flex: 0 0 auto; width: 52px; height: 52px; border-radius: 50%; overflow: hidden; display:flex; align-items:center; justify-content:center; background: var(--card); border: 1px solid var(--card-border); transition: border-color .2s, transform .2s; }
+.program-strip-item:hover{ border-color: var(--lime); transform: translateY(-2px); }
+.program-strip-item img{ width: 100%; height: 100%; object-fit: contain; padding: 6px; }
+.program-strip-initial{ font-family: var(--ff-display); font-size: 1.3rem; color: var(--lime); }
+@media (max-width: 640px){
+  .program-strip-row{ justify-content: flex-start; }
+}
