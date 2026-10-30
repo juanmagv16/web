@@ -1,7 +1,7 @@
 /* ============================================
    SUBE CANAL — sistema de diseño
-   Tipografía: Anton en todo el sitio (un solo peso, 400). La
-   jerarquía se logra con tamaño, color y espaciado, no con negritas.
+   Tipografía: Anton (títulos) + Roboto (cuerpo, con pesos
+   400/500/700 para generar contraste y mejorar legibilidad)
    Paleta: negro cuero #0b0b0b, verde lima #c1ff00, blanco #f5f5f0
    Concepto: el pasaje de transporte / boleto como
    metáfora de pertenecer a la comunidad de Sube Canal.
@@ -16,6 +16,8 @@
   font-style: normal;
   font-display: swap;
 }
+/* Roboto se carga desde el <head> de cada página (un @import ubicado acá
+   no funcionaba: el navegador lo ignora si no está al principio del archivo). */
 
 :root{
   --black: #0b0b0b;
@@ -24,19 +26,18 @@
   --lime-dim: #8fbf00;
   --white: #f5f5f0;
   --grey: #a8a8a2;
-  --grey-dim: #8d8d87;
+  --grey-dim: #6b6b66;
   --card: #151512;
   --card-border: rgba(245,245,240,0.09);
   --radius: 18px;
   --ticket-notch: 22px;
   --max: 1160px;
   --ff-display: 'Anton', sans-serif;
-  --ff-body: 'Anton', sans-serif;
+  --ff-body: 'Roboto', sans-serif;
 }
 
 *{ box-sizing: border-box; min-width: 0; }
-html{ scroll-behavior: smooth; font-synthesis: none; }
-b, strong{ font-weight: 400; }
+html{ scroll-behavior: smooth; }
 
 html, body{
   max-width: 100%;
@@ -48,9 +49,9 @@ body{
   background-color: var(--black);
   color: var(--white);
   font-family: var(--ff-body);
-  font-size: 17px;
-  line-height: 1.65;
-  letter-spacing: 0.03em;
+  font-size: 16px;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -109,10 +110,10 @@ a{ color: inherit; text-decoration: none; }
 
 .eyebrow{
   font-family: var(--ff-body);
-  font-weight: 400;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  font-size: 0.82rem;
+  font-size: 0.75rem;
   color: var(--lime);
 }
 
@@ -144,22 +145,13 @@ a:focus-visible, button:focus-visible{
 .brand{ grid-column: 2; justify-self: center; }
 .brand img{ height: 40px; width:auto; }
 .header-weather{
-  /* Franja fina sobre el logo (hora, día y clima). Ocupa siempre su lugar
-     para que la página no "salte" cuando llega el clima. */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 34px;
-  padding: 4px 18px;
-  font-family: var(--ff-display);
-  font-size: 1.05rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  line-height: 1;
-  color: var(--white);
+  grid-column: 1;
+  justify-self: start;
+  font-family: var(--ff-body);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--grey);
   white-space: nowrap;
-  background: rgba(11,11,11,0.86);
-  border-bottom: 1px solid var(--card-border);
 }
 .nav-links{
   grid-column: 3;
@@ -167,7 +159,7 @@ a:focus-visible, button:focus-visible{
   display:flex;
   align-items:center;
   gap: 32px;
-  font-weight: 400;
+  font-weight: 500;
   font-size: 0.92rem;
 }
 .nav-links a{ opacity: 0.85; transition: opacity .2s, color .2s; }
@@ -212,6 +204,7 @@ a:focus-visible, button:focus-visible{
   .nav-links.is-open{ max-height: 320px; }
   .nav-links a{ padding: 16px 24px; border-top: 1px solid var(--card-border); opacity: 1; }
   .nav-toggle{ display:inline-flex; }
+  .header-weather{ display: none; }
 }
 
 /* ---------- Hero ---------- */
@@ -250,7 +243,7 @@ a:focus-visible, button:focus-visible{
   gap: 8px;
   padding: 15px 28px;
   border-radius: 999px;
-  font-weight: 400;
+  font-weight: 700;
   font-size: 0.95rem;
   text-transform: uppercase;
   letter-spacing: 0.02em;
@@ -273,8 +266,8 @@ a:focus-visible, button:focus-visible{
 /* Reproductor en vivo del hero */
 .hero-player{ width: 100%; }
 .hero-player-label{
-  font-size: 0.82rem;
-  font-weight: 400;
+  font-size: 0.72rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--lime);
@@ -293,8 +286,8 @@ a:focus-visible, button:focus-visible{
 }
 .next-stop-label{
   font-family: var(--ff-body);
-  font-size: 0.82rem;
-  font-weight: 400;
+  font-size: 0.7rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--lime);
@@ -353,7 +346,7 @@ a:focus-visible, button:focus-visible{
 }
 .cd-label{
   font-family: var(--ff-body);
-  font-size: 0.82rem;
+  font-size: 0.64rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--grey-dim);
@@ -393,8 +386,8 @@ a:focus-visible, button:focus-visible{
 }
 .news-card:hover{ border-color: rgba(193,255,0,0.35); transform: translateY(-3px); }
 .news-tag{
-  font-size: 0.82rem;
-  font-weight: 400;
+  font-size: 0.68rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--lime);
@@ -533,7 +526,7 @@ section{ padding: 88px 0; }
   font-size: 1.5rem;
 }
 .benefit-name{ font-family: var(--ff-display); font-weight: 400; font-size: 1.05rem; text-transform: none; }
-.benefit-cat{ color: var(--grey-dim); font-size: 0.82rem; font-weight: 400; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+.benefit-cat{ color: var(--grey-dim); font-size: 0.78rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
 .benefit-perks{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap: 8px; }
 .benefit-perks li{
   font-size: 0.92rem;
@@ -550,14 +543,14 @@ section{ padding: 88px 0; }
   transform: rotate(45deg);
 }
 .benefit-foot{ margin-top: auto; padding-top: 8px; border-top: 1px solid var(--card-border); display:flex; justify-content: space-between; align-items:center; }
-.benefit-ig{ font-size: 0.85rem; font-weight: 400; color: var(--grey); display:flex; align-items:center; gap:6px; transition: color .2s; }
+.benefit-ig{ font-size: 0.85rem; font-weight: 500; color: var(--grey); display:flex; align-items:center; gap:6px; transition: color .2s; }
 .benefit-ig:hover{ color: var(--lime); }
 
 @media (max-width: 640px){
   .benefit-card{ flex-basis: 82vw; }
   .carousel-arrow{ width: 40px; height: 40px; }
 }
-.benefits-note{ margin-top: 32px; font-size: 0.82rem; color: var(--grey-dim); }
+.benefits-note{ margin-top: 32px; font-size: 0.78rem; color: var(--grey-dim); }
 
 .btn-location{
   margin-top: 24px;
@@ -567,8 +560,8 @@ section{ padding: 88px 0; }
   display:inline-flex;
   align-items:center;
   gap: 4px;
-  font-size: 0.82rem;
-  font-weight: 400;
+  font-size: 0.78rem;
+  font-weight: 700;
   color: var(--lime);
   white-space: nowrap;
 }
@@ -615,12 +608,12 @@ section{ padding: 88px 0; }
 .plan-tag{
   position:absolute; top:-13px; left: 28px;
   background: var(--lime); color: var(--black);
-  font-size: 0.82rem; font-weight: 400; text-transform: uppercase;
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
   letter-spacing: 0.06em; padding: 5px 12px; border-radius: 999px;
 }
-.plan h3{ font-size: 1.05rem; text-transform: none; color: var(--grey); font-family: var(--ff-body); font-weight: 400; }
+.plan h3{ font-size: 1.05rem; text-transform: none; color: var(--grey); font-family: var(--ff-body); font-weight: 500; }
 .plan .price{ font-family: var(--ff-display); font-size: 2.4rem; margin-top: 14px; color: var(--white); }
-.plan .price span{ font-size: 0.95rem; color: var(--grey-dim); font-family: var(--ff-body); font-weight: 400; text-transform: none; }
+.plan .price span{ font-size: 0.95rem; color: var(--grey-dim); font-family: var(--ff-body); font-weight: 500; text-transform: none; }
 .plan p.desc{ color: var(--grey); margin-top: 12px; font-size: 0.92rem; flex-grow: 1; }
 .plan .btn{ margin-top: 24px; justify-content:center; width: 100%; }
 
@@ -662,7 +655,7 @@ footer{
   align-items:center;
   gap: 8px;
   font-size: 0.85rem;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--grey);
   transition: color .2s;
 }
@@ -709,7 +702,7 @@ footer{
 .email-help-body li{ margin-bottom: 8px; }
 .email-help-body .btn{ margin-bottom: 14px; }
 .email-help-note{
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: var(--lime-dim);
   background: rgba(193,255,0,0.06);
   border: 1px dashed rgba(193,255,0,0.3);
@@ -781,14 +774,14 @@ footer{
   min-width: 52px;
 }
 .schedule-list a{
-  font-weight: 400;
+  font-weight: 500;
   color: var(--white);
   transition: color .2s;
 }
 .schedule-list a:hover{ color: var(--lime); }
 .schedule-alt{
   width: 100%;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: var(--grey-dim);
   padding-left: 64px;
 }
@@ -815,10 +808,10 @@ footer{
 .ondemand-list a:hover{ border-color: rgba(193,255,0,0.35); transform: translateX(4px); }
 .ondemand-main{ display:flex; flex-direction:column; gap: 4px; }
 .ondemand-name{ font-family: var(--ff-display); font-size: 1.05rem; color: var(--white); }
-.ondemand-desc{ font-size: 0.82rem; color: var(--grey-dim); }
+.ondemand-desc{ font-size: 0.8rem; color: var(--grey-dim); }
 .ondemand-tag{
-  font-size: 0.82rem;
-  font-weight: 400;
+  font-size: 0.7rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--lime);
@@ -835,7 +828,7 @@ footer{
   align-items:center;
   gap: 8px;
   font-size: 0.85rem;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--grey);
   margin-bottom: 24px;
   transition: color .2s;
@@ -869,7 +862,7 @@ footer{
 }
 .program-schedule{
   color: var(--lime);
-  font-weight: 400;
+  font-weight: 700;
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -879,7 +872,7 @@ footer{
   align-items:center;
   gap: 7px;
   font-size: 0.85rem;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--grey);
   background: var(--card);
   border: 1px solid var(--card-border);
@@ -927,7 +920,7 @@ a.program-ig-chip:hover{ color: var(--lime); border-color: rgba(193,255,0,0.35);
   align-items:center;
   gap: 8px;
   color: var(--white);
-  font-weight: 400;
+  font-weight: 500;
   font-size: 0.95rem;
   transition: color .2s;
 }
@@ -935,7 +928,7 @@ a.program-ig-chip:hover{ color: var(--lime); border-color: rgba(193,255,0,0.35);
 .person-plain{
   display:inline-block;
   color: var(--grey);
-  font-weight: 400;
+  font-weight: 500;
   font-size: 0.95rem;
 }
 .pending-note{
@@ -964,8 +957,8 @@ a.program-ig-chip:hover{ color: var(--lime); border-color: rgba(193,255,0,0.35);
   color: var(--white);
 }
 .content-subhead-eyebrow{
-  font-size: 0.82rem;
-  font-weight: 400;
+  font-size: 0.72rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--lime);
@@ -987,8 +980,8 @@ a.program-ig-chip:hover{ color: var(--lime); border-color: rgba(193,255,0,0.35);
 }
 .hub-card:hover{ border-color: rgba(193,255,0,0.35); transform: translateY(-4px); }
 .hub-card-eyebrow{
-  font-size: 0.82rem;
-  font-weight: 400;
+  font-size: 0.72rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--lime);
@@ -1042,7 +1035,7 @@ a.program-ig-chip:hover{ color: var(--lime); border-color: rgba(193,255,0,0.35);
    ============================================ */
 
 /* Tipografía: Anton en títulos, menú, botones, etiquetas y horarios.
-   Anton es también la tipografía de los textos largos (ver --ff-body). */
+   Roboto queda solo para los textos largos (párrafos, descripciones). */
 .nav-links a, .btn, .eyebrow, .hero-player-label, .next-stop-label, .cd-label,
 .content-subhead-eyebrow, .ondemand-tag, .program-schedule, .program-info-card h2,
 .plan h3, .plan-tag, .benefits-note-title{
