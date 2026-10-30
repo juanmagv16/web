@@ -79,7 +79,10 @@
   window.SubePlanillas = {
     fuentes: function (nombre) {
       var p = PLANILLAS[nombre];
-      return [p.publicada, gviz(p.id, p.gid)].filter(Boolean);
+      // 1) la copia que GitHub actualiza cada hora en datos/ (la más confiable),
+      // 2) la planilla publicada, si se cargó su link, 3) la planilla en vivo.
+      var copia = nombre === "programacion" ? "datos/programacion.csv" : "";
+      return [copia, p.publicada, gviz(p.id, p.gid)].filter(Boolean);
     },
     logo: logo,
     driveId: driveId,

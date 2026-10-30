@@ -161,6 +161,9 @@
     var container = document.getElementById("content-schedule");
     var ondemandBlock = document.getElementById("schedule-ondemand-block");
     if (!container || !ondemandBlock || !window.SubeSchedule) return;
+    // La grilla ya viene armada desde la planilla (la regenera GitHub cada
+    // hora): no hace falta volver a dibujarla en el navegador.
+    if (container.getAttribute("data-origen") === "planilla") return;
     try {
       PERFILES = JSON.parse(container.getAttribute("data-perfiles") || "{}");
     } catch (e) {
