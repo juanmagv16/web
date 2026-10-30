@@ -14,7 +14,7 @@
     },
     {
       "slug": "lamparas-aurora",
-      "nombre": "Aurora lamparas",
+      "nombre": "Aurora",
       "rubro": "Bazar/Deco",
       "instagram": "lamparas.aurora",
       "beneficios": [
@@ -48,6 +48,18 @@
       "ubicacion": "33C2+7J La Plata, Provincia de Buenos Aires",
       "tipo": "adherido",
       "logo": "assets/socios/planilla/casachicha-lp.webp"
+    },
+    {
+      "slug": "cuatrogatoslocos",
+      "nombre": "Cuatro gatos locos",
+      "rubro": "Gastronomía",
+      "instagram": "cuatrogatoslocos_",
+      "beneficios": [
+        "10% de descuento en combos"
+      ],
+      "ubicacion": "",
+      "tipo": "adherido",
+      "logo": "assets/socios/planilla/cuatrogatoslocos.webp"
     },
     {
       "slug": "estacionquenoma",
@@ -87,7 +99,7 @@
     },
     {
       "slug": "libreriamascaro",
-      "nombre": "Mascaro",
+      "nombre": "Mascaró",
       "rubro": "Librería/Editorial",
       "instagram": "libreriamascaro",
       "beneficios": [
@@ -107,7 +119,7 @@
       ],
       "ubicacion": "3XXM+3M Gonnet, Provincia de Buenos Aires",
       "tipo": "adherido",
-      "logo": "assets/socios/planilla/munayarena.webp"
+      "logo": ""
     },
     {
       "slug": "mundo-semilla",
@@ -147,7 +159,7 @@
     },
     {
       "slug": "roots-cooperativa",
-      "nombre": "Roots Pizza",
+      "nombre": "Roots cooperativa",
       "rubro": "Gastronomía",
       "instagram": "roots_cooperativa",
       "beneficios": [
@@ -170,18 +182,6 @@
       "logo": "assets/socios/planilla/tatana-ar.webp"
     },
     {
-      "slug": "ve-gui",
-      "nombre": "Ve_gui",
-      "rubro": "Gastronomía",
-      "instagram": "ve_gui_",
-      "beneficios": [
-        "10% de descuento"
-      ],
-      "ubicacion": "",
-      "tipo": "adherido",
-      "logo": "assets/socios/planilla/ve-gui.webp"
-    },
-    {
       "slug": "vaga-arg",
       "nombre": "Vaga",
       "rubro": "Gastronomía",
@@ -194,16 +194,16 @@
       "logo": "assets/socios/planilla/vaga-arg.webp"
     },
     {
-      "slug": "cuatrogatoslocos",
-      "nombre": "Cuatro gatos locos",
+      "slug": "ve-gui",
+      "nombre": "Ve_gui",
       "rubro": "Gastronomía",
-      "instagram": "cuatrogatoslocos_",
+      "instagram": "ve_gui_",
       "beneficios": [
-        "10% de descuento en combos"
+        "10% de descuento"
       ],
       "ubicacion": "",
       "tipo": "adherido",
-      "logo": "assets/socios/planilla/cuatrogatoslocos.webp"
+      "logo": "assets/socios/planilla/ve-gui.webp"
     }
   ]
 }

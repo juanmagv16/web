@@ -72,9 +72,9 @@ def nav_links_html(depth, active):
 
 
 def header_html(depth, active):
-    return '''<header class="site-header">
+    return '''<div class="header-weather" id="header-weather" aria-live="polite"></div>
+<header class="site-header">
   <div class="wrap">
-    <div class="header-weather" id="header-weather" aria-live="polite" hidden></div>
     <a href="{u}index.html" class="brand"><img src="{u}assets/logo.png" alt="Sube Canal" width="269" height="104"></a>
     <nav class="nav-links" id="nav-links">
       {links}
@@ -118,10 +118,7 @@ def page_html(title, description, body, depth, active, extra_scripts=None, body_
 <title>{title}</title>
 <meta name="description" content="{description}">
 <link rel="icon" href="{u}assets/logo.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" href="{u}assets/fonts/Anton-Regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="{u}style.css">
 </head>
 <body>
@@ -157,6 +154,57 @@ def write(path, html):
     with open(full, "w", encoding="utf-8") as f:
         f.write(html)
     print("generado:", path)
+
+
+def generar_planillas_js():
+    """Copia a assets/planillas.js los links de las planillas (una sola fuente:
+    datos/fuentes.json) y la tabla "logo de Drive → archivo local" de los
+    programas (se arma con datos/programacion.csv y assets/programas/)."""
+    import csv
+    import json
+    ruta_f = os.path.join(ROOT, "datos", "fuentes.json")
+    if not os.path.exists(ruta_f):
+        return
+    with open(ruta_f, encoding="utf-8") as fh:
+        fuentes = json.load(fh)
+    planillas = {}
+    for nombre in ("programacion", "comercios"):
+        cfg = fuentes.get(nombre) or {}
+        m = re.search(r"/spreadsheets/d/([a-zA-Z0-9_-]+)", cfg.get("planilla", ""))
+        if m:
+            planillas[nombre] = {"id": m.group(1), "gid": str(cfg.get("gid", "0")), "publicada": ""}
+    logos = {}
+    ruta_p = os.path.join(ROOT, "datos", "programacion.csv")
+    if os.path.exists(ruta_p):
+        with open(ruta_p, encoding="utf-8") as fh:
+            filas = [f for f in csv.reader(fh) if any(c.strip() for c in f)]
+        if filas:
+            tit = [t.strip().lower() for t in filas[0]]
+            if "nombre" in tit and "logo" in tit:
+                for f in filas[1:]:
+                    nombre = f[tit.index("nombre")].strip() if tit.index("nombre") < len(f) else ""
+                    link = f[tit.index("logo")].strip() if tit.index("logo") < len(f) else ""
+                    m = re.search(r"drive\.google\.com/(?:file/d/|open\?id=|uc\?(?:[^#]*&)?id=)([a-zA-Z0-9_-]+)", link)
+                    arch = "assets/programas/{}.webp".format(_slugify(nombre))
+                    if m and nombre and os.path.exists(os.path.join(ROOT, arch)):
+                        logos[m.group(1)] = arch
+    pend = {i: True for i in fuentes.get("logos_pendientes", [])}
+    bloque = (
+        "  // >>> GENERADO por build_site.py desde datos/fuentes.json y datos/programacion.csv.\n"
+        "  // No se edita a mano: para cambiar una planilla se edita datos/fuentes.json.\n"
+        "  var PLANILLAS = " + json.dumps(planillas, ensure_ascii=False) + ";\n"
+        "  var LOGOS_LOCALES = " + json.dumps(logos, ensure_ascii=False, indent=2).replace("\n", "\n  ") + ";\n"
+        "  var LOGOS_PENDIENTES = " + json.dumps(pend) + ";\n"
+        "  // <<< FIN GENERADO\n"
+    )
+    ruta_js = os.path.join(ROOT, "assets", "planillas.js")
+    with open(ruta_js, encoding="utf-8") as fh:
+        js = fh.read()
+    nuevo = re.sub(r"  // >>> GENERADO.*?// <<< FIN GENERADO\n", lambda _: bloque, js, flags=re.S)
+    if nuevo != js:
+        with open(ruta_js, "w", encoding="utf-8") as fh:
+            fh.write(nuevo)
+    print("generado: assets/planillas.js (links y logos de las planillas)")
 
 
 # ============================================================
@@ -1100,6 +1148,7 @@ def program_body(p):
 # ESCRITURA DE ARCHIVOS
 # ============================================================
 if __name__ == "__main__":
+    generar_planillas_js()
     write(
         "index.html",
         page_html(

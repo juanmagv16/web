@@ -1,0 +1,58 @@
+{
+  "programas": [
+    {
+      "slug": "streaming-copa",
+      "nombre": "streaming copa",
+      "descripcion": "Viví la pasión del torneo de la Copa del Rey con toda la previa, el análisis y el aguante.",
+      "logo": "assets/programas/streaming-copa.webp"
+    },
+    {
+      "slug": "marcando-la-cancha",
+      "nombre": "marcando la cancha",
+      "descripcion": "Toda la pasión del deporte, análisis, debate y las historias que se juegan dentro y fuera de la cancha.",
+      "logo": ""
+    },
+    {
+      "slug": "falopa-informativa-nacional",
+      "nombre": "falopa informativa nacional",
+      "descripcion": "Rosca política, actualidad y humor. Todo esto y mas en FIN! charlamos de lo que pasa y debatimos lo que otros prefieren esquivar.",
+      "logo": ""
+    },
+    {
+      "slug": "el-amplificador",
+      "nombre": "el amplificador",
+      "descripcion": "Música, artistas y cultura emergente. Le damos volumen a las voces y los sonidos que merecen ser escuchados.",
+      "logo": "assets/programas/el-amplificador.webp"
+    },
+    {
+      "slug": "estacion-freak",
+      "nombre": "estacion freak",
+      "descripcion": "Anime, cultura geek y todo lo que te vuela la cabeza. Un espacio para compartir pasiones y explorar universos.",
+      "logo": "assets/programas/estacion-freak.webp"
+    },
+    {
+      "slug": "de-que-viven",
+      "nombre": "¿de qué viven?",
+      "descripcion": "Historias, laburos y formas de ganarse la vida. Salimos a descubrir de qué viven quienes hacen girar la ciudad.",
+      "logo": ""
+    },
+    {
+      "slug": "chicha-y-limonada",
+      "nombre": "chicha y limonada",
+      "descripcion": "Entre la charla y el descontrol, un espacio para debatir, reírse y compartir esas conversaciones que pueden ir para cualquier lado.",
+      "logo": ""
+    },
+    {
+      "slug": "umbrales",
+      "nombre": "umbrales",
+      "descripcion": "Conversaciones íntimas con personas que se animan a cruzar sus propios límites, explorar nuevas formas de crear y habitar la escena, y compartir aquello que las mueve.",
+      "logo": ""
+    },
+    {
+      "slug": "especiales",
+      "nombre": "especiales",
+      "descripcion": "Especiales temáticos y eventos únicos para salirnos de la rutina y vivirlo juntos en vivo.",
+      "logo": ""
+    }
+  ]
+}
