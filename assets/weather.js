@@ -70,16 +70,29 @@
     );
   }
 
-  function horaArgentina() {
+  // Día de la semana abreviado. Se pide en inglés a Intl (clave fija,
+  // igual en todos los navegadores) y se traduce acá.
+  var DIAS_CORTOS = { Mon: "LUN", Tue: "MAR", Wed: "MIÉ", Thu: "JUE", Fri: "VIE", Sat: "SÁB", Sun: "DOM" };
+
+  function horaArgentina(ahora) {
     try {
       return new Intl.DateTimeFormat("es-AR", {
         timeZone: TIMEZONE,
         hour: "2-digit",
         minute: "2-digit",
         hourCycle: "h23",
-      }).format(new Date());
+      }).format(ahora);
     } catch (e) {
       return ""; // navegador sin soporte de Intl con timeZone: no mostramos hora rota
+    }
+  }
+
+  function diaArgentina(ahora) {
+    try {
+      var en = new Intl.DateTimeFormat("en-US", { timeZone: TIMEZONE, weekday: "short" }).format(ahora);
+      return DIAS_CORTOS[en] || "";
+    } catch (e) {
+      return "";
     }
   }
 
@@ -88,18 +101,16 @@
   var clima = { icono: null, temp: null };
 
   function render(container) {
-    var hora = horaArgentina();
+    var ahora = new Date();
+    var hora = horaArgentina(ahora);
+    var dia = diaArgentina(ahora);
     var partes = [];
     if (clima.icono && clima.temp !== null) {
       partes.push(clima.icono + " " + Math.round(clima.temp) + "°");
     }
-    if (hora) partes.push(hora);
+    if (hora) partes.push((dia ? dia + " " : "") + hora);
 
-    if (!partes.length) {
-      container.hidden = true;
-      return;
-    }
-    container.hidden = false;
+    // Si no hay nada para mostrar, la franja queda vacía (sin romper nada).
     container.textContent = partes.join(" · ");
   }
 

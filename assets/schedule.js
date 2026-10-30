@@ -23,7 +23,7 @@
   // puede leer, se usa la copia de respaldo de más abajo.
   var FUENTES_CSV = window.SubePlanillas
     ? window.SubePlanillas.fuentes("programacion")
-    : ["https://docs.google.com/spreadsheets/d/1sf038ryCAifTFDUtAlhzYzwXquH3moezDdh43rLs2to/gviz/tq?tqx=out:csv&headers=1&gid=0"];
+    : [];
 
   var AR_OFFSET_MS = 3 * 60 * 60 * 1000; // Argentina = UTC-3 (fijo, sin DST)
   var DAY_MS = 24 * 60 * 60 * 1000;

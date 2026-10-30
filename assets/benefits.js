@@ -13,7 +13,7 @@
   // Planilla de comercios (links en assets/planillas.js).
   var FUENTES = window.SubePlanillas
     ? window.SubePlanillas.fuentes("comercios")
-    : ["https://docs.google.com/spreadsheets/d/1T7-2AKnZ1Ss7LwBhUYtFCkPZxjxFTJ3yF6EhMgFnD7M/gviz/tq?tqx=out:csv&headers=1&gid=0"];
+    : [];
 
   function stripAccents(s) {
     return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
