@@ -16,7 +16,7 @@
       "slug": "falopa-informativa-nacional",
       "nombre": "falopa informativa nacional",
       "descripcion": "Rosca política, actualidad y humor. Todo esto y mas en FIN! charlamos de lo que pasa y debatimos lo que otros prefieren esquivar.",
-      "logo": ""
+      "logo": "assets/programas/falopa-informativa-nacional.webp"
     },
     {
       "slug": "el-amplificador",
@@ -27,13 +27,13 @@
     {
       "slug": "estacion-freak",
       "nombre": "estacion freak",
-      "descripcion": "Anime, cultura geek y todo lo que te vuela la cabeza. Un espacio para compartir pasiones y explorar universos.",
+      "descripcion": "Anime, cultura geek y todo lo que te vuela la cabeza. Un espacio para compartir pasiones y explorar universos.\n\nCada dos semanas.",
       "logo": "assets/programas/estacion-freak.webp"
     },
     {
       "slug": "de-que-viven",
       "nombre": "¿de qué viven?",
-      "descripcion": "Historias, laburos y formas de ganarse la vida. Salimos a descubrir de qué viven quienes hacen girar la ciudad.",
+      "descripcion": "Historias, laburos y formas de ganarse la vida. Salimos a descubrir de qué viven quienes hacen girar la ciudad.\n\nCada dos semanas.",
       "logo": ""
     },
     {
