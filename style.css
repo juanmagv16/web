@@ -1587,9 +1587,7 @@ a.program-ig-chip:hover{ color: var(--lime); border-color: rgba(193,255,0,0.35);
 .pase-result--muted .pase-result-icon{ background: rgba(255,255,255,0.08); color: var(--white); }
 .pase-result--muted strong{ color: var(--white); }
 
-/* Contenidos: descripción y logo de cada programa (desde la planilla) */
-.schedule-info{ width: 100%; display:flex; align-items: flex-start; gap: 14px; padding-left: 64px; margin-top: 6px; }
-=======
+/* ============================================
    Contenidos: descripción y logo de cada programa (desde la planilla)
    ============================================ */
 .schedule-info{ width: 100%; display:flex; align-items: flex-start; gap: 14px; padding-left: 64px; margin-top: 6px; text-align: left; }
@@ -1653,6 +1651,7 @@ a.program-ig-chip:hover{ color: var(--lime); border-color: rgba(193,255,0,0.35);
 .nc-play::after{
   content: ""; position: absolute; left: 22px; top: 17px;
   border-style: solid; border-width: 11px 0 11px 17px; border-color: transparent transparent transparent var(--lime);
+}
 .footer-strip picture{ display:block; line-height: 0; }
 
 /* Logos de comercios (de la planilla): se muestran completos, sin recortar
@@ -1755,4 +1754,148 @@ a.program-ig-chip:hover{ color: var(--lime); border-color: rgba(193,255,0,0.35);
 .program-strip-initial{ font-family: var(--ff-display); font-size: 1.3rem; color: var(--lime); }
 @media (max-width: 640px){
   .program-strip-row{ justify-content: flex-start; }
+}
+
+/* ============================================
+   Ajustes del 3/11/2026 (pedido de Nahuel: generales y header)
+   ============================================ */
+
+/* Legibilidad: el gris tenue pasa de 3,7:1 a 5,5:1 de contraste sobre negro
+   y ningún texto informativo queda por debajo de ~13 px. Misma paleta. */
+:root{ --grey-dim: #8d8d87; }
+.benefit-cat, .nc-date, .pase-hint, .article-figure figcaption{ font-size: 0.82rem; }
+.benefits-note{ font-size: 0.85rem; }
+.ondemand-desc{ font-size: 0.9rem; }
+.schedule-info p, .program-subtitle, .ondemand-desc, .benefit-card p{ line-height: 1.6; }
+/* Anton queda para títulos, menú, botones y etiquetas cortas: en tamaños
+   chicos se le da un poco más de aire entre letras. */
+.eyebrow, .raffle-eyebrow, .content-subhead-eyebrow, .next-stop-label{ letter-spacing: 0.12em; }
+
+/* Textura: en celulares (pantalla vertical) se usa un recorte cuadrado de
+   la misma imagen, que pesa la mitad y no se agranda de más. */
+@media (max-width: 760px) and (orientation: portrait){
+  body::before{
+    background-image:
+      linear-gradient(180deg, rgba(11,11,11,0.62) 0%, rgba(11,11,11,0.74) 100%),
+      url('assets/textura-movil.jpg');
+    background-image:
+      linear-gradient(180deg, rgba(11,11,11,0.62) 0%, rgba(11,11,11,0.74) 100%),
+      image-set(url('assets/textura-movil.webp') type('image/webp'), url('assets/textura-movil.jpg') type('image/jpeg'));
+  }
+}
+
+/* Header: clima, día y hora con la misma presencia que el menú */
+.header-weather{
+  font-family: var(--ff-display);
+  font-weight: 400;
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  color: var(--white);
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-transform: uppercase;
+  line-height: 1;
+}
+.header-weather .hw-sep{ color: var(--lime); }
+.header-weather .hw-clima{ white-space: nowrap; }
+.header-weather .hw-hora{ white-space: nowrap; }
+@media (min-width: 1241px) and (max-width: 1440px){
+  .header-weather{ font-size: 0.98rem; }
+}
+/* Celulares: arriba a la izquierda, en dos renglones cortos, sin tapar el logo */
+@media (max-width: 780px){
+  .header-weather{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+  }
+  .header-weather[hidden]{ display: none; }
+  .header-weather .hw-sep{ display: none; }
+}
+@media (max-width: 359px){
+  .header-weather{ font-size: 0.72rem; }
+}
+
+/* ---------- Comunidad (3/11) ---------- */
+/* Sorteos: el título gana protagonismo */
+.raffle-text h3{ font-family: var(--ff-display); font-weight: 400; text-transform: uppercase; font-size: clamp(1.5rem, 3.2vw, 2rem); line-height: 1.05; letter-spacing: 0.01em; margin-bottom: 8px; }
+.raffle-text p:last-child{ font-size: 1rem; }
+
+/* «¿No te llegan nuestros correos?»: más visible, sin competir con los beneficios */
+.email-help{ border: 1px solid rgba(193,255,0,0.35); border-left: 4px solid var(--lime); }
+.email-help summary{ justify-content: flex-start; font-weight: 500; font-size: 1.05rem; padding: 18px 22px; }
+.email-help summary:hover .email-help-title{ color: var(--lime); }
+.email-help-title{ flex: 1; transition: color .2s; }
+.email-help-icon{ flex: 0 0 36px; height: 36px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: rgba(193,255,0,0.12); color: var(--lime); font-size: 1.05rem; }
+.email-help .chevron{ color: var(--lime); }
+.email-help[open] summary{ border-bottom: 1px solid var(--card-border); margin-bottom: 18px; }
+@media (max-width: 640px){
+  .email-help summary{ font-size: 0.98rem; padding: 16px; gap: 12px; }
+}
+
+/* ---------- Contenidos (3/11) ---------- */
+/* Cada programa: horario | nombre, «Conduce» y debajo la descripción con el
+   logo al costado. «Conduce» ya no queda encima del logo. */
+.schedule-list li.prog-item{
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  align-items: start;
+  gap: 0 14px;
+}
+.schedule-list li.prog-item--od{ grid-template-columns: minmax(0, 1fr); }
+.prog-item .schedule-time{ padding-top: 3px; }
+.prog-body{ min-width: 0; text-align: left; }
+.prog-name{ margin: 0; font-size: inherit; line-height: 1.15; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+.prog-name .ondemand-tag{ font-size: 0.78rem; letter-spacing: 0.08em; }
+.prog-detail{ display: flex; align-items: flex-start; gap: 14px; margin-top: 8px; }
+.prog-text{ flex: 1; min-width: 0; }
+.prog-detail .schedule-logo{ flex: 0 0 auto; height: 64px; width: auto; max-width: 120px; margin: 0; }
+.schedule-conduce{
+  width: auto; margin: 0 0 6px; padding: 0;
+  font-size: 0.98rem; font-weight: 500; line-height: 1.4;
+  color: var(--lime); opacity: 1;
+}
+.schedule-conduce .conduce-label{ font-family: var(--ff-display); font-weight: 400; text-transform: uppercase; letter-spacing: 0.06em; margin-right: 2px; }
+.prog-text .schedule-desc{ margin: 0; font-size: 0.92rem; line-height: 1.6; color: var(--grey); }
+@media (max-width: 720px){
+  .schedule-list li.prog-item{ grid-template-columns: 54px minmax(0, 1fr); gap: 0 10px; }
+  .schedule-list li.prog-item--od{ grid-template-columns: minmax(0, 1fr); }
+  .prog-item .schedule-time{ font-size: 1.15rem; min-width: 0; }
+  .prog-detail .schedule-logo{ height: 52px; max-width: 88px; }
+  .schedule-conduce{ font-size: 0.92rem; }
+}
+
+/* Perfil del programa: descripción en un renglón si entra, y el equipo
+   (conducción, columnistas, producción) en un solo bloque antes del video */
+.program-hero .program-subtitle{ max-width: none; }
+.program-team{
+  margin: 26px 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.team-row{ padding: 18px 22px; border-left: 1px solid var(--card-border); }
+.team-row:first-child{ border-left: 0; }
+.team-row dt{ font-family: var(--ff-display); text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.85rem; color: var(--lime); margin-bottom: 8px; }
+.team-row dd{ margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.team-name{ font-size: 1.02rem; color: var(--white); }
+.program-hero{ padding-bottom: 32px; }
+@media (max-width: 720px){
+  .program-team{ grid-template-columns: 1fr; }
+  .team-row{ border-left: 0; border-top: 1px solid var(--card-border); padding: 14px 18px; }
+  .team-row:first-child{ border-top: 0; }
+}
+@media (max-width: 560px){
+  /* En pantallas angostas el texto usa todo el ancho y el logo va debajo */
+  .prog-detail{ flex-direction: column; gap: 10px; }
+  .prog-detail .schedule-logo{ order: 2; height: 48px; max-width: 96px; }
 }

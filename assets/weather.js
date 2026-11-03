@@ -83,24 +83,52 @@
     }
   }
 
+  // Día de la semana en Argentina (La Plata): corto para mostrar ("VIE")
+  // y completo para lectores de pantalla ("viernes").
+  var DIAS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+  var CORTOS = ["DOM", "LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB"];
+  function diaArgentina() {
+    try {
+      var en = new Intl.DateTimeFormat("en-US", { timeZone: TIMEZONE, weekday: "short" }).format(new Date());
+      var i = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(en);
+      return i < 0 ? null : { corto: CORTOS[i], largo: DIAS[i] };
+    } catch (e) {
+      return null;
+    }
+  }
+
   // Único estado compartido: la hora se recalcula sola en cada render,
   // el clima queda cacheado acá hasta el próximo refresh.
   var clima = { icono: null, temp: null };
 
+  function span(clase, texto) {
+    var s = document.createElement("span");
+    s.className = clase;
+    s.textContent = texto;
+    return s;
+  }
+
   function render(container) {
     var hora = horaArgentina();
-    var partes = [];
-    if (clima.icono && clima.temp !== null) {
-      partes.push(clima.icono + " " + Math.round(clima.temp) + "°");
-    }
-    if (hora) partes.push(hora);
-
-    if (!partes.length) {
+    var dia = diaArgentina();
+    var hayClima = clima.icono && clima.temp !== null;
+    if (!hora && !hayClima) {
       container.hidden = true;
       return;
     }
     container.hidden = false;
-    container.textContent = partes.join(" · ");
+    container.textContent = "";
+    var leer = [];
+    if (hayClima) {
+      container.appendChild(span("hw-clima", clima.icono + " " + Math.round(clima.temp) + "°"));
+      leer.push(Math.round(clima.temp) + " grados en La Plata");
+    }
+    if (hayClima && hora) container.appendChild(span("hw-sep", "·"));
+    if (hora) {
+      container.appendChild(span("hw-hora", (dia ? dia.corto + " " : "") + hora));
+      leer.push((dia ? dia.largo + ", " : "") + hora + " horas");
+    }
+    container.setAttribute("aria-label", leer.join(". "));
   }
 
   function cargarClima(container) {

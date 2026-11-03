@@ -16,12 +16,14 @@
 
 <header class="site-header">
   <div class="wrap">
-    <div class="header-weather" id="header-weather" aria-live="polite" hidden></div>
+    <div class="header-weather" id="header-weather" role="group" hidden></div>
     <a href="index.html" class="brand"><img src="assets/logo.png" alt="Sube Canal" width="269" height="104"></a>
     <nav class="nav-links" id="nav-links">
       <a href="comunidad.html">Comunidad</a>
       <a href="contenidos.html" class="is-current">Contenidos</a>
+      <a href="noticias.html">Noticias</a>
       <a href="contacto.html">Contacto</a>
+      <a href="mi-pase.html" class="nav-pass">Mi pase</a>
     </nav>
     <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-links">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -45,28 +47,31 @@
         <h3>Programación</h3>
       </div>
 
-      <div class="content-schedule" id="content-schedule" data-origen="planilla" data-perfiles="{&quot;streaming-copa&quot;: &quot;Streaming copa&quot;, &quot;marcando-la-cancha&quot;: &quot;Marcando la cancha&quot;, &quot;falopa-informativa-nacional&quot;: &quot;Falopa informativa nacional&quot;, &quot;el-amplificador&quot;: &quot;El amplificador&quot;, &quot;estacion-freak&quot;: &quot;Estacion freak&quot;, &quot;de-que-viven&quot;: &quot;¿De qué viven?&quot;, &quot;chicha-y-limonada&quot;: &quot;Chicha y limonada&quot;, &quot;umbrales&quot;: &quot;Umbrales&quot;}">
+      <div class="content-schedule" id="content-schedule" data-origen="planilla" data-perfiles="{&quot;streaming-copa&quot;: &quot;streaming copa&quot;, &quot;marcando-la-cancha&quot;: &quot;marcando la cancha&quot;, &quot;falopa-informativa-nacional&quot;: &quot;falopa informativa nacional&quot;, &quot;el-amplificador&quot;: &quot;el amplificador&quot;, &quot;estacion-freak&quot;: &quot;estacion freak&quot;, &quot;de-que-viven&quot;: &quot;¿de qué viven?&quot;, &quot;chicha-y-limonada&quot;: &quot;chicha y limonada&quot;, &quot;umbrales&quot;: &quot;umbrales&quot;}">
 
         <div class="schedule-day">
           <h3>Lunes</h3>
           <ul class="schedule-list">
-            <li>
+            <li class="prog-item">
               <span class="schedule-time">18:00</span>
-              <a href="programas/streaming-copa.html">Streaming copa</a>
-              <p class="schedule-conduce">Conduce: Mati Cañas y Cipriano Ardaiz</p>
-              <div class="schedule-info"><img class="schedule-logo" src="assets/programas/streaming-copa.webp" alt="Logo de Streaming copa" loading="lazy" decoding="async"><p class="schedule-desc">Viví la pasión del fútbol con toda la previa, el análisis y el aguante. La Copa se juega también desde SUBE.</p></div>
+              <div class="prog-body">
+                <h4 class="prog-name"><a href="programas/streaming-copa.html">streaming copa</a></h4>
+                <div class="prog-detail"><img class="schedule-logo" src="assets/programas/streaming-copa.webp?v=39c77c9f" alt="Logo de streaming copa" loading="lazy" decoding="async"><div class="prog-text"><p class="schedule-conduce"><span class="conduce-label">Conduce:</span> Mati Cañas y Cipriano Ardaiz</p><p class="schedule-desc">Viví la pasión del torneo de la Copa del Rey con toda la previa, el análisis y el aguante.</p></div></div>
+              </div>
             </li>
-            <li>
+            <li class="prog-item">
               <span class="schedule-time">19:30</span>
-              <a href="programas/marcando-la-cancha.html">Marcando la cancha</a>
-              <p class="schedule-conduce">Conduce: Agus Coto, Tino Meli y Joaco De Martino</p>
-              <div class="schedule-info"><p class="schedule-desc">Toda la pasión del deporte, análisis, debate y las historias que se juegan dentro y fuera de la cancha.</p></div>
+              <div class="prog-body">
+                <h4 class="prog-name"><a href="programas/marcando-la-cancha.html">marcando la cancha</a></h4>
+                <div class="prog-detail"><div class="prog-text"><p class="schedule-conduce"><span class="conduce-label">Conduce:</span> Agus Coto, Tino Meli y Joaco De Martino</p><p class="schedule-desc">Toda la pasión del deporte, análisis, debate y las historias que se juegan dentro y fuera de la cancha.</p></div></div>
+              </div>
             </li>
-            <li>
+            <li class="prog-item">
               <span class="schedule-time">21:00</span>
-              <a href="programas/falopa-informativa-nacional.html">Falopa informativa nacional</a>
-              <p class="schedule-conduce">Conduce: Alber Bidart, Fran Panella y Fede Machado</p>
-              <div class="schedule-info"><p class="schedule-desc">Rosca política, actualidad y humor; Todo esto y mas en FIN! charlamos de lo que pasa y debatimos lo que otros prefieren esquivar.</p></div>
+              <div class="prog-body">
+                <h4 class="prog-name"><a href="programas/falopa-informativa-nacional.html">falopa informativa nacional</a></h4>
+                <div class="prog-detail"><div class="prog-text"><p class="schedule-conduce"><span class="conduce-label">Conduce:</span> Alber Bidart, Fran Panella y Fede Machado</p><p class="schedule-desc">Rosca política, actualidad y humor. Todo esto y mas en FIN! charlamos de lo que pasa y debatimos lo que otros prefieren esquivar.</p></div></div>
+              </div>
             </li>
           </ul>
         </div>
@@ -74,60 +79,70 @@
         <div class="schedule-day">
           <h3>Jueves</h3>
           <ul class="schedule-list">
-            <li>
+            <li class="prog-item">
               <span class="schedule-time">18:00</span>
-              <a href="programas/el-amplificador.html">El amplificador</a>
-              <p class="schedule-conduce">Conduce: Belén Raggio y Diego Cisternas</p>
-              <div class="schedule-info"><img class="schedule-logo" src="assets/programas/el-amplificador.webp" alt="Logo de El amplificador" loading="lazy" decoding="async"><p class="schedule-desc">Música, artistas y cultura emergente. Le damos volumen a las voces y los sonidos que merecen ser escuchados.</p></div>
+              <div class="prog-body">
+                <h4 class="prog-name"><a href="programas/el-amplificador.html">el amplificador</a></h4>
+                <div class="prog-detail"><img class="schedule-logo" src="assets/programas/el-amplificador.webp?v=69aa28bf" alt="Logo de el amplificador" loading="lazy" decoding="async"><div class="prog-text"><p class="schedule-conduce"><span class="conduce-label">Conduce:</span> Belén Raggio y Diego Cisternas</p><p class="schedule-desc">Música, artistas y cultura emergente. Le damos volumen a las voces y los sonidos que merecen ser escuchados.</p></div></div>
+              </div>
             </li>
-            <li>
+            <li class="prog-item">
               <span class="schedule-time">19:30</span>
-              <a href="programas/estacion-freak.html">Estacion freak</a>
-              <p class="schedule-conduce">Conduce: Majo Guano, Sol Gimenez y Ari Vargas</p>
-              <span class="schedule-alt">Cada dos semanas, alterna con ¿De qué viven?</span>
-              <div class="schedule-info"><img class="schedule-logo" src="assets/programas/estacion-freak.webp" alt="Logo de Estacion freak" loading="lazy" decoding="async"><p class="schedule-desc">Anime, cultura geek y todo lo que te vuela la cabeza. Un espacio para compartir pasiones y explorar universos.</p></div>
+              <div class="prog-body">
+                <h4 class="prog-name"><a href="programas/estacion-freak.html">estacion freak</a></h4>
+                <div class="prog-detail"><img class="schedule-logo" src="assets/programas/estacion-freak.webp?v=39ccf12c" alt="Logo de estacion freak" loading="lazy" decoding="async"><div class="prog-text"><p class="schedule-conduce"><span class="conduce-label">Conduce:</span> Majo Guano, Sol Gimenez y Ari Vargas</p><p class="schedule-desc">Anime, cultura geek y todo lo que te vuela la cabeza. Un espacio para compartir pasiones y explorar universos.</p></div></div>
+              </div>
             </li>
-            <li>
+            <li class="prog-item">
               <span class="schedule-time">20:00</span>
-              <a href="programas/de-que-viven.html">¿De qué viven?</a>
-              <p class="schedule-conduce">Conduce: Agus Sandia, Eze Varano y Mili Lucero</p>
-              <span class="schedule-alt">Cada dos semanas, alterna con Estacion freak</span>
-              <div class="schedule-info"><p class="schedule-desc">Historias, laburos y formas de ganarse la vida. Salimos a descubrir de qué viven quienes hacen girar la city.</p></div>
+              <div class="prog-body">
+                <h4 class="prog-name"><a href="programas/de-que-viven.html">¿de qué viven?</a></h4>
+                <div class="prog-detail"><div class="prog-text"><p class="schedule-conduce"><span class="conduce-label">Conduce:</span> Agus Sandia, Eze Varano y Mili Lucero</p><p class="schedule-desc">Historias, laburos y formas de ganarse la vida. Salimos a descubrir de qué viven quienes hacen girar la ciudad.</p></div></div>
+              </div>
             </li>
-            <li>
+            <li class="prog-item">
               <span class="schedule-time">21:30</span>
-              <a href="programas/chicha-y-limonada.html">Chicha y limonada</a>
-              <p class="schedule-conduce">Conduce: Iñaki Asenjo, Pali Cecilia y Mai Schnaider</p>
-              <div class="schedule-info"><p class="schedule-desc">Entre la charla y el descontrol, un espacio para debatir, reírse y compartir esas conversaciones que pueden ir para cualquier lado.</p></div>
+              <div class="prog-body">
+                <h4 class="prog-name"><a href="programas/chicha-y-limonada.html">chicha y limonada</a></h4>
+                <div class="prog-detail"><div class="prog-text"><p class="schedule-conduce"><span class="conduce-label">Conduce:</span> Iñaki Asenjo, Pali Cecilia y Mai Schnaider</p><p class="schedule-desc">Entre la charla y el descontrol, un espacio para debatir, reírse y compartir esas conversaciones que pueden ir para cualquier lado.</p></div></div>
+              </div>
             </li>
           </ul>
         </div>
 
         <div class="schedule-day" id="schedule-ondemand-block">
           <h3>On demand</h3>
-          <ul class="ondemand-list">
-            <li>
-              <a href="programas/umbrales.html">
-                <span class="ondemand-main">
-                  <span class="ondemand-name">Umbrales</span>
-                  <span class="ondemand-desc">Conversaciones íntimas con personas que se animan a cruzar sus propios límites, explorar nuevas formas de crear y habitar la escena, y compartir aquello que las mueve.</span>
-                </span>
-                <span class="ondemand-tag">Programa</span>
-              </a>
+          <ul class="schedule-list schedule-list--ondemand">
+            <li class="prog-item prog-item--od">
+              <div class="prog-body">
+                <h4 class="prog-name"><a href="programas/umbrales.html">umbrales</a> <span class="ondemand-tag">Programa</span></h4>
+                <div class="prog-detail"><div class="prog-text"><p class="schedule-conduce"><span class="conduce-label">Conduce:</span> Euge Gallo y Juan Velis</p><p class="schedule-desc">Conversaciones íntimas con personas que se animan a cruzar sus propios límites, explorar nuevas formas de crear y habitar la escena, y compartir aquello que las mueve.</p></div></div>
+              </div>
             </li>
-            <li>
-              <a href="https://www.youtube.com/watch?v=2E0gkC1fRDY&list=PLYT7ujTIBmWbglZ7Mmi-r4RnP1NqsDMt6" target="_blank" rel="noopener">
-                <span class="ondemand-main">
-                  <span class="ondemand-name">Especiales</span>
-                  <span class="ondemand-desc">Navegá en todos nuestros especiales</span>
-                </span>
-                <span class="ondemand-tag">Playlist</span>
-              </a>
+            <li class="prog-item prog-item--od">
+              <div class="prog-body">
+                <h4 class="prog-name"><a href="https://www.youtube.com/watch?v=nalMLH7Ne80&amp;list=PLYT7ujTIBmWbglZ7Mmi-r4RnP1NqsDMt6&amp;pp=sAgC" target="_blank" rel="noopener">especiales</a> <span class="ondemand-tag">Playlist</span></h4>
+                <div class="prog-detail"><div class="prog-text"><p class="schedule-desc">Especiales temáticos y eventos únicos para salirnos de la rutina y vivirlo juntos en vivo.</p></div></div>
+              </div>
             </li>
           </ul>
         </div>
 
       </div>
+
+      <div class="content-subhead content-subhead--noticias">
+        <span class="content-subhead-eyebrow">Redacción SUBE</span>
+        <h3>Noticias</h3>
+      </div>
+
+      <a class="hub-card" href="noticias.html">
+        <span class="hub-card-title">Coberturas, notas y actualidad</span>
+        <span class="hub-card-desc">La parte informativa de SUBE: lo que pasa en La Plata y en el país, contado por nuestra redacción.</span>
+        <span class="hub-card-arrow">→</span>
+      </a>
+
+    </div>
+  </section>
 
 </main>
 

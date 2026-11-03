@@ -104,15 +104,9 @@
     var nombreHtml = slug
       ? '<a href="programas/' + slug + '.html">' + escapeHtml(nombrePara(p)) + "</a>"
       : "<span>" + escapeHtml(p.programa) + "</span>";
-    var alt = "";
-    if (p.frecuencia_dias >= 14) {
-      // Si hay otro programa quincenal el mismo día, se alternan semana por medio
-      var pareja = items.filter(function (o) { return o !== p && o.frecuencia_dias >= 14; });
-      alt = '<span class="schedule-alt">Cada dos semanas' +
-        (pareja.length === 1 ? ", alterna con " + escapeHtml(nombrePara(pareja[0])) : "") + "</span>";
-    }
+    // (Ya no se muestra «Cada dos semanas, alterna con…»: va en la descripción de la planilla)
     return (
-      "<li><span class=\"schedule-time\">" + horaTexto + "</span>" + nombreHtml + alt + infoHtml(p) + "</li>"
+      "<li><span class=\"schedule-time\">" + horaTexto + "</span>" + nombreHtml + infoHtml(p) + "</li>"
     );
   }
 

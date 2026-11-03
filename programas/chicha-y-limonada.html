@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chicha y limonada · SUBE</title>
-<meta name="description" content="Chicha y limonada — programa de SUBE. Playlist, quiénes lo hacen y redes.">
+<title>chicha y limonada · SUBE</title>
+<meta name="description" content="chicha y limonada — programa de SUBE. Playlist, quiénes lo hacen y redes.">
 <link rel="icon" href="../assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,12 +16,14 @@
 
 <header class="site-header">
   <div class="wrap">
-    <div class="header-weather" id="header-weather" aria-live="polite" hidden></div>
+    <div class="header-weather" id="header-weather" role="group" hidden></div>
     <a href="../index.html" class="brand"><img src="../assets/logo.png" alt="Sube Canal" width="269" height="104"></a>
     <nav class="nav-links" id="nav-links">
       <a href="../comunidad.html">Comunidad</a>
       <a href="../contenidos.html" class="is-current">Contenidos</a>
+      <a href="../noticias.html">Noticias</a>
       <a href="../contacto.html">Contacto</a>
+      <a href="../mi-pase.html" class="nav-pass">Mi pase</a>
     </nav>
     <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-links">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -39,7 +41,7 @@
       <div class="program-title">
         <div>
           <p class="eyebrow">Programa</p>
-          <h1>Chicha y limonada</h1>
+          <h1>chicha y limonada</h1>
         </div>
       </div>
       <p class="program-subtitle">Entre la charla y el descontrol, un espacio para debatir, reírse y compartir esas conversaciones que pueden ir para cualquier lado.</p>
@@ -47,6 +49,7 @@
         <span class="program-schedule">Jueves · 21:30 · Todas las semanas</span>
         <a class="program-ig-chip" href="https://www.instagram.com/chichaylimonada.sube/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>@chichaylimonada.sube</span></a>
       </div>
+      <dl class="program-team" aria-label="Equipo del programa"><div class="team-row"><dt>Conductores</dt><dd><span class="team-name">Iñaki Asenjo</span><span class="team-name">Pali Cecilia</span><span class="team-name">Mai Schnaider</span></dd></div><div class="team-row"><dt>Columnista</dt><dd><span class="team-name">Juan Pelis</span></dd></div><div class="team-row"><dt>Producción</dt><dd><span class="team-name">Nani Sanchez</span><span class="team-name">Male Escaray</span></dd></div></dl>
     </div>
   </section>
 
@@ -55,14 +58,12 @@
       <div class="video-embed">
         <iframe
           src="https://www.youtube.com/embed/OsnGQQ6ryrU?list=PLYT7ujTIBmWbEmAmjwWQMRK0TahbqHlv2"
-          title="Chicha y limonada — SUBE"
+          title="chicha y limonada — SUBE"
           loading="lazy"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen>
         </iframe>
       </div>
-
-      <div class="program-info-grid"><div class="program-info-card"><h2>Conducen</h2><ul class="people-list"><li><a href="https://www.instagram.com/inakiasag/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Iñaki Asenjo</span></a></li><li><a href="https://www.instagram.com/palipax/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Pali Cecilia</span></a></li><li><a href="https://www.instagram.com/mai.schnaider/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Mai Schnaider</span></a></li></ul></div><div class="program-info-card"><h2>Columnistas</h2><ul class="people-list"><li><span class="person-plain">Juan Pelis</span></li></ul></div><div class="program-info-card"><h2>Producción</h2><ul class="people-list"><li><a href="https://www.instagram.com/nanisan___/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Nani Sanchez</span></a></li><li><a href="https://www.instagram.com/malenaescaray/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Male Escaray</span></a></li></ul></div></div>
     </div>
   </section>
 

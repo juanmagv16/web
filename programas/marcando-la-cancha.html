@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Marcando la cancha · SUBE</title>
-<meta name="description" content="Marcando la cancha — programa de SUBE. Playlist, quiénes lo hacen y redes.">
+<title>marcando la cancha · SUBE</title>
+<meta name="description" content="marcando la cancha — programa de SUBE. Playlist, quiénes lo hacen y redes.">
 <link rel="icon" href="../assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,12 +16,14 @@
 
 <header class="site-header">
   <div class="wrap">
-    <div class="header-weather" id="header-weather" aria-live="polite" hidden></div>
+    <div class="header-weather" id="header-weather" role="group" hidden></div>
     <a href="../index.html" class="brand"><img src="../assets/logo.png" alt="Sube Canal" width="269" height="104"></a>
     <nav class="nav-links" id="nav-links">
       <a href="../comunidad.html">Comunidad</a>
       <a href="../contenidos.html" class="is-current">Contenidos</a>
+      <a href="../noticias.html">Noticias</a>
       <a href="../contacto.html">Contacto</a>
+      <a href="../mi-pase.html" class="nav-pass">Mi pase</a>
     </nav>
     <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-links">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -39,7 +41,7 @@
       <div class="program-title">
         <div>
           <p class="eyebrow">Programa</p>
-          <h1>Marcando la cancha</h1>
+          <h1>marcando la cancha</h1>
         </div>
       </div>
       <p class="program-subtitle">Toda la pasión del deporte, análisis, debate y las historias que se juegan dentro y fuera de la cancha.</p>
@@ -47,6 +49,7 @@
         <span class="program-schedule">Lunes · 19:30 · Todas las semanas</span>
         <a class="program-ig-chip" href="https://www.instagram.com/marcandolacancha.sube/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>@marcandolacancha.sube</span></a>
       </div>
+      <dl class="program-team" aria-label="Equipo del programa"><div class="team-row"><dt>Conductores</dt><dd><span class="team-name">Agus Coto</span><span class="team-name">Tino Meli</span><span class="team-name">Joaco De Martino</span></dd></div><div class="team-row"><dt>Columnistas</dt><dd><span class="team-name">Rulo</span><span class="team-name">El Perlas</span><span class="team-name">Juanita</span></dd></div><div class="team-row"><dt>Producción</dt><dd><span class="team-name">Cami Del Canto</span></dd></div></dl>
     </div>
   </section>
 
@@ -55,14 +58,12 @@
       <div class="video-embed">
         <iframe
           src="https://www.youtube.com/embed/uFQ6LhtzW1E?list=PLYT7ujTIBmWYogyJY-uOZ4T5qc6VLCZzS"
-          title="Marcando la cancha — SUBE"
+          title="marcando la cancha — SUBE"
           loading="lazy"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen>
         </iframe>
       </div>
-
-      <div class="program-info-grid"><div class="program-info-card"><h2>Conducen</h2><ul class="people-list"><li><a href="https://www.instagram.com/aguscoto_/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Agus Coto</span></a></li><li><a href="https://www.instagram.com/tinomeli_/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Tino Meli</span></a></li><li><a href="https://www.instagram.com/joacodemartino/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Joaco De Martino</span></a></li></ul></div><div class="program-info-card"><h2>Columnistas</h2><ul class="people-list"><li><span class="person-plain">Rulo</span></li><li><span class="person-plain">El Perlas</span></li><li><span class="person-plain">Juanita</span></li></ul></div><div class="program-info-card"><h2>Producción</h2><ul class="people-list"><li><a href="https://www.instagram.com/camidelcant0/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Cami Del Canto</span></a></li></ul></div></div>
     </div>
   </section>
 

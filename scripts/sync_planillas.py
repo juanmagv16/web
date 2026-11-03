@@ -226,6 +226,12 @@ def guardar_logo(url, slug, carpeta=None):
     return os.path.relpath(os.path.join(carpeta, nombre), ROOT).replace(os.sep, "/")
 
 
+def logo_anterior(slug, carpeta):
+    """Logo ya guardado de una corrida anterior (o '' si no hay)."""
+    ruta = os.path.join(carpeta, slug + ".webp")
+    return os.path.relpath(ruta, ROOT).replace(os.sep, "/") if os.path.isfile(ruta) else ""
+
+
 def leer_csv(cfg):
     """Descarga una pestaña de Google Sheets como filas de CSV."""
     url = url_csv(cfg)
@@ -287,7 +293,12 @@ def sync_programacion(cfg):
                 usados.add(os.path.basename(p["logo"]))
                 nota("Logo de programa OK, fila {} ({}): {}".format(n, nombre, guardar_logo.ultimo))
             except Exception as e:  # noqa: BLE001
-                aviso("Programación, fila {} ({}): no se pudo usar el logo: {}".format(n, nombre, e))
+                previo = logo_anterior(slug, PROG_LOGOS_DIR)
+                if previo:
+                    p["logo"] = previo
+                    usados.add(os.path.basename(previo))
+                aviso("Programación, fila {} ({}): no se pudo usar el logo{}: {}".format(
+                    n, nombre, " (se mantiene el anterior)" if previo else "", e))
         programas.append(p)
     if os.path.isdir(PROG_LOGOS_DIR):
         for fn in os.listdir(PROG_LOGOS_DIR):
@@ -370,7 +381,9 @@ def sync_comercios(cfg):
                 c["logo"] = guardar_logo(url, slug)
                 nota("Logo de comercio OK, fila {} ({}): {}".format(n, nombre, guardar_logo.ultimo))
             except Exception as e:  # noqa: BLE001
-                problemas.append("fila {} ({}): no se pudo usar el logo: {}".format(n, nombre, e))
+                c["logo"] = logo_anterior(slug, LOGOS_DIR)  # si Drive falla un rato, queda el último logo bueno
+                problemas.append("fila {} ({}): no se pudo usar el logo{}: {}".format(
+                    n, nombre, " (se mantiene el anterior)" if c["logo"] else "", e))
         elif celda(f, cols["logo"]):
             problemas.append("fila {} ({}): la columna de logo no tiene un link válido".format(n, nombre))
         if c["tipo"] != "auspiciante" and not beneficios:

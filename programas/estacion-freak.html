@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Estacion freak · SUBE</title>
-<meta name="description" content="Estacion freak — programa de SUBE. Playlist, quiénes lo hacen y redes.">
+<title>estacion freak · SUBE</title>
+<meta name="description" content="estacion freak — programa de SUBE. Playlist, quiénes lo hacen y redes.">
 <link rel="icon" href="../assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,12 +16,14 @@
 
 <header class="site-header">
   <div class="wrap">
-    <div class="header-weather" id="header-weather" aria-live="polite" hidden></div>
+    <div class="header-weather" id="header-weather" role="group" hidden></div>
     <a href="../index.html" class="brand"><img src="../assets/logo.png" alt="Sube Canal" width="269" height="104"></a>
     <nav class="nav-links" id="nav-links">
       <a href="../comunidad.html">Comunidad</a>
       <a href="../contenidos.html" class="is-current">Contenidos</a>
+      <a href="../noticias.html">Noticias</a>
       <a href="../contacto.html">Contacto</a>
+      <a href="../mi-pase.html" class="nav-pass">Mi pase</a>
     </nav>
     <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-links">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -37,9 +39,9 @@
     <div class="wrap">
       <a class="back-link" href="../contenidos.html"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>Volver a Contenidos</a>
       <div class="program-title">
-        <img class="program-logo" src="../assets/programas/estacion-freak.webp" alt="Logo de Estacion freak" decoding="async"><div>
+        <img class="program-logo" src="../assets/programas/estacion-freak.webp?v=39ccf12c" alt="Logo de estacion freak" decoding="async"><div>
           <p class="eyebrow">Programa</p>
-          <h1>Estacion freak</h1>
+          <h1>estacion freak</h1>
         </div>
       </div>
       <p class="program-subtitle">Anime, cultura geek y todo lo que te vuela la cabeza. Un espacio para compartir pasiones y explorar universos.</p>
@@ -47,6 +49,7 @@
         <span class="program-schedule">Jueves · 19:30 · Cada dos semanas</span>
         <a class="program-ig-chip" href="https://www.instagram.com/estacion.freak/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>@estacion.freak</span></a>
       </div>
+      <dl class="program-team" aria-label="Equipo del programa"><div class="team-row"><dt>Conductores</dt><dd><span class="team-name">Majo Guano</span><span class="team-name">Sol Gimenez</span><span class="team-name">Ari Vargas</span></dd></div><div class="team-row"><dt>Columnistas</dt><dd><span class="team-name">Fidel</span><span class="team-name">Juanita</span></dd></div><div class="team-row"><dt>Producción</dt><dd><span class="team-name">Mora Gutierrez</span></dd></div></dl>
     </div>
   </section>
 
@@ -55,14 +58,12 @@
       <div class="video-embed">
         <iframe
           src="https://www.youtube.com/embed/ElsMjpmD5sU?list=PLYT7ujTIBmWZWm37-X_-CzKtCt5fgRIE1"
-          title="Estacion freak — SUBE"
+          title="estacion freak — SUBE"
           loading="lazy"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen>
         </iframe>
       </div>
-
-      <div class="program-info-grid"><div class="program-info-card"><h2>Conducen</h2><ul class="people-list"><li><a href="https://www.instagram.com/majoguano/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Majo Guano</span></a></li><li><a href="https://www.instagram.com/solencolores/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Sol Gimenez</span></a></li><li><a href="https://www.instagram.com/vargasari__/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Ari Vargas</span></a></li></ul></div><div class="program-info-card"><h2>Columnistas</h2><ul class="people-list"><li><span class="person-plain">Fidel</span></li><li><span class="person-plain">Juanita</span></li></ul></div><div class="program-info-card"><h2>Producción</h2><ul class="people-list"><li><a href="https://www.instagram.com/mora.gutierrez/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Mora Gutierrez</span></a></li></ul></div></div>
     </div>
   </section>
 

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>¿De qué viven? · SUBE</title>
-<meta name="description" content="¿De qué viven? — programa de SUBE. Playlist, quiénes lo hacen y redes.">
+<title>¿de qué viven? · SUBE</title>
+<meta name="description" content="¿de qué viven? — programa de SUBE. Playlist, quiénes lo hacen y redes.">
 <link rel="icon" href="../assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,12 +16,14 @@
 
 <header class="site-header">
   <div class="wrap">
-    <div class="header-weather" id="header-weather" aria-live="polite" hidden></div>
+    <div class="header-weather" id="header-weather" role="group" hidden></div>
     <a href="../index.html" class="brand"><img src="../assets/logo.png" alt="Sube Canal" width="269" height="104"></a>
     <nav class="nav-links" id="nav-links">
       <a href="../comunidad.html">Comunidad</a>
       <a href="../contenidos.html" class="is-current">Contenidos</a>
+      <a href="../noticias.html">Noticias</a>
       <a href="../contacto.html">Contacto</a>
+      <a href="../mi-pase.html" class="nav-pass">Mi pase</a>
     </nav>
     <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-links">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -39,14 +41,15 @@
       <div class="program-title">
         <div>
           <p class="eyebrow">Programa</p>
-          <h1>¿De qué viven?</h1>
+          <h1>¿de qué viven?</h1>
         </div>
       </div>
-      <p class="program-subtitle">Historias, laburos y formas de ganarse la vida. Salimos a descubrir de qué viven quienes hacen girar la city.</p>
+      <p class="program-subtitle">Historias, laburos y formas de ganarse la vida. Salimos a descubrir de qué viven quienes hacen girar la ciudad.</p>
       <div class="program-meta">
         <span class="program-schedule">Jueves · 20:00 · Cada dos semanas</span>
         <a class="program-ig-chip" href="https://www.instagram.com/dqv.sube/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>@dqv.sube</span></a>
       </div>
+      <dl class="program-team" aria-label="Equipo del programa"><div class="team-row"><dt>Conductores</dt><dd><span class="team-name">Agus Sandia</span><span class="team-name">Eze Varano</span><span class="team-name">Mili Lucero</span></dd></div><div class="team-row"><dt>Producción</dt><dd><span class="team-name">Nahuel Fabian Maciel</span></dd></div></dl>
     </div>
   </section>
 
@@ -55,14 +58,12 @@
       <div class="video-embed">
         <iframe
           src="https://www.youtube.com/embed/HY-aRlpJ7tY?list=PLYT7ujTIBmWYiJVF9dSRf6__ckwOeMf_E"
-          title="¿De qué viven? — SUBE"
+          title="¿de qué viven? — SUBE"
           loading="lazy"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen>
         </iframe>
       </div>
-
-      <div class="program-info-grid"><div class="program-info-card"><h2>Conducen</h2><ul class="people-list"><li><a href="https://www.instagram.com/agussandia/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Agus Sandia</span></a></li><li><a href="https://www.instagram.com/ezequiel.varano/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Eze Varano</span></a></li><li><a href="https://www.instagram.com/luceritosinvela_/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Mili Lucero</span></a></li></ul></div><div class="program-info-card"><h2>Producción</h2><ul class="people-list"><li><a href="https://www.instagram.com/na.ue_/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Nahuel Fabian Maciel</span></a></li></ul></div></div>
     </div>
   </section>
 
