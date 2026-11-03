@@ -210,7 +210,7 @@ a:focus-visible, button:focus-visible{
     overflow: hidden;
     transition: max-height .28s ease;
   }
-  .nav-links.is-open{ max-height: 320px; }
+  .nav-links.is-open{ max-height: 420px; }
   .nav-links a{ padding: 16px 24px; border-top: 1px solid var(--card-border); opacity: 1; }
   .nav-toggle{ display:inline-flex; }
 }

@@ -46,7 +46,13 @@ NAV_ITEMS = [
     ("tienda", "Tienda", "tienda.html"),
     ("contacto", "Contacto", "contacto.html"),
     ("mipase", "Mi pase", "mi-pase.html"),
+    ("redaccion", "Redacción", "redaccion/"),
 ]
+
+# Pestaña «Redacción» en el menú. En la web de prueba queda a la vista para
+# probar el panel; en la web oficial va en False (el panel sigue andando en
+# subecanal.com.ar/redaccion, pero sin ningún botón que lleve ahí).
+REDACCION_EN_MENU = True
 
 # Secciones ocultas al público por ahora. Para volver a mostrar una,
 # sacala de esta lista y regenerá el sitio (python3 build_site.py):
@@ -56,6 +62,8 @@ SECCIONES_OCULTAS = {"tienda"}
 
 
 def visible(seccion):
+    if seccion == "redaccion":
+        return REDACCION_EN_MENU
     return seccion not in SECCIONES_OCULTAS
 
 
