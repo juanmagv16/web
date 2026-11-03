@@ -38,7 +38,7 @@ FUENTES = os.path.join(ROOT, "datos", "fuentes.json")
 SALIDA = os.path.join(ROOT, "datos", "comercios.json")
 LOGOS_DIR = os.path.join(ROOT, "assets", "socios", "planilla")
 LOGO_MAX = 640  # px del lado más largo (nítido también en pantallas de alta densidad)
-PROG_LOGOS_DIR = os.path.join(ROOT, "assets", "programas", "planilla")
+PROG_LOGOS_DIR = os.path.join(ROOT, "assets", "programas")
 PROG_SALIDA = os.path.join(ROOT, "datos", "programas.json")
 
 
@@ -186,6 +186,9 @@ def abrir_imagen(datos, tipo):
 def guardar_logo(url, slug, carpeta=None):
     from PIL import Image  # se instala en GitHub (pip install pillow)
     carpeta = carpeta or LOGOS_DIR
+    m_id = re.search(r"[?&]id=([a-zA-Z0-9_-]+)", url)
+    if m_id and m_id.group(1) in PENDIENTES:
+        raise ValueError("logo pendiente de confirmar (ver logos_pendientes en datos/fuentes.json)")
     datos, tipo = descargar(url)
     m = re.search(r"[?&]id=([a-zA-Z0-9_-]+)", url) if "drive.google.com" in url else None
     if "text/html" in tipo and m:
@@ -295,11 +298,15 @@ def sync_programacion(cfg):
         fh.write("\n")
 
 
+PENDIENTES = set()  # ids de Drive de logos que no se muestran hasta confirmarlos
+
+
 def main():
     if not os.path.exists(FUENTES):
         aviso("No está datos/fuentes.json: la web sigue con los datos anteriores.")
         return 0
     fuentes = json.load(open(FUENTES, encoding="utf-8"))
+    PENDIENTES.update(fuentes.get("logos_pendientes", []))
     if fuentes.get("programacion"):
         sync_programacion(fuentes["programacion"])
     if fuentes.get("comercios"):

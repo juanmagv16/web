@@ -4,8 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SUBE :: Un viaje colectivo por La Plata</title>
-<meta name="description" content="SUBE es un canal platense hecho a pulmón. Conocé los beneficios de la Comunidad de pasajeros y sumate.">
+<meta name="description" content="SUBE es un medio de comunicación autogestivo con identidad platense. Conocé los beneficios de la Comunidad de Pasajerxs y sumate como socix.">
 <link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="assets/fonts/Anton-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,14 +17,11 @@
 <header class="site-header">
   <div class="wrap">
     <div class="header-weather" id="header-weather" aria-live="polite" hidden></div>
-    <a href="index.html" class="brand"><img src="assets/logo.png" alt="Sube Canal"></a>
+    <a href="index.html" class="brand"><img src="assets/logo.png" alt="Sube Canal" width="269" height="104"></a>
     <nav class="nav-links" id="nav-links">
       <a href="comunidad.html">Comunidad</a>
       <a href="contenidos.html">Contenidos</a>
-      <a href="noticias.html">Noticias</a>
-      <a href="tienda.html">Tienda</a>
       <a href="contacto.html">Contacto</a>
-      <a href="mi-pase.html" class="nav-pass">Mi pase</a>
     </nav>
     <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-links">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -38,10 +39,10 @@
         <h1>Subite a este<br><span class="accent">viaje colectivo</span></h1>
         <div class="hero-sub">
           <p>Somos un canal platense hecho a pulmón. Creamos contenidos, generamos encuentros y construimos comunidad alrededor de la cultura local.</p>
-          <p>La Comunidad de pasajeros sostiene SUBE todos los meses. Sumándote, vos también sos parte y accedés a beneficios en una red de espacios amigos.</p>
+          <p>La Comunidad de Pasajerxs sostiene SUBE todos los meses. Sumándote, vos también sos parte y accedés a beneficios en una red de espacios amigos.</p>
         </div>
         <div class="hero-actions">
-          <a href="comunidad.html#asociate" class="btn btn-primary">Subirme a la comunidad</a>
+          <a href="comunidad.html#asociate" class="btn btn-primary">Quiero ser pasajerx</a>
           <a href="comunidad.html#beneficios" class="btn btn-ghost">Ver beneficios</a>
         </div>
       </div>
@@ -58,30 +59,7 @@
           </iframe>
         </div>
 
-        <div class="next-stop" id="next-stop" aria-live="polite" data-perfiles="{&quot;streaming-copa&quot;: &quot;Streaming Copa&quot;, &quot;marcando-la-cancha&quot;: &quot;Marcando la cancha&quot;, &quot;falopa-informativa-nacional&quot;: &quot;FIN! F@lopa informativa nacional&quot;, &quot;el-amplificador&quot;: &quot;El Amplificador – 10ma temporada&quot;, &quot;estacion-freak&quot;: &quot;Estación Freak&quot;, &quot;de-que-viven&quot;: &quot;¿De qué viven?&quot;, &quot;chicha-y-limonada&quot;: &quot;Chicha y limonada&quot;, &quot;umbrales&quot;: &quot;Umbrales&quot;}" hidden></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="featured-news">
-    <div class="wrap">
-      <div class="section-head">
-        <h2>Noticias destacadas</h2>
-        <a class="section-head-link" href="noticias.html">Ver todas las noticias →</a>
-      </div>
-      <div class="news-grid">
-        <a class="news-card" href="noticias/oro-argentino-perdidas-banco-amigo.html">
-          <span class="news-tag">Política</span>
-          <span class="news-title">El oro argentino, pérdidas millonarias y un banco amigo del Gobierno</span>
-        </a>
-        <a class="news-card" href="noticias/boca-y-estudiantes-van-por-la-gloria-argentina-tendra-finalistas-en-las-dos-copas.html">
-          <span class="news-tag">Deportes</span>
-          <span class="news-title">Boca y Estudiantes van por la gloria: Argentina tendrá finalistas en las dos copas</span>
-        </a>
-        <a class="news-card" href="noticias/donde-se-chicha-el-finde.html">
-          <span class="news-tag">Agenda</span>
-          <span class="news-title">¿Dónde se chicha el finde?</span>
-        </a>
+        <div class="next-stop" id="next-stop" aria-live="polite" data-perfiles="{&quot;streaming-copa&quot;: &quot;Streaming copa&quot;, &quot;marcando-la-cancha&quot;: &quot;Marcando la cancha&quot;, &quot;falopa-informativa-nacional&quot;: &quot;Falopa informativa nacional&quot;, &quot;el-amplificador&quot;: &quot;El amplificador&quot;, &quot;estacion-freak&quot;: &quot;Estacion freak&quot;, &quot;de-que-viven&quot;: &quot;¿De qué viven?&quot;, &quot;chicha-y-limonada&quot;: &quot;Chicha y limonada&quot;, &quot;umbrales&quot;: &quot;Umbrales&quot;}" hidden></div>
       </div>
     </div>
   </section>
@@ -89,33 +67,19 @@
   <section class="sponsors">
     <div class="wrap">
       <div class="sponsor-slots">
-        <a class="sponsor-slot sponsor-slot--banner sponsor-banner" href="comunidad.html#beneficios" aria-label="Sponsors oficiales: Roots Cooperativa, Refugio 62 y Tatana">
-          <img class="sponsor-banner-title" src="assets/sponsors/sponsors-oficiales-titulo.jpg" alt="" width="628" height="396" loading="lazy">
-          <span class="sponsor-banner-logos">
-            <img src="assets/sponsors/logo-roots-cooperativa.png" alt="Roots Cooperativa" loading="lazy">
-            <img src="assets/sponsors/logo-refugio-62.png" alt="Refugio 62" loading="lazy">
-            <img src="assets/sponsors/logo-tatana.png" alt="Tatana" loading="lazy">
-          </span>
+        <a class="sponsor-slot sponsor-slot--banner" href="contacto.html">
+          <span class="sponsor-slot-label">Banner horizontal</span>
         </a>
 
         <div class="sponsor-slot-row">
-          <a class="sponsor-slot sponsor-slot--square sponsor-slot--image sponsor-slot--logo" href="contacto.html">
-            <img src="assets/sponsors/cuadrado-roots.webp" alt="Roots Cooperativa" width="357" height="357" loading="lazy">
+          <a class="sponsor-slot sponsor-slot--square" href="contacto.html">
+            <span class="sponsor-slot-label">Cuadrado</span>
           </a>
-          <a class="sponsor-slot sponsor-slot--square sponsor-slot--image sponsor-slot--logo" href="contacto.html">
-            <img src="assets/sponsors/cuadrado-mascaro.webp" alt="Librería Mascaró" width="640" height="640" loading="lazy">
+          <a class="sponsor-slot sponsor-slot--square" href="contacto.html">
+            <span class="sponsor-slot-label">Cuadrado</span>
           </a>
-          <a class="sponsor-slot sponsor-slot--square sponsor-slot--image sponsor-slot--logo" href="contacto.html">
-            <img src="assets/sponsors/cuadrado-casa-chicha.webp" alt="Casa Chicha" width="639" height="640" loading="lazy">
-          </a>
-        </div>
-
-        <div class="sponsor-slot-row sponsor-slot-row--2">
-          <a class="sponsor-slot sponsor-slot--banner" href="contacto.html">
-            <span class="sponsor-slot-label">Banner horizontal</span>
-          </a>
-          <a class="sponsor-slot sponsor-slot--banner" href="contacto.html">
-            <span class="sponsor-slot-label">Banner horizontal</span>
+          <a class="sponsor-slot sponsor-slot--square" href="contacto.html">
+            <span class="sponsor-slot-label">Cuadrado</span>
           </a>
         </div>
       </div>
@@ -127,7 +91,10 @@
 <footer>
   <div class="wrap">
     <div class="footer-strip">
-      <img class="footer-bus" src="assets/colectivo.png" alt="Sube Canal — un viaje colectivo">
+      <picture>
+        <source srcset="assets/colectivo.webp" type="image/webp">
+        <img class="footer-bus" src="assets/colectivo.png" alt="Sube Canal — un viaje colectivo" width="919" height="288" loading="lazy" decoding="async">
+      </picture>
       <div class="footer-channels">
         <a href="mailto:laplatasube@gmail.com"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg><span>laplatasube@gmail.com</span></a>
         <a href="https://www.instagram.com/subecanal" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Instagram</span></a>
@@ -141,6 +108,7 @@
 
 <script src="assets/nav.js"></script>
 <script src="assets/weather.js"></script>
+<script src="assets/planillas.js"></script>
 <script src="assets/schedule.js"></script>
 <script src="assets/next-stop.js"></script>
 </body>

@@ -1,10 +1,12 @@
 {
+  "_ayuda": "Planillas que lee GitHub cada hora (scripts/sync_planillas.py). Tienen que estar compartidas como 'Cualquier persona con el vínculo: Lector'. logos_pendientes: ids de archivos de Drive que no se muestran hasta confirmar que corresponden.",
   "comercios": {
     "planilla": "https://docs.google.com/spreadsheets/d/1T7-2AKnZ1Ss7LwBhUYtFCkPZxjxFTJ3yF6EhMgFnD7M/edit",
-    "gid": ""
+    "gid": "0"
   },
   "programacion": {
     "planilla": "https://docs.google.com/spreadsheets/d/1sf038ryCAifTFDUtAlhzYzwXquH3moezDdh43rLs2to/edit",
     "gid": "0"
-  }
+  },
+  "logos_pendientes": ["1SamSQ182pxsponUXAcrLw_XcqTz7hZkV"]
 }

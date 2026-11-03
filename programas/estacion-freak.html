@@ -3,9 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Estación Freak · SUBE</title>
-<meta name="description" content="Estación Freak — programa de SUBE. Playlist, quiénes lo hacen y redes.">
+<title>Estacion freak · SUBE</title>
+<meta name="description" content="Estacion freak — programa de SUBE. Playlist, quiénes lo hacen y redes.">
 <link rel="icon" href="../assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="../assets/fonts/Anton-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -13,14 +17,11 @@
 <header class="site-header">
   <div class="wrap">
     <div class="header-weather" id="header-weather" aria-live="polite" hidden></div>
-    <a href="../index.html" class="brand"><img src="../assets/logo.png" alt="Sube Canal"></a>
+    <a href="../index.html" class="brand"><img src="../assets/logo.png" alt="Sube Canal" width="269" height="104"></a>
     <nav class="nav-links" id="nav-links">
       <a href="../comunidad.html">Comunidad</a>
       <a href="../contenidos.html" class="is-current">Contenidos</a>
-      <a href="../noticias.html">Noticias</a>
-      <a href="../tienda.html">Tienda</a>
       <a href="../contacto.html">Contacto</a>
-      <a href="../mi-pase.html" class="nav-pass">Mi pase</a>
     </nav>
     <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-links">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -35,11 +36,15 @@
   <section class="program-hero">
     <div class="wrap">
       <a class="back-link" href="../contenidos.html"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>Volver a Contenidos</a>
-      <p class="eyebrow">Programa</p>
-      <h1>Estación Freak</h1>
-      <p class="program-subtitle program-subtitle--pending">⚠️ Falta el subtítulo (“Un programa sobre…”) — pasámelo y lo cargo.</p>
+      <div class="program-title">
+        <img class="program-logo" src="../assets/programas/estacion-freak.webp" alt="Logo de Estacion freak" decoding="async"><div>
+          <p class="eyebrow">Programa</p>
+          <h1>Estacion freak</h1>
+        </div>
+      </div>
+      <p class="program-subtitle">Anime, cultura geek y todo lo que te vuela la cabeza. Un espacio para compartir pasiones y explorar universos.</p>
       <div class="program-meta">
-        <span class="program-schedule">Jueves · 19:30 · Cada dos semanas, alterna con ¿De qué viven?</span>
+        <span class="program-schedule">Jueves · 19:30 · Cada dos semanas</span>
         <a class="program-ig-chip" href="https://www.instagram.com/estacion.freak/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>@estacion.freak</span></a>
       </div>
     </div>
@@ -49,15 +54,15 @@
     <div class="wrap">
       <div class="video-embed">
         <iframe
-          src="https://www.youtube.com/embed/cITbAH_vBrI?list=PLYT7ujTIBmWZWm37-X_-CzKtCt5fgRIE1"
-          title="Estación Freak — SUBE"
+          src="https://www.youtube.com/embed/ElsMjpmD5sU?list=PLYT7ujTIBmWZWm37-X_-CzKtCt5fgRIE1"
+          title="Estacion freak — SUBE"
           loading="lazy"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen>
         </iframe>
       </div>
 
-      <div class="program-info-grid"><div class="program-info-card"><h2>Conducen</h2><ul class="people-list"><li><a href="https://www.instagram.com/majoguano/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Majo Guano</span></a></li><li><a href="https://www.instagram.com/solencolores/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Sol Gimenez</span></a></li><li><a href="https://www.instagram.com/vargasari__/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Ari Vargas</span></a></li></ul></div><div class="program-info-card"><h2>Columnistas</h2><ul class="people-list"><li><a href="https://www.instagram.com/fidelentraigas/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Fidel Entraigas</span></a></li><li><a href="https://www.instagram.com/juaape_/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Juani Perone</span></a></li></ul></div><div class="program-info-card"><h2>Producción</h2><ul class="people-list"><li><a href="https://www.instagram.com/majoguano/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Majo Guano</span></a></li><li><a href="https://www.instagram.com/mora.gutierrez/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Mora Gutierrez</span></a></li></ul></div></div>
+      <div class="program-info-grid"><div class="program-info-card"><h2>Conducen</h2><ul class="people-list"><li><a href="https://www.instagram.com/majoguano/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Majo Guano</span></a></li><li><a href="https://www.instagram.com/solencolores/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Sol Gimenez</span></a></li><li><a href="https://www.instagram.com/vargasari__/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Ari Vargas</span></a></li></ul></div><div class="program-info-card"><h2>Columnistas</h2><ul class="people-list"><li><span class="person-plain">Fidel</span></li><li><span class="person-plain">Juanita</span></li></ul></div><div class="program-info-card"><h2>Producción</h2><ul class="people-list"><li><a href="https://www.instagram.com/mora.gutierrez/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Mora Gutierrez</span></a></li></ul></div></div>
     </div>
   </section>
 
@@ -66,7 +71,10 @@
 <footer>
   <div class="wrap">
     <div class="footer-strip">
-      <img class="footer-bus" src="../assets/colectivo.png" alt="Sube Canal — un viaje colectivo">
+      <picture>
+        <source srcset="../assets/colectivo.webp" type="image/webp">
+        <img class="footer-bus" src="../assets/colectivo.png" alt="Sube Canal — un viaje colectivo" width="919" height="288" loading="lazy" decoding="async">
+      </picture>
       <div class="footer-channels">
         <a href="mailto:laplatasube@gmail.com"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg><span>laplatasube@gmail.com</span></a>
         <a href="https://www.instagram.com/subecanal" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Instagram</span></a>

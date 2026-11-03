@@ -5,20 +5,15 @@ Genera TODO el sitio de Sube Canal a partir de plantillas compartidas
 (header, footer, nav) para que cada página quede consistente.
 
 Correr con: python3 build_site.py
-(con --revisar, cualquier aviso termina con error; lo usa la revisión
-automática de GitHub)
 Vuelve a escribir: index.html, comunidad.html, contenidos.html,
 noticias.html, tienda.html, contacto.html, y todos los archivos
-dentro de programas/ y noticias/.
-
-Las notas de la sección Noticias NO se escriben acá: cada una es un
-archivo de texto en la carpeta redaccion/ (ver redaccion/ayuda/LEEME.md).
+dentro de programas/.
 
 Para agregar/editar el contenido de un programa, buscar el diccionario
 PROGRAMS más abajo.
 """
-import html
 import os
+import html
 import re
 import sys
 
@@ -37,6 +32,7 @@ CHEVRON_ICON = '<svg class="chevron" viewBox="0 0 24 24" width="18" height="18" 
 ARROW_LEFT_ICON = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>'
 ARROW_RIGHT_ICON = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>'
 PIN_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21s7-6.6 7-12a7 7 0 1 0-14 0c0 5.4 7 12 7 12z"></path><circle cx="12" cy="9" r="2.5"></circle></svg>'
+TICKET_ICON = '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"></path><path d="M9 6v12" stroke-dasharray="2 2"></path></svg>'
 BACK_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>'
 BURGER_ICON = '''<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <g class="line-open"><path d="M4 6h16M4 12h16M4 18h16"></path></g>
@@ -52,6 +48,16 @@ NAV_ITEMS = [
     ("mipase", "Mi pase", "mi-pase.html"),
 ]
 
+# Secciones ocultas al público por ahora. Para volver a mostrar una,
+# sacala de esta lista y regenerá el sitio (python3 build_site.py):
+# vuelven su link en el menú, sus accesos y su página completa.
+# Mientras está oculta, su página redirige a la Home y no aparece en Google.
+SECCIONES_OCULTAS = {"tienda"}
+
+
+def visible(seccion):
+    return seccion not in SECCIONES_OCULTAS
+
 
 def up(depth):
     """Prefijo relativo según la profundidad de la página (0 = raíz)."""
@@ -61,6 +67,8 @@ def up(depth):
 def nav_links_html(depth, active):
     links = []
     for key, label, href in NAV_ITEMS:
+        if not visible(key):
+            continue
         classes = []
         if key == active:
             classes.append("is-current")
@@ -75,7 +83,7 @@ def header_html(depth, active):
     return '''<header class="site-header">
   <div class="wrap">
     <div class="header-weather" id="header-weather" aria-live="polite" hidden></div>
-    <a href="{u}index.html" class="brand"><img src="{u}assets/logo.png" alt="Sube Canal"></a>
+    <a href="{u}index.html" class="brand"><img src="{u}assets/logo.png" alt="Sube Canal" width="269" height="104"></a>
     <nav class="nav-links" id="nav-links">
       {links}
     </nav>
@@ -91,7 +99,10 @@ def footer_html(depth):
     return '''<footer>
   <div class="wrap">
     <div class="footer-strip">
-      <img class="footer-bus" src="{u}assets/colectivo.png" alt="Sube Canal — un viaje colectivo">
+      <picture>
+        <source srcset="{u}assets/colectivo.webp" type="image/webp">
+        <img class="footer-bus" src="{u}assets/colectivo.png" alt="Sube Canal — un viaje colectivo" width="919" height="288" loading="lazy" decoding="async">
+      </picture>
       <div class="footer-channels">
         <a href="mailto:laplatasube@gmail.com">{mail}<span>laplatasube@gmail.com</span></a>
         <a href="https://www.instagram.com/subecanal" target="_blank" rel="noopener">{ig}<span>Instagram</span></a>
@@ -115,6 +126,10 @@ def page_html(title, description, body, depth, active, extra_scripts=None, body_
 <title>{title}</title>
 <meta name="description" content="{description}">{robots}
 <link rel="icon" href="{u}assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="{u}assets/fonts/Anton-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="{u}style.css">
 </head>
 <body>
@@ -156,18 +171,18 @@ def write(path, html):
 # ============================================================
 # HOME (index.html)
 # ============================================================
-LIVE_PLAYLIST_ID = "PLYT7ujTIBmWat3a4FBqiq8kWbAD_kybd5"  # playlist «Último programa»
+LIVE_PLAYLIST_ID = "PLYT7ujTIBmWat3a4FBqiq8kWbAD_kybd5"
 
-HOME_BODY_TEMPLATE = '''  <section class="hero">
+HOME_BODY = '''{franja_programas}  <section class="hero">
     <div class="wrap">
       <div>
         <h1>Subite a este<br><span class="accent">viaje colectivo</span></h1>
         <div class="hero-sub">
           <p>Somos un canal platense hecho a pulmón. Creamos contenidos, generamos encuentros y construimos comunidad alrededor de la cultura local.</p>
-          <p>La Comunidad de pasajeros sostiene SUBE todos los meses. Sumándote, vos también sos parte y accedés a beneficios en una red de espacios amigos.</p>
+          <p>La Comunidad de Pasajerxs sostiene SUBE todos los meses. Sumándote, vos también sos parte y accedés a beneficios en una red de espacios amigos.</p>
         </div>
         <div class="hero-actions">
-          <a href="comunidad.html#asociate" class="btn btn-primary">Subirme a la comunidad</a>
+          <a href="comunidad.html#asociate" class="btn btn-primary">Quiero ser pasajerx</a>
           <a href="comunidad.html#beneficios" class="btn btn-ghost">Ver beneficios</a>
         </div>
       </div>
@@ -189,19 +204,7 @@ HOME_BODY_TEMPLATE = '''  <section class="hero">
     </div>
   </section>
 
-  <section class="featured-news">
-    <div class="wrap">
-      <div class="section-head">
-        <h2>Noticias destacadas</h2>
-        <a class="section-head-link" href="noticias.html">Ver todas las noticias →</a>
-      </div>
-      <div class="news-grid">
-{featured_news}
-      </div>
-    </div>
-  </section>
-
-  <section class="sponsors">
+{noticias_destacadas}  <section class="sponsors">
     <div class="wrap">
       <div class="sponsor-slots">
         <a class="sponsor-slot sponsor-slot--banner sponsor-banner" href="comunidad.html#beneficios" aria-label="Sponsors oficiales: Roots Cooperativa, Refugio 62 y Tatana">
@@ -224,18 +227,24 @@ HOME_BODY_TEMPLATE = '''  <section class="hero">
             <img src="assets/sponsors/cuadrado-casa-chicha.webp" alt="Casa Chicha" width="639" height="640" loading="lazy">
           </a>
         </div>
-
-        <div class="sponsor-slot-row sponsor-slot-row--2">
-          <a class="sponsor-slot sponsor-slot--banner" href="contacto.html">
-            <span class="sponsor-slot-label">Banner horizontal</span>
-          </a>
-          <a class="sponsor-slot sponsor-slot--banner" href="contacto.html">
-            <span class="sponsor-slot-label">Banner horizontal</span>
-          </a>
-        </div>
       </div>
     </div>
   </section>
+'''
+
+# "Noticias destacadas" de la Home: las 3 primeras notas de Noticias.
+NOTICIAS_DESTACADAS = '''  <section class="featured-news">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Noticias destacadas</h2>
+        <a class="section-head-link" href="noticias.html">Ver todas las noticias →</a>
+      </div>
+      <div class="news-grid">
+{featured_news}
+      </div>
+    </div>
+  </section>
+
 '''
 
 # ============================================================
@@ -279,13 +288,22 @@ def benefit_card_html(slug, initial, name, cat, perks, ig, ubicacion=None):
         </article>'''.format(slug=slug, name=name, initial=initial, cat=cat, perks=perks_html, ig=ig, icon=IG_ICON, loc_attr=loc_attr)
 
 
-def comercios_desde_planilla():
-    """Comercios que trae scripts/sync_comunidad.py desde Google Sheets
-    (datos/comercios.json). Si todavía no hay datos, se usa BENEFIT_CARDS."""
+# Geolocalización de comercios ("Ver qué tan cerca están"): apagada por
+# ahora. Para volver a activarla, poné True. Los datos de ubicación de cada
+# comercio y assets/geo.js siguen intactos.
+GEOLOCALIZACION_ACTIVA = False
+BOTON_UBICACION = '''      <button class="btn btn-ghost btn-location" id="activate-location" type="button">{pin} Ver qué tan cerca están</button>
+'''
+
+
+def comercios_planilla():
+    """Copia de la planilla de comercios (datos/comercios.json). Se usa para
+    que la página ya salga con los datos y logos correctos; después
+    assets/benefits.js la actualiza en vivo desde la planilla."""
+    import json
     ruta = os.path.join(ROOT, "datos", "comercios.json")
     if not os.path.exists(ruta):
         return None
-    import json
     with open(ruta, encoding="utf-8") as fh:
         return json.load(fh).get("comercios") or None
 
@@ -293,8 +311,11 @@ def comercios_desde_planilla():
 def benefit_card_from_sheet(c):
     e = html.escape
     nombre = c["nombre"]
-    if c.get("logo") and os.path.exists(os.path.join(ROOT, c["logo"])):
-        logo = '<div class="benefit-logo"><img src="{}" alt="{}" loading="lazy"></div>'.format(e(c["logo"]), e(nombre))
+    logo_path = c.get("logo") or "assets/socios/planilla/{}.webp".format(c["slug"])
+    if os.path.exists(os.path.join(ROOT, logo_path)):
+        # ?v=… cambia cuando cambia el archivo: el navegador no sigue mostrando el logo viejo
+        version = int(os.path.getmtime(os.path.join(ROOT, logo_path)))
+        logo = '<div class="benefit-logo"><img src="{}?v={}" alt="{}" width="68" height="68" loading="lazy" decoding="async"></div>'.format(e(logo_path), version, e(nombre))
     else:
         logo = '<div class="benefit-logo mono" data-slug="{}" data-name="{}">{}</div>'.format(
             e(c.get("instagram") or c["slug"]), e(nombre), e(nombre[:1].upper()))
@@ -321,25 +342,17 @@ def benefit_card_from_sheet(c):
 
 
 def benefit_cards_html():
-    comercios = comercios_desde_planilla()
+    comercios = comercios_planilla()
     if comercios:
-        # Los que son solo auspiciantes no aparecen en la lista de beneficios
         return "\n\n".join(benefit_card_from_sheet(c) for c in comercios if c.get("tipo") != "auspiciante")
     return "\n\n".join(benefit_card_html(*c) for c in BENEFIT_CARDS)
 
-
-# Geolocalización de comercios ("Ver qué tan cerca están"): apagada por
-# ahora. Para volver a activarla, poner True. Los datos de ubicación de cada
-# comercio (data-location) y assets/geo.js siguen intactos.
-GEOLOCALIZACION_ACTIVA = False
-BOTON_UBICACION = '''      <button class="btn btn-ghost btn-location" id="activate-location" type="button">{pin} Ver qué tan cerca están</button>
-'''
 
 COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
     <div class="wrap">
       <div class="section-head">
         <h2>Beneficios para nuestra comunidad</h2>
-        <p>Espacios amigos que suman descuentos exclusivos para quienes sostienen a SUBE. Mostrá tu boleto desde <a href="mi-pase.html">Mi pase</a> y viajá con beneficios.</p>
+        <p>Espacios amigos que suman descuentos exclusivos para quienes sostienen a SUBE. Mostrá tu carnet de pasajerx y viajá con beneficios.</p>
       </div>
 
       <div class="carousel">
@@ -357,26 +370,19 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
 {{boton_ubicacion}}
       <p class="benefits-note">Los descuentos y condiciones de cada beneficio son definidos por cada espacio adherido y pueden cambiar sin aviso previo.</p>
 
+      <div class="raffle-card">
+        <span class="raffle-icon" aria-hidden="true">{ticket}</span>
+        <div class="raffle-text">
+          <p class="raffle-eyebrow">Todos los meses</p>
+          <h3>Sorteos mensuales</h3>
+          <p>En SUBE Canal hacemos sorteos todos los meses.</p>
+        </div>
+        <a class="btn btn-ghost raffle-btn" href="https://www.instagram.com/subecanal" target="_blank" rel="noopener">{ig} Seguinos en Instagram</a>
+      </div>
+
       <a class="partner-cta" href="mailto:laplatasube@gmail.com?subject=Quiero%20sumar%20mi%20comercio%20a%20SUBE">
         <span class="partner-cta-title">¿Tenés un comercio o espacio en La Plata?</span>
         <span class="partner-cta-desc">Si querés formar parte de esta red, contactate con nosotros y nuestro equipo comercial te estará respondiendo.</span>
-      </a>
-    </div>
-  </section>
-
-  <section class="pass-cta-section">
-    <div class="wrap">
-      <a class="pass-cta" href="mi-pase.html">
-        <span class="pass-cta-ticket" aria-hidden="true">
-          <span class="pass-cta-ticket-top">SUBE</span>
-          <span class="pass-cta-ticket-mid">Al día</span>
-        </span>
-        <span class="pass-cta-text">
-          <span class="eyebrow">Mi pase</span>
-          <span class="pass-cta-title">¿Ya sos parte de la comunidad? Entrá y mostrá tu boleto</span>
-          <span class="pass-cta-desc">Con tu mail ves si estás al día y tenés tu boleto para mostrar en los comercios adheridos. Si tenés un comercio adherido, desde ahí también podés verificar membresías.</span>
-        </span>
-        <span class="pass-cta-arrow" aria-hidden="true">→</span>
       </a>
     </div>
   </section>
@@ -386,7 +392,7 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
       <div class="section-head">
         <p class="eyebrow">Asociate</p>
         <h2>Elegí cómo subirte</h2>
-        <p>Tu aporte sostiene la producción de Sube Canal y te suma a la Comunidad de pasajeros, con acceso a todos los beneficios de la red.</p>
+        <p>Tu aporte sostiene la producción de Sube Canal y te suma a la Comunidad de Pasajerxs, con acceso a todos los beneficios de la red.</p>
       </div>
 
       <div class="plans">
@@ -447,12 +453,14 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
     arrow_left=ARROW_LEFT_ICON,
     arrow_right=ARROW_RIGHT_ICON,
     pin=PIN_ICON,
+    ig=IG_ICON_16,
+    ticket=TICKET_ICON,
 )
 
 # ============================================================
 # CONTENIDOS — Programación inline + Noticias como antes (card)
 # ============================================================
-# Grilla de respaldo (la de siempre), por si todavía no hay copia de la planilla.
+# Grilla de respaldo (la de siempre), por si falta la copia de la planilla.
 GRILLA_RESPALDO = '''      <div class="content-schedule" id="content-schedule">
 
         <div class="schedule-day">
@@ -524,20 +532,8 @@ GRILLA_RESPALDO = '''      <div class="content-schedule" id="content-schedule">
 
 '''
 
-CONTENIDOS_BODY = '''  <section class="content">
-    <div class="wrap">
-      <div class="section-head">
-        <h2>Contenidos</h2>
-        <p>Todo lo que produce SUBE, en un solo lugar.</p>
-      </div>
-
-      <div class="content-subhead">
-        <span class="content-subhead-eyebrow">En vivo y on demand</span>
-        <h3>Programación</h3>
-      </div>
-
-{grilla}
-      <div class="content-subhead">
+# Bloque "Noticias" de Contenidos: se muestra solo si Noticias está visible.
+BLOQUE_NOTICIAS = '''      <div class="content-subhead content-subhead--noticias">
         <span class="content-subhead-eyebrow">Redacción SUBE</span>
         <h3>Noticias</h3>
       </div>
@@ -551,6 +547,21 @@ CONTENIDOS_BODY = '''  <section class="content">
     </div>
   </section>
 '''
+
+CONTENIDOS_BODY = '''  <section class="content">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Contenidos</h2>
+        <p>Todo lo que produce SUBE, en un solo lugar.</p>
+      </div>
+
+      <div class="content-subhead">
+        <span class="content-subhead-eyebrow">En vivo y on demand</span>
+        <h3>Programación</h3>
+      </div>
+
+{grilla}
+{bloque_noticias}'''
 
 # ============================================================
 # NOTICIAS (noticias.html + noticias/*.html)
@@ -578,14 +589,6 @@ def avisar(msg):
     if msg not in AVISOS:
         AVISOS.append(msg)
         print("AVISO: " + msg)
-
-
-def _slugify(text):
-    text = text.lower()
-    for a, b in (("á", "a"), ("é", "e"), ("í", "i"), ("ó", "o"), ("ú", "u"), ("ü", "u"), ("ñ", "n")):
-        text = text.replace(a, b)
-    text = re.sub(r"[^a-z0-9]+", "-", text).strip("-")
-    return text or "nota"
 
 
 def _meta_decap(raw, path):
@@ -654,7 +657,7 @@ def _armar_nota(meta, body, path):
     if meta.get("video") and not youtube_id(meta["video"]):
         avisar("la nota '{}' tiene un video que no es un link de YouTube: no se muestra.".format(os.path.basename(path)))
     return {
-        "slug": _slugify(meta.get("slug") or re.sub(r"^\d{4}-\d{2}-\d{2}-?", "", name)),
+        "slug": _slugify(meta.get("slug") or re.sub(r"^\d{4}-\d{2}-\d{2}-?", "", name)) or "nota",
         "titulo": meta["titulo"],
         "seccion": meta.get("seccion") or "Actualidad",
         "bajada": meta.get("bajada", ""),
@@ -1202,15 +1205,94 @@ PROGRAMS = [
 
 
 # ------------------------------------------------------------
-# Programación desde la planilla (datos/programacion.csv y
-# datos/programas.json, que trae scripts/sync_planillas.py).
+# Programación desde la copia de la planilla (datos/programacion.csv).
+# Sirve para que Contenidos ya salga con descripciones y logos; después
+# assets/schedule-grid.js la actualiza en vivo desde la planilla.
 # ------------------------------------------------------------
 DIAS_SEMANA = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"]
+DIA_LABEL_ES = {"lunes": "Lunes", "martes": "Martes", "miercoles": "Miércoles", "jueves": "Jueves",
+                "viernes": "Viernes", "sabado": "Sábado", "domingo": "Domingo"}
+
+
+def _slugify(text):
+    import unicodedata
+    t = unicodedata.normalize("NFD", str(text or ""))
+    t = "".join(c for c in t if unicodedata.category(c) != "Mn").lower()
+    return re.sub(r"[^a-z0-9]+", "-", t).strip("-")
+
+
+def _handle(url):
+    m = re.search(r"instagram\.com/([^/?#\s]+)", str(url or ""), re.I)
+    v = (m.group(1) if m else str(url or "")).lstrip("@").strip().strip("/")
+    return v if re.fullmatch(r"[A-Za-z0-9._]{1,30}", v or "") else None
+
+
+def _video(url):
+    """(id del video, id de la lista) a partir del link de la planilla."""
+    u = str(url or "")
+    v = re.search(r"(?:[?&]v=|youtu\.be/|/embed/|/shorts/|/live/)([A-Za-z0-9_-]{11})", u)
+    l = re.search(r"[?&]list=([A-Za-z0-9_-]+)", u)
+    return (v.group(1) if v else ""), (l.group(1) if l else "")
+
+
+def _horario(fila):
+    dia = _slugify(fila.get("dia_semana", ""))
+    if dia in DIA_LABEL_ES and fila.get("hora"):
+        frec = {"7": "Todas las semanas", "14": "Cada dos semanas"}.get(fila.get("frecuencia_dias", ""), fila.get("frecuencia", "").capitalize())
+        return " · ".join(x for x in (DIA_LABEL_ES[dia], fila["hora"][:5], frec) if x)
+    return "On demand" if _slugify(fila.get("frecuencia", "")) == "on-demand" else ""
+
+
+def conductores(fila):
+    return [fila[k] for k in ("conductor_b1", "conductor_b2", "conductor_b3") if fila.get(k)]
+
+
+def es_programa(fila):
+    """Una fila de la planilla tiene perfil propio si es un programa con
+    horario o con quien lo conduce. Lo demás (por ejemplo, «Especiales»)
+    es una playlist y lleva directo a YouTube."""
+    return bool(_horario(fila) and _horario(fila) != "On demand") or bool(conductores(fila))
+
+
+def programa_desde_fila(f):
+    video_id, list_id = _video(f.get("playlist"))
+    gente = lambda claves: [(f[n], _handle(f.get(i))) for n, i in claves if f.get(n)]
+    logo = "assets/programas/{}.webp".format(f["slug"])
+    return {
+        "slug": f["slug"],
+        "name": f["nombre"],
+        "video_id": video_id,
+        "list_id": list_id,
+        "schedule": _horario(f),
+        "subtitle": f.get("descripcion", ""),
+        "instagram": _handle(f.get("instagram_a1")),
+        "hosts": gente([("conductor_b1", "instagram_b1"), ("conductor_b2", "instagram_b2"), ("conductor_b3", "instagram_b3")]),
+        "production": gente([("produccion_c1", "instagram_c1"), ("produccion_c2", "instagram_c2")]),
+        "columnists": [(f[k], None) for k in ("columnista_d1", "columnista_d2", "columnista_d3", "columnista_d4") if f.get(k)],
+        "logo": logo if f.get("logo") and os.path.exists(os.path.join(ROOT, logo)) else "",
+    }
+
+
+def programas_perfiles():
+    """Programas con perfil: salen de la planilla de programación. Si no hay
+    copia de la planilla, se usa la lista fija PROGRAMS."""
+    filas = programacion_planilla()
+    if filas:
+        return [programa_desde_fila(f) for f in filas if es_programa(f)]
+    return [dict(p, logo="") for p in PROGRAMS]
+
+
+def perfiles():
+    """Perfiles de programa que existen en Contenidos: slug → nombre."""
+    return {p["slug"]: p["name"] for p in programas_perfiles()}
+
+
+def perfiles_json():
+    import json
+    return html.escape(json.dumps(perfiles(), ensure_ascii=False))
 
 
 def programacion_planilla():
-    """Filas de la planilla de programación como diccionarios (títulos
-    normalizados). Devuelve [] si todavía no hay copia."""
     import csv
     ruta = os.path.join(ROOT, "datos", "programacion.csv")
     if not os.path.exists(ruta):
@@ -1224,80 +1306,73 @@ def programacion_planilla():
     for f in filas[1:]:
         d = {t: (f[k].strip() if k < len(f) else "") for k, t in enumerate(titulos)}
         d["nombre"] = d.get("nombre") or d.get("programa", "")
-        if d["nombre"] and (d.get("activo", "si").lower() in SI):
+        if d["nombre"] and d.get("activo", "si").lower() in ("si", "sí"):
             d["slug"] = _slugify(d["nombre"])
             out.append(d)
     return out
-
-
-def programas_extra():
-    """slug → {descripcion, logo} desde datos/programas.json."""
-    import json
-    ruta = os.path.join(ROOT, "datos", "programas.json")
-    if not os.path.exists(ruta):
-        return {}
-    with open(ruta, encoding="utf-8") as fh:
-        return {p["slug"]: p for p in json.load(fh).get("programas", [])}
-
-
-def perfiles():
-    """Perfiles de programa que existen en Contenidos: slug → nombre."""
-    return {p["slug"]: p["name"] for p in PROGRAMS}
 
 
 def nombre_programa(fila):
     return perfiles().get(fila["slug"], fila["nombre"])
 
 
-def link_programa(fila, clase=""):
+def link_programa(fila):
     e = html.escape
     if fila["slug"] in perfiles():
-        return '<a{} href="programas/{}.html">{}</a>'.format(clase, fila["slug"], e(nombre_programa(fila)))
-    return "<span{}>{}</span>".format(clase, e(fila["nombre"]))
+        return '<a href="programas/{}.html">{}</a>'.format(fila["slug"], e(nombre_programa(fila)))
+    return "<span>{}</span>".format(e(fila["nombre"]))
 
 
-def info_programa_html(fila, extra):
-    e = html.escape
-    x = extra.get(fila["slug"], {})
-    desc = fila.get("descripcion") or x.get("descripcion", "")
-    logo = x.get("logo", "")
-    if logo and not os.path.exists(os.path.join(ROOT, logo)):
-        logo = ""
-    if not desc and not logo:
+def conduce_html(fila):
+    nombres = conductores(fila)
+    if not nombres:
         return ""
-    img = ('<img class="schedule-logo" src="{}" alt="{}" loading="lazy">'.format(e(logo), e("Logo de " + nombre_programa(fila)))
-           if logo else "")
+    texto = nombres[0] if len(nombres) == 1 else ", ".join(nombres[:-1]) + " y " + nombres[-1]
+    return '<p class="schedule-conduce">Conduce: {}</p>'.format(html.escape(texto))
+
+
+def info_programa_html(fila):
+    e = html.escape
+    desc = fila.get("descripcion", "")
+    logo = "assets/programas/{}.webp".format(fila["slug"])
+    tiene_logo = bool(fila.get("logo")) and os.path.exists(os.path.join(ROOT, logo))
+    if not desc and not tiene_logo:
+        return ""
+    img = ('<img class="schedule-logo" src="{}" alt="{}" loading="lazy" decoding="async">'.format(logo, e("Logo de " + nombre_programa(fila)))
+           if tiene_logo else "")
     return '<div class="schedule-info">{}{}</div>'.format(img, '<p class="schedule-desc">{}</p>'.format(e(desc)) if desc else "")
 
 
 def grilla_contenidos_html():
     filas = programacion_planilla()
     if not filas:
-        return GRILLA_RESPALDO
-    extra = programas_extra()
+        return GRILLA_RESPALDO.replace('id="content-schedule"', 'id="content-schedule" data-perfiles="{}"'.format(perfiles_json()))
     e = html.escape
     por_dia = {}
     for f in filas:
         dia = _slugify(f.get("dia_semana", ""))
-        if dia in DIAS_SEMANA and re.match(r"^\d{1,2}:\d{2}$", f.get("hora", "")):
+        if dia in DIAS_SEMANA and re.match(r"^\d{1,2}:\d{2}", f.get("hora", "")):
             por_dia.setdefault(dia, []).append(f)
     bloques = []
     for dia in DIAS_SEMANA:
         if dia not in por_dia:
             continue
+        lista = sorted(por_dia[dia], key=lambda f: [int(x) for x in f["hora"].split(":")[:2]])
         items = []
-        lista = sorted(por_dia[dia], key=lambda f: [int(x) for x in f["hora"].split(":")])
         for f in lista:
             alt = ""
             if f.get("frecuencia_dias") == "14":
                 pareja = [o for o in lista if o is not f and o.get("frecuencia_dias") == "14"]
-                alt = '<span class="schedule-alt">Cada dos semanas{}</span>'.format(
+                alt = '\n              <span class="schedule-alt">Cada dos semanas{}</span>'.format(
                     ", alterna con " + e(nombre_programa(pareja[0])) if len(pareja) == 1 else "")
+            info = info_programa_html(f)
+            conduce = conduce_html(f)
             items.append("""            <li>
               <span class="schedule-time">{hora}</span>
-              {link}
-              {alt}{info}
-            </li>""".format(hora=e(f["hora"]), link=link_programa(f), alt=alt, info=info_programa_html(f, extra)))
+              {link}{conduce}{alt}{info}
+            </li>""".format(hora=e(f["hora"][:5]), link=link_programa(f), alt=alt,
+                            conduce=("\n              " + conduce) if conduce else "",
+                            info=("\n              " + info) if info else ""))
         bloques.append("""        <div class="schedule-day">
           <h3>{}</h3>
           <ul class="schedule-list">
@@ -1305,19 +1380,32 @@ def grilla_contenidos_html():
           </ul>
         </div>""".format(DIA_LABEL_ES[dia], "\n".join(items)))
     ondemand = []
+    hay_especiales = False
     for f in filas:
-        if _slugify(f.get("frecuencia", "")) == "on-demand" and f["slug"] in perfiles():
-            desc = f.get("descripcion") or extra.get(f["slug"], {}).get("descripcion", "")
-            ondemand.append("""            <li>
-              <a href="programas/{slug}.html">
+        if _slugify(f.get("frecuencia", "")) != "on-demand":
+            continue
+        desc = f.get("descripcion", "")
+        if f["slug"] in perfiles():
+            href, extra, tag = "programas/{}.html".format(f["slug"]), "", "Programa"
+        else:
+            video_id, list_id = _video(f.get("playlist"))
+            if not (video_id or list_id):
+                continue  # sin link no se puede mostrar
+            href = f["playlist"]
+            extra, tag = ' target="_blank" rel="noopener"', "Playlist"
+        hay_especiales = hay_especiales or f["slug"] == "especiales"
+        ondemand.append("""            <li>
+              <a href="{href}"{extra}>
                 <span class="ondemand-main">
                   <span class="ondemand-name">{nombre}</span>{desc}
                 </span>
-                <span class="ondemand-tag">Programa</span>
+                <span class="ondemand-tag">{tag}</span>
               </a>
-            </li>""".format(slug=f["slug"], nombre=e(nombre_programa(f)),
+            </li>""".format(href=e(href), extra=extra, tag=tag, nombre=e(f["nombre"]),
                             desc='\n                  <span class="ondemand-desc">{}</span>'.format(e(desc)) if desc else ""))
-    ondemand.append("""            <li>
+    if not hay_especiales:
+        # Mientras «Especiales» no esté cargado como fila en la planilla
+        ondemand.append("""            <li>
               <a href="https://www.youtube.com/watch?v=2E0gkC1fRDY&list=PLYT7ujTIBmWbglZ7Mmi-r4RnP1NqsDMt6" target="_blank" rel="noopener">
                 <span class="ondemand-main">
                   <span class="ondemand-name">Especiales</span>
@@ -1326,7 +1414,7 @@ def grilla_contenidos_html():
                 <span class="ondemand-tag">Playlist</span>
               </a>
             </li>""")
-    return """      <div class="content-schedule" id="content-schedule" data-origen="planilla">
+    return """      <div class="content-schedule" id="content-schedule" data-origen="planilla" data-perfiles="{perfiles}">
 
 {dias}
 
@@ -1338,12 +1426,54 @@ def grilla_contenidos_html():
         </div>
 
       </div>
+""".format(perfiles=perfiles_json(), dias="\n\n".join(bloques), od="\n".join(ondemand))
 
-""".format(dias="\n\n".join(bloques), od="\n".join(ondemand))
+
+# Franja con los logos de los programas entre el header y la portada.
+# Está lista pero apagada hasta que se apruebe y estén todos los logos en la
+# planilla. Para mostrarla, poné True y regenerá el sitio.
+FRANJA_PROGRAMAS_ACTIVA = False
 
 
-DIA_LABEL_ES = {"lunes": "Lunes", "martes": "Martes", "miercoles": "Miércoles", "jueves": "Jueves",
-                "viernes": "Viernes", "sabado": "Sábado", "domingo": "Domingo"}
+def franja_programas_html():
+    if not FRANJA_PROGRAMAS_ACTIVA:
+        return ""
+    e = html.escape
+    items = []
+    for p in programas_perfiles():
+        if p.get("logo"):
+            icono = '<img src="{}" alt="" loading="lazy" decoding="async">'.format(p["logo"])
+        else:
+            icono = '<span class="program-strip-initial">{}</span>'.format(e(p["name"][:1].upper()))
+        items.append('<a class="program-strip-item" href="programas/{}.html" title="{}">{}<span class="sr-only">{}</span></a>'.format(
+            p["slug"], e(p["name"]), icono, e(p["name"])))
+    return """  <nav class="program-strip" aria-label="Programas de SUBE">
+    <div class="wrap program-strip-row">
+      {}
+    </div>
+  </nav>
+
+""".format("\n      ".join(items))
+
+
+def pagina_oculta(titulo):
+    """Página de una sección oculta: no aparece en buscadores y lleva a la Home."""
+    return """<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="refresh" content="0; url=index.html">
+<title>{} · SUBE</title>
+<link rel="canonical" href="index.html">
+<script>location.replace("index.html");</script>
+</head>
+<body>
+<p>Esta sección no está disponible por ahora. <a href="index.html">Ir al inicio de SUBE</a>.</p>
+</body>
+</html>
+""".format(titulo)
 
 
 def ig_url(handle):
@@ -1373,56 +1503,59 @@ PENDING_IG_NOTE = (
 
 
 def info_grid_html(p):
-    if not p["hosts"]:
-        return (
-            '<div class="program-info-grid">'
-            '<div class="program-info-card"><h2>Quiénes lo hacen</h2>{pending_hosts}</div>'
-            '<div class="program-info-card"><h2>Redes del programa</h2>{pending_ig}</div>'
-            "</div>"
-        ).format(pending_hosts=PENDING_HOSTS_NOTE, pending_ig=PENDING_IG_NOTE)
-
-    cards = ['<div class="program-info-card"><h2>Conducen</h2>{list}</div>'.format(list=people_list_html(p["hosts"]))]
+    cards = []
+    if p["hosts"]:
+        cards.append('<div class="program-info-card"><h2>Conducen</h2>{}</div>'.format(people_list_html(p["hosts"])))
     if p["columnists"]:
-        cards.append(
-            '<div class="program-info-card"><h2>Columnistas</h2>{list}</div>'.format(
-                list=people_list_html(p["columnists"])
-            )
-        )
+        cards.append('<div class="program-info-card"><h2>Columnistas</h2>{}</div>'.format(people_list_html(p["columnists"])))
     if p["production"]:
-        cards.append(
-            '<div class="program-info-card"><h2>Producción</h2>{list}</div>'.format(
-                list=people_list_html(p["production"])
-            )
-        )
-    return '<div class="program-info-grid">' + "".join(cards) + "</div>"
+        cards.append('<div class="program-info-card"><h2>Producción</h2>{}</div>'.format(people_list_html(p["production"])))
+    return '<div class="program-info-grid">' + "".join(cards) + "</div>" if cards else ""
 
 
 def subtitle_html(p):
-    if p["subtitle"]:
-        return '<p class="program-subtitle">{}</p>'.format(p["subtitle"])
-    return (
-        '<p class="program-subtitle program-subtitle--pending">'
-        "⚠️ Falta el subtítulo (“Un programa sobre…”) — pasámelo y lo cargo.</p>"
-    )
+    return '<p class="program-subtitle">{}</p>'.format(html.escape(p["subtitle"])) if p.get("subtitle") else ""
 
 
 def ig_chip_html(p):
-    if p["instagram"]:
+    if p.get("instagram"):
         return '<a class="program-ig-chip" href="{url}" target="_blank" rel="noopener">{icon}<span>@{handle}</span></a>'.format(
             url=ig_url(p["instagram"]), icon=IG_ICON, handle=p["instagram"]
         )
-    return '<span class="program-ig-chip program-ig-chip--pending">Sin Instagram propio todavía</span>'
+    return ""
+
+
+def video_programa_html(p):
+    if p.get("video_id"):
+        src = "https://www.youtube.com/embed/{}{}".format(p["video_id"], "?list=" + p["list_id"] if p.get("list_id") else "")
+    elif p.get("list_id"):
+        src = "https://www.youtube.com/embed/videoseries?list=" + p["list_id"]
+    else:
+        return ""
+    return """<div class="video-embed">
+        <iframe
+          src="{}"
+          title="{} — SUBE"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>""".format(src, html.escape(p["name"]))
 
 
 def program_body(p):
     return '''  <section class="program-hero">
     <div class="wrap">
       <a class="back-link" href="../contenidos.html">{back}Volver a Contenidos</a>
-      <p class="eyebrow">Programa</p>
-      <h1>{name}</h1>
+      <div class="program-title">
+        {logo}<div>
+          <p class="eyebrow">Programa</p>
+          <h1>{name}</h1>
+        </div>
+      </div>
       {subtitle}
       <div class="program-meta">
-        <span class="program-schedule">{schedule}</span>
+        {schedule}
         {ig_chip}
       </div>
     </div>
@@ -1430,27 +1563,19 @@ def program_body(p):
 
   <section class="program-body">
     <div class="wrap">
-      <div class="video-embed">
-        <iframe
-          src="https://www.youtube.com/embed/{video_id}?list={list_id}"
-          title="{name} — SUBE"
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen>
-        </iframe>
-      </div>
+      {video}
 
       {info_grid}
     </div>
   </section>
 '''.format(
         back=BACK_ICON,
-        name=p["name"],
+        name=html.escape(p["name"]),
+        logo='<img class="program-logo" src="../{}" alt="Logo de {}" decoding="async">'.format(p["logo"], html.escape(p["name"])) if p.get("logo") else "",
         subtitle=subtitle_html(p),
-        schedule=p["schedule"],
+        schedule='<span class="program-schedule">{}</span>'.format(p["schedule"]) if p.get("schedule") else "",
         ig_chip=ig_chip_html(p),
-        video_id=p["video_id"],
-        list_id=p["list_id"],
+        video=video_programa_html(p),
         info_grid=info_grid_html(p),
     )
 
@@ -1460,32 +1585,33 @@ def program_body(p):
 # ============================================================
 if __name__ == "__main__":
     NEWS = load_news()
-    HOME_BODY = HOME_BODY_TEMPLATE.format(
-        list_id=LIVE_PLAYLIST_ID,
-        featured_news=home_featured_news_html(NEWS),
-        perfiles=html.escape(__import__("json").dumps(perfiles(), ensure_ascii=False)),
-    )
-
     write(
         "index.html",
         page_html(
             "SUBE :: Un viaje colectivo por La Plata",
-            "SUBE es un canal platense hecho a pulmón. Conocé los beneficios de la Comunidad de pasajeros y sumate.",
-            HOME_BODY,
+            "SUBE es un medio de comunicación autogestivo con identidad platense. Conocé los beneficios de la Comunidad de Pasajerxs y sumate como socix.",
+            HOME_BODY.format(
+                list_id=LIVE_PLAYLIST_ID,
+                perfiles=perfiles_json(),
+                franja_programas=franja_programas_html(),
+                noticias_destacadas=NOTICIAS_DESTACADAS.replace("{featured_news}", home_featured_news_html(NEWS))
+                if visible("noticias") and NEWS else "",
+            ),
             depth=0,
             active=None,
-            extra_scripts=["schedule.js", "next-stop.js"],
+            extra_scripts=["planillas.js", "schedule.js", "next-stop.js"],
         ),
     )
     write(
         "comunidad.html",
         page_html(
             "Comunidad · SUBE",
-            "La Comunidad de pasajeros de SUBE: beneficios en comercios amigos y cómo sumarte con tu aporte.",
+            "La Comunidad de Pasajerxs de SUBE: beneficios en comercios amigos y cómo sumarte con tu aporte.",
             COMUNIDAD_BODY.replace("{boton_ubicacion}", BOTON_UBICACION.format(pin=PIN_ICON) if GEOLOCALIZACION_ACTIVA else ""),
             depth=0,
             active="comunidad",
-            extra_scripts=["logo-autoload.js", "geo.js", "carousel.js"] if GEOLOCALIZACION_ACTIVA else ["logo-autoload.js", "carousel.js"],
+            extra_scripts=(["logo-autoload.js", "geo.js", "carousel.js"] if GEOLOCALIZACION_ACTIVA
+                           else ["logo-autoload.js", "carousel.js"]),
         ),
     )
     write(
@@ -1493,29 +1619,33 @@ if __name__ == "__main__":
         page_html(
             "Contenidos · SUBE",
             "Programación y noticias de SUBE.",
-            CONTENIDOS_BODY.replace("{grilla}", grilla_contenidos_html()),
+            CONTENIDOS_BODY.replace("{grilla}", grilla_contenidos_html()).replace(
+                "{bloque_noticias}", BLOQUE_NOTICIAS if visible("noticias") else "    </div>\n  </section>\n"),
             depth=0,
             active="contenidos",
-            extra_scripts=["schedule.js", "schedule-grid.js"],
+            extra_scripts=["planillas.js", "schedule.js", "schedule-grid.js"],
         ),
     )
-    write(
-        "noticias.html",
-        page_html(
-            "Noticias · SUBE",
-            "Noticias de actualidad, coberturas y notas de la redacción de SUBE, desde La Plata.",
-            news_index_body(NEWS),
-            depth=0,
-            active="noticias",
-            extra_scripts=["news.js"],
-        ),
-    )
-    write_news_articles(NEWS)
+    if visible("noticias"):
+        write(
+            "noticias.html",
+            page_html(
+                "Noticias · SUBE",
+                "Noticias de actualidad, coberturas y notas de la redacción de SUBE, desde La Plata.",
+                news_index_body(NEWS),
+                depth=0,
+                active="noticias",
+                extra_scripts=["news.js"],
+            ),
+        )
+        write_news_articles(NEWS)
+    else:
+        write("noticias.html", pagina_oculta("Noticias"))
     write(
         "mi-pase.html",
         page_html(
             "Mi pase · SUBE",
-            "Mi pase: el boleto de la Comunidad de pasajeros de SUBE y la verificación de membresías para comercios adheridos.",
+            "Mi pase: el boleto de la Comunidad de Pasajerxs de SUBE y la verificación de membresías para comercios adheridos.",
             mi_pase_body("publico"),
             depth=0,
             active="mipase",
@@ -1545,7 +1675,7 @@ if __name__ == "__main__":
             TIENDA_BODY,
             depth=0,
             active="tienda",
-        ),
+        ) if visible("tienda") else pagina_oculta("Tienda"),
     )
     write(
         "contacto.html",
@@ -1558,7 +1688,7 @@ if __name__ == "__main__":
         ),
     )
 
-    for p in PROGRAMS:
+    for p in programas_perfiles():
         write(
             "programas/{}.html".format(p["slug"]),
             page_html(
@@ -1570,8 +1700,8 @@ if __name__ == "__main__":
             ),
         )
 
-    # Modo revisión (lo usa GitHub en .github/workflows/revisar-sitio.yml):
-    # cualquier aviso cuenta como error para que se vea la cruz roja.
+    # Modo revisión (lo usa GitHub al publicar): cualquier aviso cuenta como
+    # error para que se vea la cruz roja y no se publique algo roto.
     if "--revisar" in sys.argv and AVISOS:
         for msg in AVISOS:
             print("::error::" + msg)

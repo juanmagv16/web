@@ -6,6 +6,10 @@
 <title>Contenidos · SUBE</title>
 <meta name="description" content="Programación y noticias de SUBE.">
 <link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="assets/fonts/Anton-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,14 +17,11 @@
 <header class="site-header">
   <div class="wrap">
     <div class="header-weather" id="header-weather" aria-live="polite" hidden></div>
-    <a href="index.html" class="brand"><img src="assets/logo.png" alt="Sube Canal"></a>
+    <a href="index.html" class="brand"><img src="assets/logo.png" alt="Sube Canal" width="269" height="104"></a>
     <nav class="nav-links" id="nav-links">
       <a href="comunidad.html">Comunidad</a>
       <a href="contenidos.html" class="is-current">Contenidos</a>
-      <a href="noticias.html">Noticias</a>
-      <a href="tienda.html">Tienda</a>
       <a href="contacto.html">Contacto</a>
-      <a href="mi-pase.html" class="nav-pass">Mi pase</a>
     </nav>
     <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-links">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -44,24 +45,27 @@
         <h3>Programación</h3>
       </div>
 
-      <div class="content-schedule" id="content-schedule" data-origen="planilla">
+      <div class="content-schedule" id="content-schedule" data-origen="planilla" data-perfiles="{&quot;streaming-copa&quot;: &quot;Streaming copa&quot;, &quot;marcando-la-cancha&quot;: &quot;Marcando la cancha&quot;, &quot;falopa-informativa-nacional&quot;: &quot;Falopa informativa nacional&quot;, &quot;el-amplificador&quot;: &quot;El amplificador&quot;, &quot;estacion-freak&quot;: &quot;Estacion freak&quot;, &quot;de-que-viven&quot;: &quot;¿De qué viven?&quot;, &quot;chicha-y-limonada&quot;: &quot;Chicha y limonada&quot;, &quot;umbrales&quot;: &quot;Umbrales&quot;}">
 
         <div class="schedule-day">
           <h3>Lunes</h3>
           <ul class="schedule-list">
             <li>
               <span class="schedule-time">18:00</span>
-              <a href="programas/streaming-copa.html">Streaming Copa</a>
-              <div class="schedule-info"><img class="schedule-logo" src="assets/programas/planilla/streaming-copa.webp" alt="Logo de Streaming Copa" loading="lazy"><p class="schedule-desc">Viví la pasión del fútbol con toda la previa, el análisis y el aguante. La Copa se juega también desde SUBE.</p></div>
+              <a href="programas/streaming-copa.html">Streaming copa</a>
+              <p class="schedule-conduce">Conduce: Mati Cañas y Cipriano Ardaiz</p>
+              <div class="schedule-info"><img class="schedule-logo" src="assets/programas/streaming-copa.webp" alt="Logo de Streaming copa" loading="lazy" decoding="async"><p class="schedule-desc">Viví la pasión del fútbol con toda la previa, el análisis y el aguante. La Copa se juega también desde SUBE.</p></div>
             </li>
             <li>
               <span class="schedule-time">19:30</span>
               <a href="programas/marcando-la-cancha.html">Marcando la cancha</a>
+              <p class="schedule-conduce">Conduce: Agus Coto, Tino Meli y Joaco De Martino</p>
               <div class="schedule-info"><p class="schedule-desc">Toda la pasión del deporte, análisis, debate y las historias que se juegan dentro y fuera de la cancha.</p></div>
             </li>
             <li>
               <span class="schedule-time">21:00</span>
-              <a href="programas/falopa-informativa-nacional.html">FIN! F@lopa informativa nacional</a>
+              <a href="programas/falopa-informativa-nacional.html">Falopa informativa nacional</a>
+              <p class="schedule-conduce">Conduce: Alber Bidart, Fran Panella y Fede Machado</p>
               <div class="schedule-info"><p class="schedule-desc">Rosca política, actualidad y humor; Todo esto y mas en FIN! charlamos de lo que pasa y debatimos lo que otros prefieren esquivar.</p></div>
             </li>
           </ul>
@@ -72,22 +76,28 @@
           <ul class="schedule-list">
             <li>
               <span class="schedule-time">18:00</span>
-              <a href="programas/el-amplificador.html">El Amplificador – 10ma temporada</a>
-              <div class="schedule-info"><img class="schedule-logo" src="assets/programas/planilla/el-amplificador.webp" alt="Logo de El Amplificador – 10ma temporada" loading="lazy"><p class="schedule-desc">Música, artistas y cultura emergente. Le damos volumen a las voces y los sonidos que merecen ser escuchados.</p></div>
+              <a href="programas/el-amplificador.html">El amplificador</a>
+              <p class="schedule-conduce">Conduce: Belén Raggio y Diego Cisternas</p>
+              <div class="schedule-info"><img class="schedule-logo" src="assets/programas/el-amplificador.webp" alt="Logo de El amplificador" loading="lazy" decoding="async"><p class="schedule-desc">Música, artistas y cultura emergente. Le damos volumen a las voces y los sonidos que merecen ser escuchados.</p></div>
             </li>
             <li>
               <span class="schedule-time">19:30</span>
-              <a href="programas/estacion-freak.html">Estación Freak</a>
-              <span class="schedule-alt">Cada dos semanas, alterna con ¿De qué viven?</span><div class="schedule-info"><img class="schedule-logo" src="assets/programas/planilla/estacion-freak.webp" alt="Logo de Estación Freak" loading="lazy"><p class="schedule-desc">Anime, cultura geek y todo lo que te vuela la cabeza. Un espacio para compartir pasiones y explorar universos.</p></div>
+              <a href="programas/estacion-freak.html">Estacion freak</a>
+              <p class="schedule-conduce">Conduce: Majo Guano, Sol Gimenez y Ari Vargas</p>
+              <span class="schedule-alt">Cada dos semanas, alterna con ¿De qué viven?</span>
+              <div class="schedule-info"><img class="schedule-logo" src="assets/programas/estacion-freak.webp" alt="Logo de Estacion freak" loading="lazy" decoding="async"><p class="schedule-desc">Anime, cultura geek y todo lo que te vuela la cabeza. Un espacio para compartir pasiones y explorar universos.</p></div>
             </li>
             <li>
               <span class="schedule-time">20:00</span>
               <a href="programas/de-que-viven.html">¿De qué viven?</a>
-              <span class="schedule-alt">Cada dos semanas, alterna con Estación Freak</span><div class="schedule-info"><p class="schedule-desc">Historias, laburos y formas de ganarse la vida. Salimos a descubrir de qué viven quienes hacen girar la city.</p></div>
+              <p class="schedule-conduce">Conduce: Agus Sandia, Eze Varano y Mili Lucero</p>
+              <span class="schedule-alt">Cada dos semanas, alterna con Estacion freak</span>
+              <div class="schedule-info"><p class="schedule-desc">Historias, laburos y formas de ganarse la vida. Salimos a descubrir de qué viven quienes hacen girar la city.</p></div>
             </li>
             <li>
               <span class="schedule-time">21:30</span>
               <a href="programas/chicha-y-limonada.html">Chicha y limonada</a>
+              <p class="schedule-conduce">Conduce: Iñaki Asenjo, Pali Cecilia y Mai Schnaider</p>
               <div class="schedule-info"><p class="schedule-desc">Entre la charla y el descontrol, un espacio para debatir, reírse y compartir esas conversaciones que pueden ir para cualquier lado.</p></div>
             </li>
           </ul>
@@ -119,26 +129,15 @@
 
       </div>
 
-      <div class="content-subhead">
-        <span class="content-subhead-eyebrow">Redacción SUBE</span>
-        <h3>Noticias</h3>
-      </div>
-
-      <a class="hub-card" href="noticias.html">
-        <span class="hub-card-title">Coberturas, notas y actualidad</span>
-        <span class="hub-card-desc">La parte informativa de SUBE: lo que pasa en La Plata y en el país, contado por nuestra redacción.</span>
-        <span class="hub-card-arrow">→</span>
-      </a>
-
-    </div>
-  </section>
-
 </main>
 
 <footer>
   <div class="wrap">
     <div class="footer-strip">
-      <img class="footer-bus" src="assets/colectivo.png" alt="Sube Canal — un viaje colectivo">
+      <picture>
+        <source srcset="assets/colectivo.webp" type="image/webp">
+        <img class="footer-bus" src="assets/colectivo.png" alt="Sube Canal — un viaje colectivo" width="919" height="288" loading="lazy" decoding="async">
+      </picture>
       <div class="footer-channels">
         <a href="mailto:laplatasube@gmail.com"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg><span>laplatasube@gmail.com</span></a>
         <a href="https://www.instagram.com/subecanal" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg><span>Instagram</span></a>
@@ -152,6 +151,7 @@
 
 <script src="assets/nav.js"></script>
 <script src="assets/weather.js"></script>
+<script src="assets/planillas.js"></script>
 <script src="assets/schedule.js"></script>
 <script src="assets/schedule-grid.js"></script>
 </body>

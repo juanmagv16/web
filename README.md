@@ -88,3 +88,26 @@ Los colores y tipografías están centralizados como variables al principio de `
 ## Beneficios cargados actualmente
 
 .exe informática, Carpincho, Casa Chicha, La Compostera, La Ola Indie, Mascaró, Mundo Semilla, Pao tatt, Refugio 62, Roots Pizza y Tatana. Carpincho, Pao tatt, Refugio 62 y Roots Pizza no tenían logo disponible al momento de armar el sitio, así que muestran un ícono con su inicial — se puede reemplazar apenas tengas el archivo.
+
+## Cambios de octubre 2026 (optimización y ajustes)
+
+- **Secciones ocultas:** Noticias y Tienda no aparecen en el menú ni en ningún
+  enlace, y sus páginas redirigen a la Home (sin aparecer en Google). Su
+  contenido sigue en `build_site.py`. Para volver a mostrarlas, sacalas de
+  `SECCIONES_OCULTAS` en `build_site.py` y regenerá el sitio
+  (`python3 build_site.py`).
+- **Planillas de Google Sheets:** desde noviembre, GitHub las lee cada hora y regenera el sitio (ver `INSTRUCCIONES.md`, `scripts/sync_planillas.py` y `datos/fuentes.json`). Como respaldo, los links también están en `assets/planillas.js`.
+  Las planillas tienen que estar compartidas como "Cualquier persona con el
+  vínculo: Lector".
+  - Programación (Próxima parada y Contenidos): `assets/schedule.js` y
+    `assets/schedule-grid.js`.
+  - Comercios (Comunidad): `assets/benefits.js`.
+  - Si la planilla no se puede leer, cada sección muestra la copia guardada
+    en `datos/` (y en `assets/schedule.js`), así que nunca queda vacía.
+- **Logos:** versiones optimizadas (WebP) de la columna "Gráficas" de
+  comercios en `assets/socios/planilla/` y de los programas en
+  `assets/programas/`. La lista que relaciona cada archivo de Drive con su
+  logo está en `assets/planillas.js`. Un comercio nuevo con su logo en Drive
+  se muestra solo, con la miniatura pública de Drive.
+- **Geolocalización de comercios:** apagada. Para volver a activarla, poné
+  `GEOLOCALIZACION_ACTIVA = True` en `build_site.py` y regenerá el sitio.

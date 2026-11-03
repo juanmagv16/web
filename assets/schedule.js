@@ -19,14 +19,11 @@
 (function () {
   "use strict";
 
-  // Copia de la planilla de programación que GitHub actualiza cada hora
-  // (scripts/sync_planillas.py; el link de la planilla está en
-  // datos/fuentes.json). Si falta o no sirve, se usa el respaldo de abajo.
-  var FUENTES_CSV = [
-    "datos/programacion.csv",
-    // Planilla anterior publicada: se usa solo mientras no exista la copia de arriba.
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFybsjITyt2XR-XYTWibjY4PItJ46VK27XJOuHQ0JrJ-tZujG6duyDrwlsTdZLRbJusM-rZyMqxtky/pub?output=csv&gid=141065091&single=true"
-  ];
+  // Planilla de programación (links en assets/planillas.js). Si no se
+  // puede leer, se usa la copia de respaldo de más abajo.
+  var FUENTES_CSV = window.SubePlanillas
+    ? window.SubePlanillas.fuentes("programacion")
+    : ["https://docs.google.com/spreadsheets/d/1sf038ryCAifTFDUtAlhzYzwXquH3moezDdh43rLs2to/gviz/tq?tqx=out:csv&headers=1&gid=0"];
 
   var AR_OFFSET_MS = 3 * 60 * 60 * 1000; // Argentina = UTC-3 (fijo, sin DST)
   var DAY_MS = 24 * 60 * 60 * 1000;
@@ -121,7 +118,8 @@
     return DIA_A_INDICE.hasOwnProperty(v) ? v : null;
   }
   function parseHora(raw) {
-    var m = /^([01]?\d|2[0-3]):([0-5]\d)$/.exec(String(raw || "").trim());
+    // "18:00" o "18:00:00" (según cómo entregue Google la planilla)
+    var m = /^([01]?\d|2[0-3]):([0-5]\d)(?::[0-5]\d)?$/.exec(String(raw || "").trim());
     if (!m) return null;
     return { h: parseInt(m[1], 10), m: parseInt(m[2], 10) };
   }
@@ -130,20 +128,24 @@
     if (!isFinite(n) || n <= 0) return null;
     return n;
   }
-  function parseFechaReferencia(raw) {
-    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(raw || "").trim());
-    if (!m) return null;
-    var y = parseInt(m[1], 10),
-      mo = parseInt(m[2], 10),
-      d = parseInt(m[3], 10);
+  function fechaUTC(y, mo, d) {
     var ms = Date.UTC(y, mo - 1, d);
     var check = new Date(ms);
-    // Rechaza fechas imposibles (ej: 2026-02-30), que Date "normaliza" en
-    // vez de fallar.
-    if (check.getUTCFullYear() !== y || check.getUTCMonth() !== mo - 1 || check.getUTCDate() !== d) {
-      return null;
-    }
+    // Rechaza fechas imposibles (ej: 2026-02-30), que Date "normaliza" en vez de fallar.
+    if (check.getUTCFullYear() !== y || check.getUTCMonth() !== mo - 1 || check.getUTCDate() !== d) return null;
     return ms; // medianoche UTC de ese día calendario, usado solo como contador de días
+  }
+  // Devuelve las fechas posibles: "2026-08-24" tiene una sola lectura;
+  // "3/9/2026" puede ser 3 de septiembre o 9 de marzo. Después se elige la
+  // que coincide con el día de la semana de la planilla.
+  function parseFechaReferencia(raw) {
+    var t = String(raw || "").trim(), m, out = [];
+    if ((m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(t))) {
+      out.push(fechaUTC(+m[1], +m[2], +m[3]));
+    } else if ((m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(t))) {
+      out.push(fechaUTC(+m[3], +m[2], +m[1]), fechaUTC(+m[3], +m[1], +m[2]));
+    }
+    return out.filter(function (x) { return x !== null; });
   }
   function parseActivo(raw) {
     var v = normalizeValue(raw); // normalizeValue ya saca tildes: "sí" -> "si"
@@ -209,15 +211,15 @@
     var dia = parseDiaSemana(row[cols.dia_semana]);
     var hora = parseHora(row[cols.hora]);
     var frecuenciaDias = parseFrecuenciaDias(row[cols.frecuencia_dias]);
-    var fechaRefMs = parseFechaReferencia(row[cols.fecha_referencia]);
+    // Chequeo de consistencia: la fecha_referencia tiene que caer realmente
+    // en el día de semana declarado; si no, hay un error de carga.
+    var fechaRefMs = parseFechaReferencia(row[cols.fecha_referencia]).filter(function (ms) {
+      return diaSemanaDeFecha(ms) === dia;
+    })[0];
 
     // Cualquier campo inválido -> se descarta la fila entera, sin romper
     // el resto (requisito explícito del proyecto).
-    if (!dia || !hora || !frecuenciaDias || fechaRefMs === null) return null;
-
-    // Chequeo de consistencia: si la fecha_referencia no cae realmente en
-    // el día de semana declarado, hay un error de carga -> se descarta.
-    if (diaSemanaDeFecha(fechaRefMs) !== dia) return null;
+    if (!dia || !hora || !frecuenciaDias || fechaRefMs === undefined) return null;
 
     return {
       programa: programa,
@@ -227,6 +229,8 @@
       frecuencia_dias: frecuenciaDias,
       fecha_referencia_ms: fechaRefMs,
       temporada: cols.temporada !== -1 ? (row[cols.temporada] || "").trim() : "",
+      descripcion: cols.descripcion !== -1 ? (row[cols.descripcion] || "").trim() : "",
+      logo: cols.logo !== -1 ? (row[cols.logo] || "").trim() : "",
     };
   }
 
@@ -264,20 +268,21 @@
   }
 
   // ---------- Copia local de respaldo (fallback) ----------
-  // Copia de la planilla de programación del 26/10/2026 (mismas columnas).
+  // Copia de respaldo de la planilla de programación (26/10/2026).
   // Está escrita como CSV, con las mismas columnas exactas que la hoja
   // real, para que pase por el mismo parseo y las mismas validaciones
   // que el dato en vivo — cero lógica duplicada. Para actualizarla,
   // alcanza con editar este texto (no hay que tocar ninguna función).
   var FALLBACK_CSV =
-    "nombre,dia_semana,hora,frecuencia,frecuencia_dias,fecha_referencia,temporada,activo\n" +
-    "Streaming copa,lunes,18:00,semanal,7,2026-08-24,2026,si\n" +
-    "Marcando la cancha,lunes,19:30,semanal,7,2026-08-24,2026,si\n" +
-    "Falopa informativa nacional,lunes,21:00,semanal,7,2026-08-24,2026,si\n" +
-    "El amplificador,jueves,18:00,semanal,7,2026-08-27,2026,si\n" +
-    "Estacion freak,jueves,19:30,quincenal,14,2026-09-03,2026,si\n" +
-    "¿De qué viven?,jueves,20:00,quincenal,14,2026-08-27,2026,si\n" +
-    "Chicha y limonada,jueves,21:30,semanal,7,2026-08-27,2026,si\n";
+    "nombre,descripcion,logo,dia_semana,hora,frecuencia,frecuencia_dias,fecha_referencia,temporada,activo\n" +
+    "Streaming copa,\"Viví la pasión del fútbol con toda la previa, el análisis y el aguante. La Copa se juega también desde SUBE.\",https://drive.google.com/file/d/1-hdIhxhj2IQs9N7EaJiw2u0oiYEXPU03/view?usp=drive_link,lunes,18:00,semanal,7,2026-08-24,2026,si\n" +
+    "Marcando la cancha,\"Toda la pasión del deporte, análisis, debate y las historias que se juegan dentro y fuera de la cancha.\",,lunes,19:30,semanal,7,2026-08-24,2026,si\n" +
+    "Falopa informativa nacional,\"Rosca política, actualidad y humor; Todo esto y mas en FIN! charlamos de lo que pasa y debatimos lo que otros prefieren esquivar.\",,lunes,21:00,semanal,7,2026-08-24,2026,si\n" +
+    "El amplificador,\"Música, artistas y cultura emergente. Le damos volumen a las voces y los sonidos que merecen ser escuchados.\",https://drive.google.com/file/d/1blua-_wQVW23XCF9EZwF3pK4HDc66k81/view?usp=drive_link,jueves,18:00,semanal,7,2026-08-27,2026,si\n" +
+    "Estacion freak,\"Anime, cultura geek y todo lo que te vuela la cabeza. Un espacio para compartir pasiones y explorar universos.\",https://drive.google.com/file/d/1Oru7sSbWzna0eQ64kWo9ASmDBMpvmzi4/view?usp=drive_link,jueves,19:30,quincenal,14,2026-09-03,2026,si\n" +
+    "¿De qué viven?,\"Historias, laburos y formas de ganarse la vida. Salimos a descubrir de qué viven quienes hacen girar la city.\",,jueves,20:00,quincenal,14,2026-08-27,2026,si\n" +
+    "Chicha y limonada,\"Entre la charla y el descontrol, un espacio para debatir, reírse y compartir esas conversaciones que pueden ir para cualquier lado.\",,jueves,21:30,semanal,7,2026-08-27,2026,si\n" +
+    "Umbrales,\"Conversaciones íntimas con personas que se animan a cruzar sus propios límites, explorar nuevas formas de crear y habitar la escena, y compartir aquello que las mueve.\",,,,on demand,,,2026,si\n";
 
   var FETCH_TIMEOUT_MS = 6000; // no bloquea la Home: a los 6s se corta y se usa el fallback
 
@@ -332,6 +337,8 @@
           fecha_referencia: findCol(candidate, ["fecha_referencia", "fecha referencia", "referencia"]),
           temporada: findCol(candidate, ["temporada"]),
           activo: findCol(candidate, ["activo"]),
+          descripcion: findCol(candidate, ["descripcion"]),
+          logo: findColExact(candidate.map(normalizeHeader), ["logo"]),
         };
         break;
       }
