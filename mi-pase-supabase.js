@@ -1,0 +1,272 @@
+/* ============================================
+   SUBE — Mi pase: capa de datos REAL (Supabase)
+   ------------------------------------------------------
+   Misma forma que assets/mi-pase-datos.js (la demostración),
+   pero los datos viven en Supabase. Las reglas de quién ve qué
+   están en la base (supabase/01-estructura.sql): aunque alguien
+   modifique esta página en su navegador, no puede ver datos
+   que no le correspondan.
+   ============================================ */
+(function () {
+  var cfg = window.SUBE_PASE_CONFIG || {};
+  var sb = window.supabase.createClient(cfg.url, cfg.clave, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'implicit' }
+  });
+
+  // ¿La persona llegó desde el link del mail? (activar cuenta / recuperar contraseña)
+  var vinoDelMail = /access_token=|type=(magiclink|signup|recovery|invite)/.test(window.location.hash) ||
+    /[?&](code|token_hash)=/.test(window.location.search);
+  var errorDelMail = (function () {
+    var h = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    return h.get('error_description') || null;
+  })();
+
+  var ROLES = { equipo: 'admin', redaccion: 'redaccion', comercio: 'comercio', socio: 'socio' };
+  var TABLAS = { equipo: 'equipo', redaccion: 'redaccion', comercio: 'comercios', socio: 'socios' };
+
+  function fallo(err, porDefecto) {
+    var msg = (err && (err.message || err.error_description)) || porDefecto || 'Algo salió mal. Probá de nuevo.';
+    if (/Invalid login credentials/i.test(msg)) msg = 'El mail o la contraseña no son correctos.';
+    else if (/Email not confirmed/i.test(msg)) msg = 'Tu cuenta todavía no está activada. Tocá "Activar mi cuenta".';
+    else if (/rate limit|too many|security purposes/i.test(msg)) msg = 'Ya pediste un link hace muy poco. Esperá unos minutos y volvé a probar.';
+    else if (/Error sending|sending (magic link|confirmation|recovery)|smtp|535|550/i.test(msg)) msg = 'No pudimos enviarte el mail en este momento. Probá de nuevo en unos minutos; si sigue pasando, escribinos a laplatasube@gmail.com.';
+    else if (/not authorized/i.test(msg)) msg = 'Todavía no podemos enviar mails a esa dirección (el envío de mails de Sube está en configuración).';
+    else if (/Password should be at least/i.test(msg)) msg = 'La contraseña tiene que tener al menos 8 caracteres.';
+    else if (/same password|different from the old/i.test(msg)) msg = 'Elegí una contraseña distinta a la anterior.';
+    else if (/Failed to fetch|NetworkError|network/i.test(msg)) msg = 'No hay conexión. Revisá internet y probá de nuevo.';
+    return new Error(msg);
+  }
+  function rpc(nombre, args) {
+    return sb.rpc(nombre, args || {}).then(function (r) { if (r.error) throw fallo(r.error); return r.data; });
+  }
+  function normalizar(txt) {
+    return String(txt || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .toLowerCase().replace(/[^a-z0-9ñ@._+\- ]/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+  function mailValido(m) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m); }
+  // Los links de los mails siempre vuelven a mi-pase.html (dirección habilitada en
+  // Supabase). Desde ahí, cada cuenta ve su pantalla según su tipo.
+  function urlDeVuelta() { return window.location.origin + window.location.pathname.replace(/[^\/]*$/, '') + 'mi-pase.html'; }
+
+  // Arma la sesión que usan las pantallas: { rol, nombre, mail }
+  function armarSesion() {
+    return sb.auth.getSession().then(function (r) {
+      var s = r.data && r.data.session;
+      if (!s) return null;
+      var mail = (s.user.email || '').toLowerCase();
+      return rpc('mi_rol').then(function (rol) {
+        if (rol === 'comercio_baja') {
+          return sb.auth.signOut().then(function () { throw new Error('La cuenta de este comercio está dada de baja. Escribinos a laplatasube@gmail.com.'); });
+        }
+        if (rol === 'redaccion_baja') {
+          return sb.auth.signOut().then(function () { throw new Error('Tu credencial no está vigente. Para más información, comunicate con la coordinación: laplatasube@gmail.com.'); });
+        }
+        if (!rol) {
+          return sb.auth.signOut().then(function () { throw new Error('Tu mail ya no figura en la comunidad. Si creés que es un error, escribinos a laplatasube@gmail.com.'); });
+        }
+        var tabla = TABLAS[rol];
+        return sb.from(tabla).select('nombre').eq(rol === 'equipo' ? 'mail' : 'user_id', rol === 'equipo' ? mail : s.user.id).maybeSingle()
+          .then(function (q) {
+            return { rol: ROLES[rol], id: s.user.id, nombre: (q.data && q.data.nombre) || mail, mail: mail };
+          });
+      });
+    });
+  }
+
+  window.SubePase = {
+    modo: 'real',
+    normalizar: normalizar,
+
+    sesionActual: function () { return armarSesion().catch(function () { return null; }); },
+
+    // Si llegó desde el link del mail, lo primero es elegir la contraseña.
+    pasoPendiente: function () {
+      if (errorDelMail) {
+        history.replaceState(null, '', urlDeVuelta());
+        return Promise.resolve({ tipo: 'error', mensaje: /expired|invalid/i.test(errorDelMail)
+          ? 'El link venció o ya se usó. Pedí uno nuevo.' : errorDelMail });
+      }
+      if (!vinoDelMail) return Promise.resolve(null);
+      vinoDelMail = false;
+      return armarSesion().then(function (s) {
+        history.replaceState(null, '', urlDeVuelta());
+        return s ? { tipo: 'elegir_clave', rol: s.rol } : null;
+      }, function (err) {
+        history.replaceState(null, '', urlDeVuelta());
+        return { tipo: 'error', mensaje: err.message };
+      });
+    },
+
+    ingresar: function (rol, mail, clave) {
+      return sb.auth.signInWithPassword({ email: String(mail).trim().toLowerCase(), password: clave })
+        .then(function (r) { if (r.error) throw fallo(r.error); return armarSesion(); });
+    },
+
+    salir: function () { return sb.auth.signOut().then(function () {}); },
+
+    // Manda el link para activar la cuenta o recuperar la contraseña.
+    // El filtro de la base (solo_miembros) rechaza mails que no estén en las listas.
+    pedirEnlace: function (rol, mail) {
+      mail = String(mail || '').trim().toLowerCase();
+      if (!mailValido(mail)) return Promise.reject(new Error('Revisá el mail: parece estar mal escrito.'));
+      var opciones = { shouldCreateUser: true, emailRedirectTo: urlDeVuelta() };
+      if (rol === 'redaccion') opciones.data = { equipo: true }; // el mail sale con el texto del equipo
+      return sb.auth.signInWithOtp({ email: mail, options: opciones })
+        .then(function (r) {
+          if (r.error) {
+            if (/No encontramos/.test(r.error.message)) {
+              throw new Error(rol === 'socio'
+                ? 'No encontramos ese mail en la comunidad.'
+                : rol === 'redaccion'
+                  ? 'Ese mail no está registrado en el equipo de trabajo. Consultá con la coordinación.'
+                  : 'Ese mail no corresponde a ningún comercio adherido.');
+            }
+            throw fallo(r.error);
+          }
+          return { enviado_a: mail };
+        });
+    },
+
+    definirClave: function (token, clave, aceptoPrivacidad) {
+      if (!clave || clave.length < 8) return Promise.reject(new Error('La contraseña tiene que tener al menos 8 caracteres.'));
+      return armarSesion().then(function (s) {
+        if (!s) throw new Error('El link venció. Pedí uno nuevo.');
+        var conAviso = s.rol === 'socio' || s.rol === 'redaccion';
+        if (conAviso && !aceptoPrivacidad) throw new Error('Para activar tu cuenta tenés que aceptar el aviso de privacidad.');
+        return sb.auth.updateUser({ password: clave }).then(function (r) {
+          if (r.error && !/same password|different from the old/i.test(r.error.message)) throw fallo(r.error);
+          return conAviso ? rpc('aceptar_privacidad') : null;
+        }).then(function () { return s; });
+      });
+    },
+
+    miPase: function () {
+      return rpc('mi_pase').then(function (p) { if (!p) throw new Error('No encontramos tu pase.'); return p; });
+    },
+
+    // ---- Redacción ----
+    // Credencial de quien ingresó, o null si no es de la redacción.
+    miCredencial: function () { return rpc('mi_credencial'); },
+
+    // ¿Además es parte de la comunidad de pasajeros? (para mostrar su boleto)
+    tambienSocio: function () { return rpc('mi_pase').then(function (p) { return !!p; }, function () { return false; }); },
+
+    portal: function () {
+      return sb.from('portal_enlaces').select('titulo,descripcion,url').eq('activo', true).order('orden')
+        .then(function (r) { if (r.error) throw fallo(r.error); return r.data; });
+    },
+
+    // Página pública del código QR: no hace falta haber ingresado.
+    verificarCredencial: function (codigo) {
+      if (!/^[0-9a-f-]{36}$/i.test(String(codigo || ''))) return Promise.resolve(null);
+      return rpc('verificar_credencial', { c: codigo });
+    },
+
+    verificarSocio: function (texto) {
+      var palabras = normalizar(texto).split(' ').filter(Boolean);
+      if (palabras.length < 2) return Promise.reject(new Error('Escribí nombre y apellido.'));
+      return rpc('verificar_socio', { texto: texto }).then(function (r) { return { resultado: r }; });
+    },
+
+    admin: {
+      socios: function () {
+        var hoy = new Date(); hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset());
+        var hoyISO = hoy.toISOString().slice(0, 10);
+        return sb.from('socios').select('id,nombre,apellido,mail,estado,vigente_hasta,user_id').order('apellido')
+          .then(function (r) {
+            if (r.error) throw fallo(r.error);
+            return r.data.map(function (s) {
+              return { id: s.id, nombre: s.nombre, apellido: s.apellido, mail: s.mail, estado: s.estado,
+                vigente_hasta: s.vigente_hasta, cuenta_activada: !!s.user_id,
+                al_dia: s.estado === 'activo' && (!s.vigente_hasta || s.vigente_hasta >= hoyISO) };
+            });
+          });
+      },
+
+      previsualizarImportacion: function (filas) {
+        var v = validar(filas);
+        return rpc('importar_socios', { filas: v.validas, aplicar: false }).then(function (r) {
+          r.problemas = v.problemas; return r;
+        });
+      },
+
+      importar: function (filas) {
+        return rpc('importar_socios', { filas: validar(filas).validas, aplicar: true });
+      },
+
+      comercios: function () {
+        return sb.from('comercios').select('id,nombre,mail,activo,user_id').order('nombre').then(function (r) {
+          if (r.error) throw fallo(r.error);
+          return r.data.map(function (c) { return { id: c.id, nombre: c.nombre, mail: c.mail, activo: c.activo, cuenta_activada: !!c.user_id }; });
+        });
+      },
+
+      // Suma el comercio y le manda el link para que elija su contraseña.
+      agregarComercio: function (nombre, mail) {
+        mail = String(mail || '').trim().toLowerCase();
+        if (!String(nombre || '').trim()) return Promise.reject(new Error('Falta el nombre del comercio.'));
+        if (!mailValido(mail)) return Promise.reject(new Error('Revisá el mail del comercio.'));
+        return sb.from('comercios').insert({ nombre: nombre.trim(), mail: mail }).then(function (r) {
+          if (r.error) throw (/duplicate|unique/i.test(r.error.message) ? new Error('Ya hay un comercio con ese mail.') : fallo(r.error));
+          return sb.auth.signInWithOtp({ email: mail, options: { shouldCreateUser: true, emailRedirectTo: urlDeVuelta() } });
+        }).then(function (r) {
+          if (r && r.error) return { enviado_a: mail, aviso: 'El comercio quedó cargado, pero no se pudo mandar el mail (' + fallo(r.error).message + '). Puede activarlo él mismo desde "Activar mi cuenta".' };
+          return { enviado_a: mail };
+        });
+      },
+
+      cambiarEstadoComercio: function (id, activo) {
+        return sb.from('comercios').update({ activo: !!activo }).eq('id', id).then(function (r) { if (r.error) throw fallo(r.error); return true; });
+      },
+
+      busquedas: function () { return rpc('registro_busquedas'); },
+
+      redaccion: function () {
+        return sb.from('redaccion').select('id,numero,nombre,apellido,mail,area,seccion,activo,desde,user_id').order('numero')
+          .then(function (r) {
+            if (r.error) throw fallo(r.error);
+            return r.data.map(function (p) {
+              return { id: p.id, numero: p.numero, nombre: p.nombre, apellido: p.apellido, mail: p.mail, area: p.area,
+                seccion: p.seccion, activo: p.activo, desde: p.desde, cuenta_activada: !!p.user_id };
+            });
+          });
+      },
+
+      // Suma a alguien a la redacción y le manda el link para activar su cuenta.
+      agregarRedaccion: function (d) {
+        var mail = String(d.mail || '').trim().toLowerCase();
+        if (!String(d.nombre || '').trim()) return Promise.reject(new Error('Falta el nombre.'));
+        if (!mailValido(mail)) return Promise.reject(new Error('Revisá el mail.'));
+        return sb.from('redaccion').insert({ nombre: d.nombre.trim(), apellido: String(d.apellido || '').trim(), mail: mail,
+          area: d.area || 'Redacción', seccion: String(d.seccion || '').trim() }).then(function (r) {
+          if (r.error) throw (/duplicate|unique/i.test(r.error.message) ? new Error('Ya hay una persona del equipo registrada con ese mail.') : fallo(r.error));
+          return sb.auth.signInWithOtp({ email: mail, options: { shouldCreateUser: true, emailRedirectTo: urlDeVuelta(), data: { equipo: true } } });
+        }).then(function (r) {
+          if (r && r.error) return { enviado_a: mail, aviso: 'El alta quedó registrada, pero no se pudo enviar el mail (' + fallo(r.error).message + '). La persona puede activar su cuenta desde el acceso del equipo con "Activar cuenta".' };
+          return { enviado_a: mail };
+        });
+      },
+
+      editarRedaccion: function (id, cambios) {
+        return sb.from('redaccion').update(cambios).eq('id', id).then(function (r) { if (r.error) throw fallo(r.error); return true; });
+      }
+    }
+  };
+
+  // Revisa las filas del Excel antes de mandarlas a la base.
+  function validar(filas) {
+    var vistos = {}, validas = [], problemas = [];
+    filas.forEach(function (f, i) {
+      var fila = f.fila || i + 2;
+      var mail = String(f.mail || '').trim().toLowerCase();
+      if (!f.nombre && !f.apellido && !mail) return;
+      if (!mailValido(mail)) { problemas.push({ fila: fila, motivo: f.motivo_mail || 'Mail vacío o mal escrito', dato: f.mail || ((f.nombre || '') + ' ' + (f.apellido || '')).trim() }); return; }
+      if (vistos[mail]) { problemas.push({ fila: fila, motivo: 'Mail repetido (ya está en la fila ' + vistos[mail] + ')', dato: mail }); return; }
+      if (!f.nombre) { problemas.push({ fila: fila, motivo: 'Falta el nombre', dato: mail }); return; }
+      vistos[mail] = fila;
+      validas.push({ nombre: f.nombre, apellido: f.apellido || '', mail: mail,
+        estado: f.estado === 'inactivo' ? 'inactivo' : 'activo', vigente_hasta: f.vigente_hasta || null });
+    });
+    return { validas: validas, problemas: problemas };
+  }
+})();

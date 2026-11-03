@@ -1,0 +1,126 @@
+# Publicación automática del sitio de SUBE
+# ------------------------------------------------------------
+# Cada vez que se sube un cambio a la rama main (por ejemplo, una nota
+# nueva en redaccion/ o una foto en assets/noticias/), GitHub:
+#   0. Trae de Google Sheets los comercios de la Comunidad (y sus logos) y
+#      la programación (scripts/sync_planillas.py; los links de las
+#      planillas están en datos/fuentes.json).
+#   1. Vuelve a generar el sitio (python build_site.py).
+#   2. Revisa que las notas estén bien escritas: título, fecha en formato
+#      AAAA-MM-DD, que no haya dos notas con el mismo nombre y que las
+#      fotos mencionadas estén subidas. Si algo está mal, se detiene,
+#      no publica nada y el cambio aparece con una cruz roja (el detalle
+#      se ve en la pestaña "Actions").
+#   3. Guarda las páginas actualizadas en el repositorio.
+#   4. Publica el sitio. En uno o dos minutos la nota está en la web.
+#
+# Requisito (una sola vez): Settings → Pages → Build and deployment →
+# Source: "GitHub Actions".
+#
+# Además corre solo cada hora, para tomar los cambios de las planillas,
+# y se puede correr a mano: Actions → "Publicar el sitio" → "Run workflow".
+#
+# Las notas cargadas desde el panel de redacción (/admin/, Decap CMS)
+# llegan como Pull Request mientras están en revisión: acá solo se
+# revisan; al publicarlas desde el panel, se publican en la web.
+#
+# En los Pull Request solo revisa, no publica.
+
+name: Publicar el sitio
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"   # cada hora, a los 17 minutos
+
+concurrency:
+  group: publicar-sitio
+  cancel-in-progress: false
+
+jobs:
+  revisar:
+    name: Revisar (Pull Request)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Generar el sitio y revisar las notas
+        run: |
+          pip install --quiet pyyaml
+          python build_site.py --revisar
+      - name: Avisar si hay páginas para regenerar
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::notice::Las páginas se van a regenerar solas al aceptar este cambio:"
+            git status --short
+          fi
+          echo "Revisión terminada."
+
+  publicar:
+    name: Generar, revisar y publicar
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Traer comercios y programación desde Google Sheets
+        run: |
+          pip install --quiet pillow pyyaml pillow-heif pymupdf
+          python scripts/sync_planillas.py
+
+      - name: Achicar las fotos de las notas
+        run: python scripts/optimizar_fotos.py
+
+      - name: Generar el sitio y revisar las notas
+        run: python build_site.py --revisar
+
+      - name: Guardar las páginas actualizadas
+        id: guardar
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Las páginas ya estaban actualizadas."
+            echo "cambios=no" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "cambios=si" >> "$GITHUB_OUTPUT"
+          git status --short
+          git config user.name "Redacción SUBE (automático)"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Publicar cambios de la redacción y la planilla (automático)"
+          git pull --rebase origin main
+          git push
+
+      # En la revisión de cada hora, si no cambió nada, no hace falta volver a publicar.
+      - uses: actions/configure-pages@v5
+        if: github.event_name != 'schedule' || steps.guardar.outputs.cambios == 'si'
+
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'schedule' || steps.guardar.outputs.cambios == 'si'
+        with:
+          path: .
+
+      - name: Publicar en la web
+        id: deployment
+        if: github.event_name != 'schedule' || steps.guardar.outputs.cambios == 'si'
+        uses: actions/deploy-pages@v4
