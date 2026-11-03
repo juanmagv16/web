@@ -4,18 +4,21 @@ Cada nota de la sección **Noticias** es un archivo de texto dentro de la carpet
 
 ## La forma recomendada: el panel de redacción
 
-Entrá a **/admin/** del sitio (por ejemplo `https://subecanal.com.ar/admin/`) e iniciá sesión con tu cuenta de GitHub.
+Entrá a **/redaccion** del sitio (por ejemplo `https://subecanal.com.ar/redaccion`) con tu mail y tu contraseña de SUBE (las mismas de tu credencial). No hay ningún botón en la web que lleve ahí: se entra escribiendo la dirección.
 
-1. Tocá **Nueva nota** y completá el formulario: título, sección, fecha, bajada, firma, foto, epígrafe y el texto de la nota (con negritas, intertítulos, citas, listas y fotos dentro del texto).
-2. Tocá **Guardar**: la nota queda como **Borrador**. Nadie la ve en la web.
-3. En **Flujo editorial**, movela a **En revisión** para que alguien la lea, y después a **Lista**.
-4. Quien edita toca **Publicar**. En uno o dos minutos la nota está en la web.
+1. Tocá **+ Nueva nota** y completá: título, bajada y el texto (con negritas, links, intertítulos, citas, listas, fotos y videos de YouTube en medio del texto).
+2. A la derecha elegí la sección, la fecha, la firma, el lugar en Noticias (Principal, Destacada o Normal) y la portada (foto o video de YouTube).
+3. **Guardar** deja la nota como **Borrador**: solo la ve la redacción.
+4. **Vista previa** muestra cómo va a quedar.
+5. **Publicar en la web**: en uno o dos minutos la nota está en la web.
 
-Las fotos se achican solas al publicar. Para corregir o sacar una nota publicada: abrila en el panel, editala (o apagá **Visible en la web**) y volvé a publicar.
+Para corregir una nota publicada: abrila desde el listado, cambiá lo que haga falta y volvé a tocar **Publicar**. Para sacarla de la web sin borrarla: apagá **Visible en la web** y tocá **Publicar**.
+
+¿Primera vez o te olvidaste la contraseña? Activá o recuperá tu cuenta desde **Mi pase** (`mi-pase.html`). Si te dice que tu cuenta no tiene acceso a Redacción, pedile a la coordinación que te sume.
 
 ## Otra forma: subir el archivo desde la web de GitHub
 
-Sirve si el panel no está disponible. Las notas del panel son archivos `.md` en esta carpeta; también se pueden seguir usando archivos `.txt` como el de la plantilla.
+Sirve si el panel no está disponible. Las notas que se suben así también aparecen en el panel. Las notas del panel son archivos `.md` en esta carpeta; también se pueden seguir usando archivos `.txt` como el de la plantilla.
 
 ### Publicar una nota nueva (desde la web de GitHub, sin instalar nada)
 

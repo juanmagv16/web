@@ -463,7 +463,7 @@ on conflict (mail) do nothing;
 -- Después se editan desde Supabase: Table Editor → portal_enlaces.
 insert into public.portal_enlaces (orden, titulo, descripcion, url)
 select v.orden, v.titulo, v.descripcion, v.url from (values
-  (10, 'Escribir una nota', 'Panel de redacción: notas, fotos y flujo editorial. Se entra con tu cuenta de GitHub.', 'admin/'),
+  (10, 'Escribir una nota', 'Panel de redacción: escribí, guardá y publicá notas. Entrás con tu usuario de SUBE.', 'redaccion/'),
   (20, 'Cómo publicar una nota', 'Guía paso a paso del panel y reglas para que el sitio se vea ordenado.', 'https://github.com/juanmagv16/web/blob/main/redaccion/ayuda/LEEME.md'),
   (30, 'Noticias publicadas', 'Cómo se ve hoy la sección en la web.', 'noticias.html'),
   (40, 'Programación', 'La grilla semanal de SUBE.', 'programacion.html'),

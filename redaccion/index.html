@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Redacción · SUBE</title>
+  <link rel="icon" href="../assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/redaccion.css">
+</head>
+<body>
+<!--
+  Panel de la redacción de SUBE. No hay ningún link a esta página en el sitio:
+  se entra escribiendo la dirección (/redaccion). Cómo funciona y cómo se
+  activa: supabase/LEEME.md, sección «Panel de Redacción».
+-->
+
+<!-- ============ Ingreso ============ -->
+<div class="ingreso" id="v-ingreso" hidden>
+  <a class="marca" href="../index.html"><img src="../assets/logo.png" alt="SUBE"></a>
+  <main class="ticket">
+    <div class="ticket-top">
+      <p class="eyebrow">Acceso del equipo</p>
+      <h1>Redacción</h1>
+      <p class="lead">Ingresá con tu usuario de SUBE para cargar y editar notas.</p>
+    </div>
+    <form id="form-ingreso" novalidate>
+      <div class="mensaje error" id="ingreso-error" role="alert" hidden></div>
+      <div class="f"><label for="ing-mail">Mail</label>
+        <input class="in" id="ing-mail" type="email" autocomplete="username" placeholder="tu mail" required></div>
+      <div class="f"><label for="ing-clave">Contraseña</label>
+        <span class="pw"><input class="in" id="ing-clave" type="password" autocomplete="current-password" placeholder="••••••••" required>
+        <button type="button" data-ver="ing-clave">Mostrar</button></span></div>
+      <button class="btn" type="submit" id="ing-boton">Ingresar <span aria-hidden="true">→</span></button>
+      <a class="link" style="text-align:center" href="../mi-pase.html">¿Primera vez o te olvidaste la contraseña?</a>
+    </form>
+  </main>
+  <p class="ingreso-pie">Solo para integrantes del equipo de SUBE.<br><a href="../index.html">Volver a la web</a></p>
+</div>
+
+<!-- ============ Panel ============ -->
+<div id="v-panel" hidden>
+  <header class="top"><div class="top-in">
+    <img src="../assets/logo.png" alt="SUBE"><a class="tag" href="#">Redacción</a><span class="sp"></span>
+    <div class="usuario"><span class="nombre" id="u-nombre"></span><span class="avatar" id="u-avatar" aria-hidden="true"></span></div>
+    <button class="salir" id="b-salir" type="button">Salir</button>
+  </div></header>
+
+  <!-- Listado -->
+  <main class="wrap" id="v-lista" hidden>
+    <div class="cabeza">
+      <div><p class="eyebrow" id="saludo">Hola</p><h1>Notas</h1></div>
+      <a class="btn" href="#nueva">+ Nueva nota</a>
+    </div>
+    <div class="stats">
+      <div class="stat hl"><b id="n-pub">–</b><span>Publicadas</span></div>
+      <div class="stat"><b id="n-bor">–</b><span>Borradores</span></div>
+      <div class="stat"><b id="n-off">–</b><span>Fuera de la web</span></div>
+    </div>
+    <div class="mensaje aviso" id="lista-aviso" style="margin-top:18px" hidden></div>
+    <div class="herramientas">
+      <div class="chips" role="group" aria-label="Filtrar notas">
+        <button class="chip" type="button" data-filtro="todas" aria-pressed="true">Todas</button>
+        <button class="chip" type="button" data-filtro="borrador" aria-pressed="false">Borradores</button>
+        <button class="chip" type="button" data-filtro="publicada" aria-pressed="false">Publicadas</button>
+        <button class="chip" type="button" data-filtro="arriba" aria-pressed="false">Principal y destacadas</button>
+        <button class="chip" type="button" data-filtro="fuera" aria-pressed="false">Fuera de la web</button>
+      </div>
+      <label class="sr-only" for="buscar">Buscar por título</label>
+      <input class="buscar" id="buscar" type="search" placeholder="Buscar por título…">
+    </div>
+    <div class="lista" id="lista"><p class="cargando">Cargando notas…</p></div>
+  </main>
+
+  <!-- Editor -->
+  <main class="wrap con-barra" id="v-editor" hidden>
+    <div class="migas"><a href="#">← Notas</a><span>/</span><span id="ed-migas">Nueva nota</span></div>
+    <form class="editor" id="form-nota" novalidate>
+      <section>
+        <div class="panel">
+          <div class="f"><label for="ed-titulo">Título</label>
+            <textarea class="in titulo-in" id="ed-titulo" rows="1" placeholder="Título de la nota" maxlength="300"></textarea></div>
+          <div class="f"><label for="ed-bajada">Bajada</label>
+            <textarea class="in" id="ed-bajada" rows="2" maxlength="1000" placeholder="Una o dos oraciones que resumen la nota"></textarea>
+            <span class="hint">Aparece debajo del título y en la portada de Noticias.</span></div>
+          <div class="f"><span class="etiqueta" id="et-cuerpo">Texto de la nota</span>
+            <div>
+              <div class="barra-txt" role="toolbar" aria-label="Formato del texto">
+                <button type="button" data-cmd="bold" title="Negrita"><b>N</b></button>
+                <button type="button" data-cmd="italic" title="Cursiva"><i>C</i></button>
+                <button type="button" data-cmd="link" title="Agregar link">🔗</button>
+                <span class="sep"></span>
+                <button type="button" data-cmd="h2" title="Intertítulo">Intertítulo</button>
+                <button type="button" data-cmd="quote" title="Cita destacada">❝ Cita</button>
+                <button type="button" data-cmd="ul" title="Lista">• Lista</button>
+                <button type="button" data-cmd="ol" title="Lista numerada">1. Lista</button>
+                <span class="sep"></span>
+                <button type="button" data-cmd="foto" title="Foto en el texto">🖼 Foto</button>
+                <button type="button" data-cmd="video" title="Video de YouTube en el texto">▶ Video</button>
+              </div>
+              <div class="in cuerpo" id="ed-cuerpo" contenteditable="true" role="textbox" aria-multiline="true"
+                   aria-labelledby="et-cuerpo" data-placeholder="Escribí la nota acá. Enter para un párrafo nuevo."></div>
+            </div>
+            <span class="hint">Si queda vacía, la nota se publica con el aviso «Esta nota está en redacción».</span>
+          </div>
+        </div>
+      </section>
+
+      <aside class="lateral">
+        <div class="panel">
+          <h2>Publicación</h2>
+          <div class="estado bor" id="ed-estado">Borrador sin guardar</div>
+          <div class="acciones acciones-escritorio">
+            <button class="btn" type="button" data-accion="publicar">Publicar en la web</button>
+            <div class="dos">
+              <button class="btn btn-ghost btn-sm" type="button" data-accion="guardar">Guardar</button>
+              <button class="btn btn-ghost btn-sm" type="button" data-accion="previa">Vista previa</button>
+            </div>
+          </div>
+          <div class="acciones solo-movil"><button class="btn btn-ghost btn-sm" type="button" data-accion="previa">Vista previa</button></div>
+          <p class="chico" id="ed-ayuda">Al publicar, la nota aparece en la web en uno o dos minutos.</p>
+        </div>
+
+        <div class="panel">
+          <h2>Datos de la nota</h2>
+          <div class="f"><label for="ed-seccion">Sección</label>
+            <select class="in" id="ed-seccion"></select>
+            <input class="in" id="ed-seccion-otra" type="text" maxlength="60" placeholder="Nombre de la sección" hidden></div>
+          <div class="f"><label for="ed-fecha">Fecha</label><input class="in" id="ed-fecha" type="date"></div>
+          <div class="f"><label for="ed-autor">Firma</label><input class="in" id="ed-autor" type="text" maxlength="120">
+            <span class="hint">Si queda vacía, dice «Redacción SUBE».</span></div>
+          <div class="f"><span class="etiqueta">Lugar en Noticias</span>
+            <div class="seg" role="radiogroup" aria-label="Lugar en Noticias">
+              <label><input type="radio" name="jerarquia" value="Principal">Principal</label>
+              <label><input type="radio" name="jerarquia" value="Destacada">Destacada</label>
+              <label><input type="radio" name="jerarquia" value="Normal" checked>Normal</label>
+            </div>
+            <span class="hint">Principal: la nota grande de arriba (la anterior pasa a Destacada).</span></div>
+          <div class="f"><label class="switch"><span class="etiqueta" style="font-family:'Anton',sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:.82rem">Visible en la web</span>
+            <input type="checkbox" id="ed-visible" checked><span class="t"></span></label>
+            <span class="hint">Apagalo y tocá Publicar para sacar la nota de la web sin borrarla.</span></div>
+        </div>
+
+        <div class="panel">
+          <h2>Portada</h2>
+          <div class="f"><div class="seg" role="radiogroup" aria-label="Portada de la nota">
+            <label><input type="radio" name="portada" value="Foto" checked>Foto</label>
+            <label><input type="radio" name="portada" value="Video">Video de YouTube</label>
+          </div></div>
+          <div id="portada-foto">
+            <div class="f">
+              <div class="foto" id="foto-prev" hidden><img alt=""><button class="btn btn-ghost btn-sm quitar" type="button" id="foto-quitar" style="background:rgba(11,11,11,.8)">Quitar</button></div>
+              <label class="soltar" id="foto-soltar"><input type="file" accept="image/jpeg,image/png,image/webp" id="foto-archivo" class="sr-only">
+                <b>Subir foto</b><br>Tocá o arrastrá una imagen (JPG, PNG o WEBP)</label>
+            </div>
+            <div class="f"><label for="ed-epigrafe">Epígrafe</label><input class="in" id="ed-epigrafe" type="text" maxlength="300" placeholder="Quién aparece, dónde, crédito…"></div>
+          </div>
+          <div class="f" id="portada-video" hidden>
+            <label for="ed-video">Link del video</label>
+            <input class="in" id="ed-video" type="url" placeholder="https://www.youtube.com/watch?v=…">
+            <div class="video-prev" id="video-prev" hidden><img alt=""><span>Video de YouTube listo</span></div>
+            <span class="hint">Ideal para recortes de los programas. En la portada de Noticias se ve la miniatura con un botón de play.</span>
+          </div>
+        </div>
+
+        <div class="panel" id="panel-borrar" hidden>
+          <button class="btn btn-danger btn-sm" type="button" data-accion="borrar" style="width:100%">Borrar nota</button>
+          <p class="chico" id="borrar-ayuda"></p>
+        </div>
+      </aside>
+    </form>
+    <div class="barra-movil">
+      <button class="btn btn-ghost btn-sm" type="button" data-accion="guardar">Guardar</button>
+      <button class="btn" type="button" data-accion="publicar">Publicar</button>
+    </div>
+  </main>
+</div>
+
+<!-- Cargando la sesión -->
+<p class="cargando" id="v-cargando" style="padding-top:40vh">Cargando…</p>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.115.0/dist/umd/supabase.js"></script>
+<script src="../assets/mi-pase-config.js"></script>
+<script src="../assets/redaccion.js"></script>
+</body>
+</html>

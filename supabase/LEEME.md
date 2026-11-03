@@ -56,3 +56,34 @@ Para sumar las credenciales y el portal de trabajo de la redacción, volvé a co
 | Cargar el Excel mensual | — | — | — | ✔ | — |
 | Alta y baja de comercios y de la redacción | — | — | — | ✔ | — |
 | Registro de búsquedas | — | — | — | ✔ | — |
+
+## Panel de Redacción (/redaccion)
+
+La redacción entra a `/redaccion` (por ejemplo `https://subecanal.com.ar/redaccion`) con su mail y contraseña de SUBE. No hay ningún botón en la web que lleve ahí. El panel guarda los borradores en Supabase y, al publicar, escribe la nota en GitHub (carpeta `redaccion/`). GitHub regenera la web sola.
+
+Quién entra: las personas **activas** de la tabla `redaccion` y las del `equipo`. Las notas publicadas solo las puede **borrar** el equipo; la redacción puede sacarlas de la web con «Visible en la web».
+
+### Activarlo (una sola vez)
+
+1. **Base de datos.** SQL Editor → New query → pegá todo `03-redaccion-notas.sql` → **Run**. Crea la tabla `notas` y cambia el acceso del portal de trabajo de `admin/` a `redaccion/`.
+2. **Llave de GitHub** (la creás vos; no se la pases a nadie):
+   - github.com → tu foto → **Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**.
+   - Nombre: `SUBE redacción`. Vencimiento: 1 año (anotá la fecha para renovarla).
+   - **Repository access → Only select repositories →** el repositorio de la web.
+   - **Permissions → Repository permissions → Contents: Read and write**. Nada más.
+   - **Generate token** y copiala (empieza con `github_pat_`).
+3. **Función.** Supabase → **Edge Functions → Deploy a new function → Via Editor**.
+   - Nombre: `redaccion` (así, sin tilde).
+   - Borrá el ejemplo y pegá todo el contenido de `funciones/redaccion/index.ts` → **Deploy**.
+   - En la función → **Details** (o Settings): apagá **Verify JWT with legacy secret** → **Save**. La función comprueba sola quién ingresó.
+4. **Secrets.** Edge Functions → **Secrets** → agregá:
+   - `GITHUB_TOKEN` = la llave del paso 2
+   - `GITHUB_REPO` = `juanmagv16/web` (en la web oficial: `subecanal/web`)
+5. **Probar.** Entrá a `/redaccion` con tu usuario: tienen que aparecer las notas que ya están publicadas.
+
+### Si algo falla
+
+- *«Tu cuenta no tiene acceso a Redacción»*: esa persona no está activa en la tabla `redaccion` ni en `equipo`.
+- *«No hay conexión o el panel todavía no está activado»*: falta el paso 3, o el nombre de la función no es `redaccion`.
+- *«GitHub rechazó la llave»*: la llave venció o no tiene permiso **Contents: Read and write** sobre el repositorio. Generá otra y reemplazá `GITHUB_TOKEN`.
+- Los mensajes técnicos quedan en Edge Functions → `redaccion` → **Logs**.

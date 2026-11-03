@@ -86,7 +86,7 @@
     });
   }
   var PORTAL_DEMO = [
-    { titulo: 'Escribir una nota', descripcion: 'Panel de redacción: notas, fotos y flujo editorial. Se entra con tu cuenta de GitHub.', url: 'admin/' },
+    { titulo: 'Escribir una nota', descripcion: 'Panel de redacción: escribí, guardá y publicá notas. Entrás con tu usuario de SUBE.', url: 'redaccion/' },
     { titulo: 'Cómo publicar una nota', descripcion: 'Guía paso a paso del panel y reglas para que el sitio se vea ordenado.', url: 'https://github.com/juanmagv16/web/blob/main/redaccion/ayuda/LEEME.md' },
     { titulo: 'Noticias publicadas', descripcion: 'Cómo se ve hoy la sección en la web.', url: 'noticias.html' },
     { titulo: 'Programación', descripcion: 'La grilla semanal de SUBE.', url: 'programacion.html' },
