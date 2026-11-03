@@ -302,8 +302,9 @@ def sync_programacion(cfg):
         programas.append(p)
     if os.path.isdir(PROG_LOGOS_DIR):
         for fn in os.listdir(PROG_LOGOS_DIR):
-            if fn not in usados:
-                os.remove(os.path.join(PROG_LOGOS_DIR, fn))
+            ruta = os.path.join(PROG_LOGOS_DIR, fn)
+            if fn not in usados and os.path.isfile(ruta):  # nunca borra carpetas
+                os.remove(ruta)
     with open(PROG_SALIDA, "w", encoding="utf-8") as fh:
         json.dump({"programas": programas}, fh, ensure_ascii=False, indent=2)
         fh.write("\n")
@@ -398,8 +399,9 @@ def sync_comercios(cfg):
     usados = {os.path.basename(c["logo"]) for c in comercios if c["logo"]}
     if os.path.isdir(LOGOS_DIR):
         for fn in os.listdir(LOGOS_DIR):
-            if fn not in usados:
-                os.remove(os.path.join(LOGOS_DIR, fn))
+            ruta = os.path.join(LOGOS_DIR, fn)
+            if fn not in usados and os.path.isfile(ruta):  # nunca borra carpetas
+                os.remove(ruta)
 
     with open(SALIDA, "w", encoding="utf-8") as fh:
         json.dump({"comercios": comercios}, fh, ensure_ascii=False, indent=2)
