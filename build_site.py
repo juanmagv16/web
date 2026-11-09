@@ -184,6 +184,10 @@ LIVE_PLAYLIST_ID = "PLYT7ujTIBmWat3a4FBqiq8kWbAD_kybd5"
 HOME_BODY = '''{franja_programas}  <section class="hero">
     <div class="wrap">
       <div>
+        <picture class="hero-bus">
+          <source srcset="assets/colectivo-hero.webp" type="image/webp">
+          <img src="assets/colectivo-hero.png" alt="" width="545" height="288" fetchpriority="high" decoding="async">
+        </picture>
         <h1>Subite a este<br><span class="accent">viaje colectivo</span></h1>
         <div class="hero-sub">
           <p>Somos un canal platense hecho a pulmón. Creamos contenidos, generamos encuentros y construimos comunidad alrededor de la cultura local.</p>
@@ -245,7 +249,7 @@ NOTICIAS_DESTACADAS = '''  <section class="featured-news">
     <div class="wrap">
       <div class="section-head">
         <h2>Noticias destacadas</h2>
-        <a class="section-head-link" href="noticias.html">Ver todas las noticias →</a>
+        <a class="section-head-link" href="noticias.html">Ver todas las noticias</a>
       </div>
       <div class="news-grid">
 {featured_news}
@@ -383,7 +387,6 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
       <div class="raffle-card">
         <span class="raffle-icon" aria-hidden="true">{ticket}</span>
         <div class="raffle-text">
-          <p class="raffle-eyebrow">Todos los meses</p>
           <h3>Sorteos exclusivos para pasajerxs</h3>
           <p>En SUBE Canal hacemos sorteos todos los meses.</p>
         </div>
@@ -543,7 +546,6 @@ GRILLA_RESPALDO = '''      <div class="content-schedule" id="content-schedule">
 
 # Bloque "Noticias" de Contenidos: se muestra solo si Noticias está visible.
 BLOQUE_NOTICIAS = '''      <div class="content-subhead content-subhead--noticias">
-        <span class="content-subhead-eyebrow">Redacción SUBE</span>
         <h3>Noticias</h3>
       </div>
 
@@ -565,7 +567,6 @@ CONTENIDOS_BODY = '''  <section class="content">
       </div>
 
       <div class="content-subhead">
-        <span class="content-subhead-eyebrow">En vivo y on demand</span>
         <h3>Programación</h3>
       </div>
 
@@ -866,7 +867,6 @@ def news_index_body(notes):
     return '''  <section class="news-page">
     <div class="wrap">
       <div class="news-page-head">
-        <span class="eyebrow">Redacción SUBE</span>
         <h1>Noticias</h1>
         <p>Actualidad, coberturas y notas desde La Plata.</p>
       </div>
@@ -1609,6 +1609,7 @@ if __name__ == "__main__":
             depth=0,
             active=None,
             extra_scripts=["planillas.js", "schedule.js", "next-stop.js"],
+            body_id="inicio",
         ),
     )
     write(

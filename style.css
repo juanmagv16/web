@@ -1910,3 +1910,26 @@ summary:focus-visible, input:focus-visible, select:focus-visible, textarea:focus
   outline: 2px solid var(--lime);
   outline-offset: 3px;
 }
+
+/* Home: el colectivo encabeza la portada (antes solo aparecía en el pie).
+   Entra una sola vez desde la izquierda al cargar la página; con
+   «reducir movimiento» activado aparece quieto. */
+.hero-bus{ display:block; line-height: 0; margin: 0 0 18px -6px; }
+.hero-bus img{ width: min(400px, 82%); height: auto; }
+@media (prefers-reduced-motion: no-preference){
+  .hero-bus img{ animation: hero-bus-llega 1.1s cubic-bezier(.2,.75,.25,1) both; }
+}
+@keyframes hero-bus-llega{
+  from{ transform: translateX(-70px); opacity: 0; }
+  to{ transform: none; opacity: 1; }
+}
+/* En la Home el colectivo ya está arriba: el pie muestra solo los canales */
+#inicio ~ footer .footer-strip picture{ display: none; }
+
+/* Sponsors de la Home en celular: los tres logos en una fila, chicos,
+   en lugar de uno por pantalla. */
+@media (max-width: 640px){
+  .sponsor-slot-row{ grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .sponsor-slot--square.sponsor-slot--image{ aspect-ratio: 1 / 1; }
+  .sponsor-slot--logo{ padding: 10%; }
+}
