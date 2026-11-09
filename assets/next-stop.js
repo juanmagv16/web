@@ -126,7 +126,7 @@
     var segundos = totalSeg % 60;
 
     countdownEl.innerHTML =
-      unidadHtml(dias, dias === 1 ? "día" : "días") +
+      unidadHtml(pad(dias), dias === 1 ? "día" : "días") +
       unidadHtml(pad(horas), "hs") +
       unidadHtml(pad(minutos), "min") +
       unidadHtml(pad(segundos), "seg");

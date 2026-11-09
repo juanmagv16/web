@@ -1899,3 +1899,14 @@ a.program-ig-chip:hover{ color: var(--lime); border-color: rgba(193,255,0,0.35);
   .prog-detail{ flex-direction: column; gap: 10px; }
   .prog-detail .schedule-logo{ order: 2; height: 48px; max-width: 96px; }
 }
+
+/* ---------- Ajustes 09/11 ---------- */
+/* Noticias destacadas: la etiqueta y el título arrancan arriba en las tres
+   tarjetas (antes se centraban y quedaban a distintas alturas). */
+.news-card{ justify-content: flex-start; }
+
+/* Foco visible con teclado también en los desplegables y campos */
+summary:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible{
+  outline: 2px solid var(--lime);
+  outline-offset: 3px;
+}
