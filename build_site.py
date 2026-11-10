@@ -134,6 +134,9 @@ def page_html(title, description, body, depth, active, extra_scripts=None, body_
 <title>{title}</title>
 <meta name="description" content="{description}">{robots}
 <link rel="icon" href="{u}assets/logo.png">
+<link rel="manifest" href="{u}mi-pase.webmanifest">
+<link rel="apple-touch-icon" href="{u}assets/icono-192.png">
+<meta name="theme-color" content="#0b0b0b">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" href="{u}assets/fonts/Anton-Regular.woff2" as="font" type="font/woff2" crossorigin>
@@ -181,13 +184,12 @@ def write(path, html):
 # ============================================================
 LIVE_PLAYLIST_ID = "PLYT7ujTIBmWat3a4FBqiq8kWbAD_kybd5"
 
-HOME_BODY = '''{franja_programas}  <section class="hero">
+HOME_BODY = '''{franja_programas}  <section class="hero hero--portada">
     <div class="wrap">
-      <div>
+      <div class="hero-text">
         <h1>Subite a este<br><span class="accent">viaje colectivo</span></h1>
         <div class="hero-sub">
           <p>Somos un canal platense hecho a pulmón. Creamos contenidos, generamos encuentros y construimos comunidad alrededor de la cultura local.</p>
-          <p>La Comunidad de Pasajerxs sostiene SUBE todos los meses. Sumándote, vos también sos parte y accedés a beneficios en una red de espacios amigos.</p>
         </div>
         <div class="hero-actions">
           <a href="comunidad.html#asociate" class="btn btn-primary">Quiero ser pasajerx</a>
@@ -196,6 +198,8 @@ HOME_BODY = '''{franja_programas}  <section class="hero">
       </div>
 
       <div class="hero-player">
+        <div class="next-stop" id="next-stop" aria-live="polite" data-perfiles="{perfiles}" hidden></div>
+
         <p class="hero-player-label">Último programa</p>
         <div class="video-embed">
           <iframe
@@ -206,13 +210,11 @@ HOME_BODY = '''{franja_programas}  <section class="hero">
             allowfullscreen>
           </iframe>
         </div>
-
-        <div class="next-stop" id="next-stop" aria-live="polite" data-perfiles="{perfiles}" hidden></div>
       </div>
     </div>
   </section>
 
-{noticias_destacadas}  <section class="sponsors">
+{noticias_destacadas}{beneficios_home}  <section class="sponsors sponsors--compacto">
     <div class="wrap">
       <div class="sponsor-slots">
         <a class="sponsor-slot sponsor-slot--banner sponsor-banner" href="comunidad.html#beneficios" aria-label="Sponsors oficiales: Roots Cooperativa, Refugio 62 y Tatana">
@@ -240,6 +242,29 @@ HOME_BODY = '''{franja_programas}  <section class="hero">
   </section>
 '''
 
+# Franja de la Comunidad en la Home: algunos comercios de la planilla (en el
+# orden de la planilla) y el camino para asociarse. Cuántos se muestran:
+BENEFICIOS_HOME_CANTIDAD = 4
+
+BENEFICIOS_HOME = '''  <section class="home-benefits">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Comunidad de Pasajerxs</p>
+        <h2>Beneficios para nuestra comunidad</h2>
+        <p>La Comunidad de Pasajerxs sostiene SUBE todos los meses. Sumándote, vos también sos parte y accedés a beneficios en una red de espacios amigos.</p>
+      </div>
+      <div class="home-benefits-grid">
+{cards}
+      </div>
+      <div class="home-benefits-actions">
+        <a href="comunidad.html#beneficios" class="btn btn-ghost">Ver los {total} beneficios</a>
+        <a href="comunidad.html#asociate" class="btn btn-primary">Quiero ser pasajerx</a>
+      </div>
+    </div>
+  </section>
+
+'''
+
 # "Noticias destacadas" de la Home: las 3 primeras notas de Noticias.
 NOTICIAS_DESTACADAS = '''  <section class="featured-news">
     <div class="wrap">
@@ -247,7 +272,7 @@ NOTICIAS_DESTACADAS = '''  <section class="featured-news">
         <h2>Noticias destacadas</h2>
         <a class="section-head-link" href="noticias.html">Ver todas las noticias →</a>
       </div>
-      <div class="news-grid">
+      <div class="news-list news-list--home">
 {featured_news}
       </div>
     </div>
@@ -279,7 +304,7 @@ BENEFIT_CARDS = [
 def benefit_card_html(slug, initial, name, cat, perks, ig, ubicacion=None):
     perks_html = "".join("<li>{}</li>".format(p) for p in perks)
     loc_attr = ' data-location="{}"'.format(ubicacion) if ubicacion else ""
-    return '''        <article class="benefit-card"{loc_attr}>
+    return '''        <article class="benefit-card" data-rubro="{rubro_key}"{loc_attr}>
           <div class="benefit-top">
             <div class="benefit-logo mono" data-slug="{slug}" data-name="{name}">{initial}</div>
             <div>
@@ -293,7 +318,8 @@ def benefit_card_html(slug, initial, name, cat, perks, ig, ubicacion=None):
           <div class="benefit-foot">
             <a class="benefit-ig" href="https://www.instagram.com/{ig}/" target="_blank" rel="noopener">{icon}<span>@{ig}</span></a>
           </div>
-        </article>'''.format(slug=slug, name=name, initial=initial, cat=cat, perks=perks_html, ig=ig, icon=IG_ICON, loc_attr=loc_attr)
+        </article>'''.format(slug=slug, name=name, initial=initial, cat=cat, perks=perks_html, ig=ig, icon=IG_ICON, loc_attr=loc_attr,
+                             rubro_key=_slug_rubro(cat))
 
 
 # Geolocalización de comercios ("Ver qué tan cerca están"): apagada por
@@ -334,7 +360,7 @@ def benefit_card_from_sheet(c):
     foot = ('<a class="benefit-ig" href="https://www.instagram.com/{0}/" target="_blank" rel="noopener">{1}<span>@{0}</span></a>'.format(e(ig), IG_ICON)
             if ig else "")
     loc = ' data-location="{}"'.format(e(c["ubicacion"])) if c.get("ubicacion") else ""
-    return """        <article class="benefit-card"{loc}>
+    return """        <article class="benefit-card" data-rubro="{rubro_key}"{loc}>
           <div class="benefit-top">
             {logo}
             <div>
@@ -348,14 +374,79 @@ def benefit_card_from_sheet(c):
           <div class="benefit-foot">
             {foot}
           </div>
-        </article>""".format(loc=loc, logo=logo, nombre=e(nombre), rubro=e(c.get("rubro", "")), perks=perks, foot=foot)
+        </article>""".format(loc=loc, logo=logo, nombre=e(nombre), rubro=e(c.get("rubro", "")), perks=perks, foot=foot,
+                             rubro_key=e(_slug_rubro(c.get("rubro", ""))))
+
+
+def _slug_rubro(rubro):
+    import unicodedata
+    t = unicodedata.normalize("NFD", rubro or "").encode("ascii", "ignore").decode().lower()
+    return re.sub(r"[^a-z0-9]+", "-", t).strip("-")
+
+
+def comercios_adheridos():
+    """Lista de comercios con beneficios: [(nombre, rubro, [beneficios], html_logo)].
+    Sale de la planilla; si no hay copia de la planilla, de la lista de respaldo."""
+    comercios = comercios_planilla()
+    if comercios:
+        return [c for c in comercios if c.get("tipo") != "auspiciante"]
+    return None
 
 
 def benefit_cards_html():
-    comercios = comercios_planilla()
+    comercios = comercios_adheridos()
     if comercios:
-        return "\n\n".join(benefit_card_from_sheet(c) for c in comercios if c.get("tipo") != "auspiciante")
+        return "\n\n".join(benefit_card_from_sheet(c) for c in comercios)
     return "\n\n".join(benefit_card_html(*c) for c in BENEFIT_CARDS)
+
+
+def rubros_html():
+    """Botones para filtrar los beneficios por rubro (los rubros salen de la
+    planilla, ordenados del que más comercios tiene al que menos)."""
+    comercios = comercios_adheridos()
+    rubros = [c.get("rubro", "") for c in comercios] if comercios else [c[3] for c in BENEFIT_CARDS]
+    cuenta = {}
+    for r in rubros:
+        if r:
+            cuenta[r] = cuenta.get(r, 0) + 1
+    if len(cuenta) < 2:
+        return ""
+    orden = sorted(cuenta, key=lambda r: (-cuenta[r], r.lower()))
+    chips = ['<button type="button" class="news-chip is-active" data-rubro="" aria-pressed="true">Todos <span>{}</span></button>'.format(len(rubros))]
+    chips += ['<button type="button" class="news-chip" data-rubro="{}" aria-pressed="false">{} <span>{}</span></button>'.format(
+        html.escape(_slug_rubro(r)), html.escape(r), cuenta[r]) for r in orden]
+    return ('      <div class="benefit-filters" id="benefit-filters" role="group" aria-label="Filtrar beneficios por rubro">\n        '
+            + "\n        ".join(chips) + "\n      </div>\n")
+
+
+def total_beneficios():
+    comercios = comercios_adheridos()
+    return len(comercios) if comercios else len(BENEFIT_CARDS)
+
+
+def beneficios_home_html():
+    """Tarjetas chicas de la franja de la Home (los primeros comercios de la planilla)."""
+    e = html.escape
+    comercios = comercios_adheridos()
+    if not comercios:
+        return ""
+    cards = []
+    for c in comercios[:BENEFICIOS_HOME_CANTIDAD]:
+        logo_path = c["logo"] if "logo" in c else "assets/socios/planilla/{}.webp".format(c["slug"])
+        if logo_path and os.path.exists(os.path.join(ROOT, logo_path)):
+            logo = '<span class="benefit-logo"><img src="{}" alt="" width="56" height="56" loading="lazy" decoding="async"></span>'.format(e(logo_path))
+        else:
+            logo = '<span class="benefit-logo mono" aria-hidden="true">{}</span>'.format(e(c["nombre"][:1].upper()))
+        perk = (c.get("beneficios") or [""])[0]
+        cards.append("""        <a class="home-benefit" href="comunidad.html#beneficios">
+          {logo}
+          <span class="home-benefit-text">
+            <span class="benefit-name">{nombre}</span>
+            <span class="benefit-cat">{rubro}</span>
+            <span class="home-benefit-perk">{perk}</span>
+          </span>
+        </a>""".format(logo=logo, nombre=e(c["nombre"]), rubro=e(c.get("rubro", "")), perk=e(perk)))
+    return BENEFICIOS_HOME.format(cards="\n".join(cards), total=total_beneficios())
 
 
 COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
@@ -365,17 +456,19 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
         <p>Espacios amigos que suman descuentos exclusivos para quienes sostienen a SUBE. Mostrá tu carnet de pasajerx y viajá con beneficios.</p>
       </div>
 
-      <div class="carousel">
-        <button class="carousel-arrow carousel-arrow--prev" type="button" aria-label="Ver beneficios anteriores">{arrow_left}</button>
+      <ol class="pasos" aria-label="Cómo funciona">
+        <li><span class="paso-num" aria-hidden="true">1</span><span class="paso-text"><strong>Asociate</strong>Elegí tu aporte y sumate a la Comunidad de Pasajerxs. <a href="#asociate">Ver aportes</a></span></li>
+        <li><span class="paso-num" aria-hidden="true">2</span><span class="paso-text"><strong>Activá tu pase</strong>Si aportás a la comunidad, ya estás en la lista: no hace falta registrarte. <a href="mi-pase.html">Ir a Mi pase</a></span></li>
+        <li><span class="paso-num" aria-hidden="true">3</span><span class="paso-text"><strong>Mostralo</strong>Mostrá tu pase en los comercios adheridos y usá el beneficio.</span></li>
+      </ol>
 
-        <div class="benefit-grid" id="benefit-grid" data-fallback="true">
+{rubros}      <div class="benefit-grid benefit-grid--lista" id="benefit-grid" data-fallback="true">
 
 {cards}
 
-        </div>
-
-        <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Ver más beneficios">{arrow_right}</button>
       </div>
+      <p class="benefit-empty" id="benefit-empty" hidden>No hay beneficios en este rubro todavía.</p>
+      <button class="btn btn-ghost benefit-more" id="benefit-more" type="button" hidden>Ver los {total} beneficios</button>
 
 {{boton_ubicacion}}
       <p class="benefits-note">Los descuentos y condiciones de cada beneficio son definidos por cada espacio adherido y pueden cambiar sin aviso previo.</p>
@@ -390,7 +483,7 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
         <a class="btn btn-ghost raffle-btn" href="https://www.instagram.com/subecanal" target="_blank" rel="noopener">{ig} Seguinos en Instagram</a>
       </div>
 
-      <a class="partner-cta" href="mailto:laplatasube@gmail.com?subject=Quiero%20sumar%20mi%20comercio%20a%20SUBE">
+      <a class="partner-cta" href="comercios.html">
         <span class="partner-cta-title">¿Tenés un comercio o espacio en La Plata?</span>
         <span class="partner-cta-desc">Si querés formar parte de esta red, contactate con nosotros y nuestro equipo comercial te estará respondiendo.</span>
       </a>
@@ -431,6 +524,30 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
 
       </div>
 
+      <div class="faq" id="preguntas">
+        <h3>Preguntas frecuentes</h3>
+        <details class="faq-item">
+          <summary>¿Cómo uso los beneficios?{chevron}</summary>
+          <div class="faq-body"><p>Entrá a <a href="mi-pase.html">Mi pase</a> y mostrá esa pantalla en los comercios adheridos. La hora corre en vivo: una captura de pantalla no sirve.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary>¿Tengo que registrarme para tener Mi pase?{chevron}</summary>
+          <div class="faq-body"><p>No. Si aportás a la Comunidad de Pasajerxs, ya estás en la lista: activás tu cuenta desde <a href="mi-pase.html">Mi pase</a> con el mail de tu suscripción.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary>¿Puedo cancelar mi aporte mensual?{chevron}</summary>
+          <div class="faq-body"><p>Sí. La suscripción mensual es vía Mercado Pago y podés cancelarla cuando quieras.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary>¿Los beneficios son siempre los mismos?{chevron}</summary>
+          <div class="faq-body"><p>Los descuentos y condiciones de cada beneficio son definidos por cada espacio adherido y pueden cambiar sin aviso previo.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary>Tengo un comercio, ¿cómo me sumo?{chevron}</summary>
+          <div class="faq-body"><p>Mirá cómo funciona y escribinos desde <a href="comercios.html">Sumá tu comercio</a>.</p></div>
+        </details>
+      </div>
+
       <details class="email-help">
         <summary>
           <span class="email-help-icon" aria-hidden="true">✉</span>
@@ -460,6 +577,8 @@ COMUNIDAD_BODY = '''  <section class="benefits" id="beneficios">
   </section>
 '''.format(
     cards=benefit_cards_html(),
+    rubros=rubros_html(),
+    total=total_beneficios(),
     chevron=CHEVRON_ICON,
     arrow_left=ARROW_LEFT_ICON,
     arrow_right=ARROW_RIGHT_ICON,
@@ -570,6 +689,7 @@ CONTENIDOS_BODY = '''  <section class="content">
       </div>
 
 {grilla}
+{programas}
 {bloque_noticias}'''
 
 # ============================================================
@@ -951,17 +1071,11 @@ def news_article_body(note, notes):
 
 
 def home_featured_news_html(notes):
-    """Las 3 tarjetas de 'Noticias destacadas' de la home: el mismo orden
-    de la portada de Noticias (principal, destacadas y después las más
-    nuevas)."""
+    """Las 3 notas de 'Noticias destacadas' de la home, con foto: el mismo
+    orden de la portada de Noticias (principal, destacadas y después las
+    más nuevas). La primera va más grande."""
     picked = notes[:3]
-    cards = []
-    for n in picked:
-        cards.append('''        <a class="news-card" href="{url}">
-          <span class="news-tag">{sec}</span>
-          <span class="news-title">{titulo}</span>
-        </a>'''.format(url=news_url(n, 0), sec=html.escape(n["seccion"]), titulo=html.escape(n["titulo"])))
-    return "\n".join(cards)
+    return "\n".join("        " + news_card_html(n, 0, lead=(i == 0)) for i, n in enumerate(picked))
 
 
 def write_news_articles(notes):
@@ -1072,13 +1186,115 @@ TIENDA_BODY = '''  <section class="soon">
   </section>
 '''
 
-CONTACTO_BODY = '''  <section class="soon">
+CONTACTO_BODY = '''  <section class="soon contacto">
     <div class="wrap">
       <div class="section-head">
         <h2>Contacto</h2>
-        <p>Esta sección la vamos a ir completando. Mientras tanto, escribinos directamente:</p>
+        <p>Elegí el camino que más se parece a tu consulta.</p>
       </div>
-      <a class="btn btn-primary" href="mailto:laplatasube@gmail.com">Escribirnos por mail</a>
+
+      <div class="contacto-grid">
+        <div class="contacto-card">
+          <p class="eyebrow">Comunidad</p>
+          <h3>Soy pasajerx</h3>
+          <ul class="contacto-links">
+            <li><a href="mi-pase.html">Entrar a Mi pase</a></li>
+            <li><a href="comunidad.html#preguntas">Preguntas frecuentes</a></li>
+            <li><a href="comunidad.html#asociate">¿No te llegan nuestros correos?</a></li>
+          </ul>
+          <a class="btn btn-ghost" href="mailto:laplatasube@gmail.com?subject=Consulta%20de%20pasajerx">{mail} Escribirnos</a>
+        </div>
+
+        <div class="contacto-card">
+          <p class="eyebrow">Red de espacios amigos</p>
+          <h3>Tengo un comercio o espacio</h3>
+          <ul class="contacto-links">
+            <li><a href="comercios.html">Sumá tu comercio</a></li>
+            <li><a href="mi-pase.html">Verificar una membresía</a></li>
+            <li><a href="cartel.html">Cartel para tu local</a></li>
+          </ul>
+          <a class="btn btn-ghost" href="mailto:laplatasube@gmail.com?subject=Quiero%20sumar%20mi%20comercio%20a%20SUBE">{mail} Escribirnos</a>
+        </div>
+
+        <div class="contacto-card">
+          <p class="eyebrow">SUBE Canal</p>
+          <h3>Otras consultas</h3>
+          <ul class="contacto-links">
+            <li><a href="https://www.instagram.com/subecanal" target="_blank" rel="noopener">Instagram</a></li>
+            <li><a href="contenidos.html">Programación</a></li>
+          </ul>
+          <a class="btn btn-ghost" href="mailto:laplatasube@gmail.com">{mail} laplatasube@gmail.com</a>
+        </div>
+      </div>
+    </div>
+  </section>
+'''.format(mail=MAIL_ICON)
+
+# Página para comercios (no va en el menú: se llega desde Comunidad y Contacto).
+# El mail sale armado con los mismos datos que tiene la planilla de comercios.
+COMERCIOS_MAILTO = ("mailto:laplatasube@gmail.com?subject=Quiero%20sumar%20mi%20comercio%20a%20SUBE"
+                    "&body=Nombre%20del%20comercio%20o%20espacio%3A%0A"
+                    "Rubro%3A%0AInstagram%3A%0ABeneficio%20para%20la%20comunidad%3A%0A"
+                    "Ubicaci%C3%B3n%3A%0A%0A(Adjunt%C3%A1%20el%20logo%20si%20lo%20ten%C3%A9s%20a%20mano)")
+
+COMERCIOS_BODY = '''  <section class="soon comercios-page">
+    <div class="wrap">
+      <a class="back-link" href="comunidad.html">{back}Volver a Comunidad</a>
+      <div class="section-head">
+        <p class="eyebrow">Red de espacios amigos</p>
+        <h2>¿Tenés un comercio o espacio en La Plata?</h2>
+        <p>Si querés formar parte de esta red, contactate con nosotros y nuestro equipo comercial te estará respondiendo.</p>
+      </div>
+
+      <ol class="pasos" aria-label="Cómo funciona para un comercio">
+        <li><span class="paso-num" aria-hidden="true">1</span><span class="paso-text"><strong>Definís tu beneficio</strong>Los descuentos y condiciones de cada beneficio son definidos por cada espacio adherido.</span></li>
+        <li><span class="paso-num" aria-hidden="true">2</span><span class="paso-text"><strong>Aparecés en la web</strong>Tu espacio se muestra en <a href="comunidad.html#beneficios">Comunidad</a> con su logo, rubro, beneficio e Instagram.</span></li>
+        <li><span class="paso-num" aria-hidden="true">3</span><span class="paso-text"><strong>Verificás en el momento</strong>Con tu cuenta de comercio en <a href="mi-pase.html">Mi pase</a> comprobás si la persona está al día con la comunidad.</span></li>
+      </ol>
+
+      <div class="comercios-cols">
+        <div class="contacto-card">
+          <h3>Qué necesitamos de tu espacio</h3>
+          <ul class="benefit-perks">
+            <li>Nombre del comercio o espacio</li>
+            <li>Rubro</li>
+            <li>Instagram</li>
+            <li>Beneficio para la comunidad</li>
+            <li>Logo</li>
+            <li>Ubicación</li>
+          </ul>
+          <a class="btn btn-primary" href="{mailto}">{mail} Quiero sumar mi comercio</a>
+        </div>
+
+        <div class="contacto-card">
+          <h3>Si ya sos parte de la red</h3>
+          <ul class="contacto-links">
+            <li><a href="mi-pase.html">Verificar una membresía</a></li>
+            <li><a href="cartel.html">Cartel para tu local (para imprimir)</a></li>
+            <li><a href="mailto:laplatasube@gmail.com?subject=Cambio%20en%20el%20beneficio%20de%20mi%20comercio">Avisar un cambio en tu beneficio</a></li>
+          </ul>
+          <p class="comercios-count">Hoy son <strong>{total}</strong> espacios en la red.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+'''
+
+# Cartel para imprimir y pegar en el local: lleva a la página de Comunidad.
+CARTEL_BODY = '''  <section class="cartel-page">
+    <div class="wrap">
+      <div class="cartel-acciones no-print">
+        <a class="back-link" href="comercios.html">{back}Volver</a>
+        <button class="btn btn-primary" type="button" onclick="window.print()">Imprimir cartel</button>
+      </div>
+
+      <div class="cartel" id="cartel">
+        <img class="cartel-logo" src="assets/logo.png" alt="SUBE">
+        <p class="cartel-eyebrow">Comunidad de Pasajerxs</p>
+        <p class="cartel-titulo">Mostrá tu carnet de pasajerx y <span>viajá con beneficios</span></p>
+        <div class="cartel-qr" id="cartel-qr" data-destino="comunidad.html"></div>
+        <p class="cartel-url" id="cartel-url"></p>
+      </div>
     </div>
   </section>
 '''
@@ -1458,6 +1674,35 @@ def franja_programas_html():
 """.format("\n      ".join(items))
 
 
+def tarjetas_programas_html():
+    """Tarjetas de los programas con perfil (logo, nombre y horario), para
+    llegar a cada uno sin tener que buscarlo en la grilla."""
+    e = html.escape
+    cards = []
+    for p in programas_perfiles():
+        if p.get("logo"):
+            icono = '<span class="prog-card-logo"><img src="{}" alt="" loading="lazy" decoding="async"></span>'.format(e(p["logo"]))
+        else:
+            icono = '<span class="prog-card-logo prog-card-logo--mono" aria-hidden="true">{}</span>'.format(e(p["name"][:1].upper()))
+        horario = '<span class="prog-card-when">{}</span>'.format(e(p["schedule"])) if p.get("schedule") else ""
+        cards.append("""        <a class="prog-card" href="programas/{slug}.html">
+          {icono}
+          <span class="prog-card-text"><span class="prog-card-name">{nombre}</span>{horario}</span>
+          <span class="prog-card-arrow" aria-hidden="true">→</span>
+        </a>""".format(slug=p["slug"], icono=icono, nombre=e(p["name"]), horario=horario))
+    if not cards:
+        return ""
+    return """      <div class="content-subhead content-subhead--programas">
+        <span class="content-subhead-eyebrow">Quiénes los hacen, videos y redes</span>
+        <h3>Programas</h3>
+      </div>
+
+      <div class="prog-cards">
+{}
+      </div>
+""".format("\n".join(cards))
+
+
 def pagina_oculta(titulo):
     """Página de una sección oculta: no aparece en buscadores y lleva a la Home."""
     return """<!DOCTYPE html>
@@ -1605,6 +1850,7 @@ if __name__ == "__main__":
                 franja_programas=franja_programas_html(),
                 noticias_destacadas=NOTICIAS_DESTACADAS.replace("{featured_news}", home_featured_news_html(NEWS))
                 if visible("noticias") and NEWS else "",
+                beneficios_home=beneficios_home_html(),
             ),
             depth=0,
             active=None,
@@ -1621,7 +1867,7 @@ if __name__ == "__main__":
             active="comunidad",
             # Con la planilla, los logos salen solo de ahí (no de imágenes viejas cargadas a mano)
             extra_scripts=(([] if comercios_planilla() else ["logo-autoload.js"])
-                           + (["geo.js", "carousel.js"] if GEOLOCALIZACION_ACTIVA else ["carousel.js"])),
+                           + (["geo.js", "beneficios.js"] if GEOLOCALIZACION_ACTIVA else ["beneficios.js"])),
         ),
     )
     write(
@@ -1630,6 +1876,7 @@ if __name__ == "__main__":
             "Contenidos · SUBE",
             "Programación y noticias de SUBE.",
             CONTENIDOS_BODY.replace("{grilla}", grilla_contenidos_html()).replace(
+                "{programas}", tarjetas_programas_html()).replace(
                 "{bloque_noticias}", BLOQUE_NOTICIAS if visible("noticias") else "    </div>\n  </section>\n"),
             depth=0,
             active="contenidos",
@@ -1695,6 +1942,29 @@ if __name__ == "__main__":
             CONTACTO_BODY,
             depth=0,
             active="contacto",
+        ),
+    )
+
+    write(
+        "comercios.html",
+        page_html(
+            "Sumá tu comercio · SUBE",
+            "Cómo sumar tu comercio o espacio a la red de beneficios de la Comunidad de Pasajerxs de SUBE.",
+            COMERCIOS_BODY.format(back=BACK_ICON, mail=MAIL_ICON, mailto=COMERCIOS_MAILTO, total=total_beneficios()),
+            depth=0,
+            active="comunidad",
+        ),
+    )
+    write(
+        "cartel.html",
+        page_html(
+            "Cartel para tu local · SUBE",
+            "Cartel para imprimir de la Comunidad de Pasajerxs de SUBE.",
+            CARTEL_BODY.format(back=BACK_ICON),
+            depth=0,
+            active=None,
+            extra_scripts=["cartel.js"],
+            noindex=True,
         ),
     )
 

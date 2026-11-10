@@ -38,9 +38,11 @@ Sitio estático: `build_site.py` genera todas las páginas `.html` a partir de p
 | Noticias (notas en Markdown) | `redaccion/*.md` (formato en `redaccion/_plantilla.txt`) |
 | Panel de Redacción | `redaccion/index.html`, `assets/redaccion.*`, función `supabase/funciones/redaccion/` |
 | Mi pase (credencial, socios, comercios) | `mi-pase.html`, `credencial.html`, `assets/mi-pase*.js`, `supabase/` |
+| Comunidad: filtro de beneficios por rubro | `assets/beneficios.js` |
+| Página para comercios y cartel con QR | `comercios.html`, `cartel.html` (salen de `build_site.py`), `assets/cartel.js` |
 | Publicación automática | `.github/workflows/publicar-sitio.yml` |
 
-**Interruptores en `build_site.py`:** `SECCIONES_OCULTAS` (hoy, solo Tienda), `REDACCION_EN_MENU`, `GEOLOCALIZACION_ACTIVA`, `FRANJA_PROGRAMAS_ACTIVA`.
+**Interruptores en `build_site.py`:** `SECCIONES_OCULTAS` (hoy, solo Tienda), `REDACCION_EN_MENU`, `GEOLOCALIZACION_ACTIVA`, `FRANJA_PROGRAMAS_ACTIVA`, `BENEFICIOS_HOME_CANTIDAD` (comercios en la franja de la Home).
 
 ## Publicación
 
@@ -82,4 +84,6 @@ Antes de dar por terminado un cambio:
 
 - Logos de programas en Drive compartidos como privados: hay que pasarlos a «Cualquier persona con el vínculo: Lector».
 - Supabase: activar Redacción (SQL `03`, función `redaccion`, Secrets) y agregar el dominio oficial en Authentication → URL Configuration. Ver `supabase/LEEME.md`.
+- Supabase: correr `supabase/04-comercio-resumen.sql` para que cada comercio vea sus verificaciones.
+- Textos por definir y mejoras que quedaron afuera: ver `CAMBIOS-10-11.md`.
 - GitHub avisa que algunas acciones del workflow usan Node 20 (obsoleto): actualizarlas.

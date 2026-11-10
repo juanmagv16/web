@@ -281,6 +281,15 @@
       return esperar({ resultado: r === 'no_encontrado' ? 'no_activo' : r });
     },
 
+    resumenComercio: function () {
+      var s = leerSesion(); if (!s || s.rol !== 'comercio') return error('Tenés que ingresar como comercio.');
+      var ahora = new Date(), mes = ahora.getFullYear() + '-' + ahora.getMonth();
+      var mias = leer().busquedas.filter(function (b) { return b.comercio_id === s.id; });
+      var delMes = mias.filter(function (b) { var f = new Date(b.fecha); return f.getFullYear() + '-' + f.getMonth() === mes; });
+      return esperar({ mes: delMes.length, total: mias.length,
+        mes_al_dia: delMes.filter(function (b) { return b.resultado === 'activo'; }).length });
+    },
+
     // ---- Administración ----
     admin: {
       socios: function () { return esperar(copia(leer().socios.map(function (s) {

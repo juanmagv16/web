@@ -87,3 +87,12 @@ Quién entra: las personas **activas** de la tabla `redaccion` y las del `equipo
 - *«No hay conexión o el panel todavía no está activado»*: falta el paso 3, o el nombre de la función no es `redaccion`.
 - *«GitHub rechazó la llave»*: la llave venció o no tiene permiso **Contents: Read and write** sobre el repositorio. Generá otra y reemplazá `GITHUB_TOKEN`.
 - Los mensajes técnicos quedan en Edge Functions → `redaccion` → **Logs**.
+
+## Resumen para cada comercio (opcional)
+
+Para que cada comercio vea en Mi pase cuántas verificaciones hizo (este mes y en total):
+
+1. En Supabase, entrá a **SQL Editor**.
+2. Pegá todo el contenido de `04-comercio-resumen.sql` y tocá **Run**.
+
+Solo muestra números, nunca nombres. Mientras no se corra, la web funciona igual y el resumen no aparece.

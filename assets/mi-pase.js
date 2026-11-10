@@ -361,6 +361,10 @@
       mostrar(barraSesion(sesion, 'Mi pase') +
         (volver ? '<button type="button" class="pase-back" data-volver-cred>← Volver a mi credencial</button>' : '') +
         '<div class="pase-ticket-wrap">' + ticket + '</div>' +
+        '<details class="pase-atajo"><summary>Tener Mi pase a mano en el celular</summary>' +
+        '<div class="pase-atajo-body"><p><strong>En Android (Chrome):</strong> tocá el menú ⋮ y elegí «Agregar a la pantalla principal».</p>' +
+        '<p><strong>En iPhone (Safari):</strong> tocá Compartir y elegí «Agregar a inicio».</p>' +
+        '<p>Te queda un ícono de SUBE que abre directo tu pase.</p></div></details>' +
         '<p class="pase-note">¿Algún dato está mal? Escribinos a <a href="mailto:laplatasube@gmail.com">laplatasube@gmail.com</a>.</p>');
       engancharSalir();
       on('[data-volver-cred]', 'click', volver);
@@ -448,6 +452,23 @@
     }, function (err) { mostrar(errorHtml(err.message)); });
   }
 
+  // ---------- Comercio: cuántas verificaciones hizo ----------
+  // Si la base todavía no tiene esta función (supabase/04-comercio-resumen.sql),
+  // no se muestra nada.
+  function resumenComercio() {
+    var box = $('#comercio-resumen');
+    if (!box || !API.resumenComercio) return;
+    API.resumenComercio().then(function (r) {
+      if (!r || !$('#comercio-resumen')) return;
+      $('#comercio-resumen').innerHTML =
+        '<div class="pase-stats pase-stats--comercio">' +
+        '<div class="pase-stat"><strong>' + (r.mes || 0) + '</strong><span>verificaciones este mes</span></div>' +
+        '<div class="pase-stat"><strong>' + (r.mes_al_dia || 0) + '</strong><span>estaban al día</span></div>' +
+        '<div class="pase-stat"><strong>' + (r.total || 0) + '</strong><span>verificaciones en total</span></div>' +
+        '</div>';
+    }, function () {});
+  }
+
   // ---------- Comercio: buscador ----------
   function panelComercio(sesion) {
     mostrar(barraSesion(sesion, 'Comercio') +
@@ -460,9 +481,12 @@
       '<button class="btn btn-primary" type="submit">Verificar</button>' +
       '</form>' +
       '<div id="resultado" aria-live="polite"></div>' +
-      '</div>'
+      '</div>' +
+      '<div id="comercio-resumen"></div>' +
+      '<p class="pase-note"><a href="cartel.html">Cartel para tu local</a> · <a href="comunidad.html#beneficios">Ver los beneficios publicados</a></p>'
     );
     engancharSalir();
+    resumenComercio();
     on('#f-buscar', 'submit', function (e) {
       e.preventDefault();
       var q = e.target.q.value, btn = e.target.querySelector('button[type=submit]');
@@ -476,6 +500,7 @@
         else html = '<div class="pase-result pase-result--no"><span class="pase-result-icon">✘</span><div><strong>No figura al día</strong><span>Revisá que el nombre y el apellido estén bien escritos.</span></div></div>';
         $('#resultado').innerHTML = html;
         e.target.q.select();
+        resumenComercio();
       }, function (err) { ocupado(btn, false); $('#resultado').innerHTML = errorHtml(err.message); });
     });
   }

@@ -1899,3 +1899,219 @@ a.program-ig-chip:hover{ color: var(--lime); border-color: rgba(193,255,0,0.35);
   .prog-detail{ flex-direction: column; gap: 10px; }
   .prog-detail .schedule-logo{ order: 2; height: 48px; max-width: 96px; }
 }
+
+/* ============================================================
+   Mejoras del 10/11: jerarquía de la Home, Comunidad en grilla,
+   Contenidos, Contacto y página para comercios
+   ============================================================ */
+
+/* ---------- Home: portada ---------- */
+.hero--portada{ padding: 48px 0 56px; }
+.hero--portada .wrap{ align-items: start; }
+.hero--portada .hero-actions{ margin-top: 28px; }
+.hero--portada .next-stop{ margin-top: 0; margin-bottom: 22px; }
+.hero--portada .hero-player-label{ margin-bottom: 10px; }
+@media (max-width: 900px){
+  .hero--portada{ padding: 32px 0 44px; }
+  .hero--portada .wrap{ gap: 28px; }
+  .hero--portada .hero-sub{ margin-top: 14px; }
+  .hero--portada .hero-actions{ margin-top: 22px; gap: 10px; }
+  /* Próxima parada, compacta: programa a la izquierda y cuenta regresiva a la derecha */
+  .hero--portada .next-stop{ padding: 14px 16px; }
+  .hero--portada .next-stop-countdown{ margin-top: 12px; }
+  .hero--portada .cd-unit{ padding: 8px 4px; }
+}
+
+/* ---------- Home: noticias con foto ---------- */
+.featured-news .section-head{ max-width: none; display:flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; margin-bottom: 28px; }
+.featured-news .section-head h2{ margin-top: 0; }
+.news-list--home{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.news-list--home .nc--lead{ grid-column: 1 / -1; }
+@media (max-width: 640px){
+  .news-list--home{ grid-template-columns: 1fr; }
+  /* Las dos notas secundarias, en renglón: foto chica a la izquierda */
+  .news-list--home .nc:not(.nc--lead){ display:grid; grid-template-columns: 112px minmax(0, 1fr); }
+  .news-list--home .nc:not(.nc--lead) .nc-media,
+  .news-list--home .nc:not(.nc--lead) .nc-media--empty{ aspect-ratio: auto; height: 100%; min-height: 96px; border-bottom: 0; border-right: 1px solid var(--card-border); }
+  .news-list--home .nc:not(.nc--lead) .nc-media--empty span{ font-size: 0.8rem; }
+  .news-list--home .nc:not(.nc--lead) .nc-body{ padding: 14px 16px; gap: 6px; justify-content: center; }
+  .news-list--home .nc:not(.nc--lead) .nc-title{ font-size: 1.02rem; }
+  .news-list--home .nc:not(.nc--lead) .nc-bajada{ display:none; }
+}
+
+/* ---------- Home: franja de la Comunidad ---------- */
+.home-benefits{ padding: 0 0 72px; }
+.home-benefits .section-head{ margin-bottom: 28px; }
+.home-benefits-grid{ display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.home-benefit{
+  display:flex; align-items:center; gap: 14px;
+  padding: 16px 18px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  transition: border-color .2s ease, transform .2s ease;
+}
+.home-benefit:hover{ border-color: rgba(193,255,0,0.35); transform: translateY(-3px); }
+.home-benefit .benefit-logo{ width: 56px; height: 56px; }
+.home-benefit-text{ display:flex; flex-direction: column; gap: 2px; }
+.home-benefit .benefit-name{ font-size: 1rem; line-height: 1.2; }
+.home-benefit .benefit-cat{ margin-top: 0; }
+.home-benefit-perk{ color: var(--lime); font-size: 0.88rem; font-weight: 500; line-height: 1.35; margin-top: 4px; }
+.home-benefits-actions{ display:flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+@media (max-width: 1100px){ .home-benefits-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px){
+  .home-benefits-grid{ grid-template-columns: 1fr; gap: 10px; }
+  .home-benefit{ padding: 12px 14px; }
+  .home-benefits-actions{ flex-direction: column; }
+  .home-benefits-actions .btn{ width: 100%; }
+}
+
+/* ---------- Home: sponsors más chicos ---------- */
+.sponsors--compacto{ padding-bottom: 72px; }
+.sponsors--compacto .sponsor-slot-row{ max-width: 720px; margin-inline: auto; }
+@media (max-width: 640px){
+  .sponsors--compacto .sponsor-slot-row{ grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .sponsors--compacto .sponsor-slot--square.sponsor-slot--image{ aspect-ratio: 1 / 1; }
+  .sponsors--compacto .sponsor-slot--banner{ height: 72px; }
+}
+
+/* ---------- Pasos («cómo funciona») ---------- */
+.pasos{ list-style: none; margin: 0 0 40px; padding: 0; display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; counter-reset: none; }
+.pasos li{ display:flex; gap: 14px; align-items: flex-start; padding: 18px 20px; background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); }
+.paso-num{ flex-shrink: 0; width: 36px; height: 36px; display:flex; align-items:center; justify-content:center; border-radius: 50%; background: var(--lime); color: var(--black); font-family: var(--ff-display); font-size: 1.1rem; }
+.paso-text{ color: var(--grey); font-size: 0.94rem; line-height: 1.5; }
+.paso-text strong{ display:block; font-family: var(--ff-display); font-weight: 400; font-size: 1.1rem; letter-spacing: 0.01em; color: var(--white); margin-bottom: 4px; }
+.paso-text a{ color: var(--lime); white-space: nowrap; }
+.paso-text a:hover{ text-decoration: underline; }
+@media (max-width: 860px){ .pasos{ grid-template-columns: 1fr; gap: 10px; margin-bottom: 32px; } .pasos li{ padding: 14px 16px; } }
+
+/* ---------- Comunidad: beneficios en grilla con filtro ---------- */
+.benefit-filters{ display:flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+.benefit-filters .news-chip span{ opacity: 0.65; margin-left: 4px; font-variant-numeric: tabular-nums; }
+.benefit-grid--lista{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  overflow: visible;
+  scroll-snap-type: none;
+  padding: 0;
+}
+.benefit-grid--lista .benefit-card{ flex: none; }
+.benefit-grid--lista .benefit-card[hidden]{ display: none; }
+.benefit-empty{ color: var(--grey); padding: 20px 0; }
+.benefit-more{ margin-top: 18px; width: 100%; }
+@media (max-width: 640px){
+  /* En el celular los botones de rubro se deslizan de costado, en un renglón */
+  .benefit-filters{ flex-wrap: nowrap; overflow-x: auto; margin-inline: -20px; padding: 0 20px 6px; scrollbar-width: none; }
+  .benefit-filters::-webkit-scrollbar{ display:none; }
+  .benefit-filters .news-chip{ flex-shrink: 0; }
+  .benefit-grid--lista{ grid-template-columns: 1fr; gap: 10px; }
+  .benefit-grid--lista .benefit-card{ padding: 16px; gap: 12px; }
+  .benefit-grid--lista .benefit-logo{ width: 56px; height: 56px; }
+}
+
+/* ---------- Preguntas frecuentes ---------- */
+.faq{ margin-top: 56px; }
+.faq h3{ font-family: var(--ff-display); font-weight: 400; font-size: clamp(1.4rem, 4vw, 1.8rem); margin-bottom: 16px; }
+.faq-item{ border: 1px solid var(--card-border); border-radius: 14px; background: var(--card); }
+.faq-item + .faq-item{ margin-top: 10px; }
+.faq-item summary{ list-style: none; cursor: pointer; display:flex; align-items:center; justify-content: space-between; gap: 16px; padding: 16px 20px; font-weight: 500; color: var(--white); }
+.faq-item summary::-webkit-details-marker{ display:none; }
+.faq-item summary .chevron{ flex-shrink: 0; color: var(--lime); transition: transform .2s ease; }
+.faq-item[open] summary .chevron{ transform: rotate(180deg); }
+.faq-item summary:hover{ color: var(--lime); }
+.faq-body{ padding: 0 20px 18px; color: var(--grey); font-size: 0.96rem; line-height: 1.6; }
+.faq-body p{ margin: 0; }
+.faq-body a{ color: var(--lime); }
+.faq-body a:hover{ text-decoration: underline; }
+.faq + .email-help{ margin-top: 10px; }
+
+/* ---------- Contenidos: tarjetas de programas ---------- */
+.content-subhead--programas{ margin-top: 56px; }
+.prog-cards{ display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.prog-card{ display:flex; align-items:center; gap: 14px; padding: 14px 16px; background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); transition: border-color .2s ease, transform .2s ease; }
+.prog-card:hover{ border-color: rgba(193,255,0,0.35); transform: translateY(-3px); }
+.prog-card-logo{ flex-shrink: 0; width: 60px; height: 60px; border-radius: 12px; overflow: hidden; background: var(--black-soft); border: 1px solid var(--card-border); display:flex; align-items:center; justify-content:center; }
+.prog-card-logo img{ width: 100%; height: 100%; object-fit: contain; }
+.prog-card-logo--mono{ font-family: var(--ff-display); font-size: 1.5rem; color: var(--lime); }
+.prog-card-text{ display:flex; flex-direction: column; gap: 3px; flex: 1; }
+.prog-card-name{ font-family: var(--ff-display); font-size: 1.12rem; line-height: 1.2; letter-spacing: 0.01em; color: var(--white); }
+.prog-card-when{ color: var(--grey); font-size: 0.86rem; }
+.prog-card-arrow{ color: var(--lime); font-family: var(--ff-display); font-size: 1.2rem; transition: transform .2s ease; }
+.prog-card:hover .prog-card-arrow{ transform: translateX(3px); }
+
+/* ---------- Contacto y página para comercios ---------- */
+.contacto .section-head, .comercios-page .section-head{ margin-bottom: 32px; }
+.contacto-grid{ display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.contacto-card{ display:flex; flex-direction: column; gap: 14px; padding: 24px; background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); }
+.contacto-card h3{ font-family: var(--ff-display); font-weight: 400; font-size: 1.35rem; line-height: 1.2; }
+.contacto-card .eyebrow{ margin: 0; }
+.contacto-card .btn{ margin-top: auto; white-space: normal; text-align: center; }
+.contacto-links{ list-style: none; margin: 0 0 6px; padding: 0; display:flex; flex-direction: column; }
+.contacto-links li + li{ border-top: 1px solid var(--card-border); }
+.contacto-links a{ display:flex; justify-content: space-between; gap: 12px; padding: 11px 0; color: var(--white); }
+.contacto-links a::after{ content: "→"; color: var(--lime); }
+.contacto-links a:hover{ color: var(--lime); }
+.comercios-cols{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.comercios-count{ color: var(--grey); font-size: 0.94rem; margin: 0; }
+.comercios-count strong{ color: var(--lime); font-family: var(--ff-display); font-weight: 400; font-size: 1.3rem; }
+@media (max-width: 900px){ .contacto-grid{ grid-template-columns: 1fr; } }
+@media (max-width: 720px){ .comercios-cols{ grid-template-columns: 1fr; } }
+
+/* ---------- Cartel para el local (para imprimir) ---------- */
+.cartel-page{ padding: 40px 0 72px; }
+.cartel-acciones{ display:flex; align-items:center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.cartel-acciones .back-link{ margin: 0; }
+.cartel{
+  max-width: 520px; margin: 0 auto; padding: 44px 36px;
+  background: var(--black); border: 2px solid var(--lime); border-radius: 24px;
+  display:flex; flex-direction: column; align-items:center; text-align:center; gap: 18px;
+}
+.cartel-logo{ width: 180px; height: auto; }
+.cartel-eyebrow{ font-family: var(--ff-display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--lime); font-size: 1rem; margin: 0; }
+.cartel-titulo{ font-family: var(--ff-display); text-transform: uppercase; font-size: clamp(1.8rem, 7vw, 2.6rem); line-height: 1.08; color: var(--white); margin: 0; }
+.cartel-titulo span{ color: var(--lime); }
+.cartel-qr{ width: 220px; max-width: 70%; background: #fff; padding: 10px; border-radius: 14px; }
+.cartel-qr svg{ display:block; width: 100%; height: auto; }
+.cartel-url{ font-weight: 700; letter-spacing: 0.02em; color: var(--white); margin: 0; word-break: break-all; }
+@media print{
+  @page{ size: A4; margin: 12mm; }
+  body{ background: #fff !important; }
+  .site-header, .site-footer, .no-print, header, footer{ display: none !important; }
+  .cartel-page{ padding: 0; }
+  .cartel{ max-width: none; min-height: 250mm; justify-content: center; gap: 12mm; border-width: 3px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .cartel-logo{ width: 70mm; }
+  .cartel-titulo{ font-size: 44pt; }
+  .cartel-eyebrow{ font-size: 16pt; }
+  .cartel-qr{ width: 80mm; }
+  .cartel-url{ font-size: 14pt; }
+}
+@media (max-width: 640px){
+  /* Tarjetas de beneficio compactas en el celular: logo a la izquierda, datos a la derecha */
+  .benefit-grid--lista .benefit-card{ display:grid; grid-template-columns: 52px minmax(0, 1fr); column-gap: 14px; row-gap: 6px; padding: 14px 16px; }
+  .benefit-grid--lista .benefit-top{ display: contents; }
+  .benefit-grid--lista .benefit-logo{ width: 52px; height: 52px; grid-row: 1 / span 3; align-self: start; }
+  .benefit-grid--lista .benefit-perks, .benefit-grid--lista .benefit-foot{ grid-column: 2; }
+  .benefit-grid--lista .benefit-foot{ border-top: 0; padding-top: 0; margin-top: 0; }
+  .benefit-grid--lista .benefit-card:hover{ transform: none; }
+  .pasos li{ padding: 12px 14px; gap: 12px; }
+  .paso-num{ width: 30px; height: 30px; font-size: 1rem; }
+}
+.benefit-more[hidden], .benefit-empty[hidden]{ display: none; }
+
+/* ---------- Mi pase: atajo en el celular y resumen del comercio ---------- */
+.pase-atajo{ margin-top: 20px; border: 1px solid var(--card-border); border-radius: 14px; background: var(--card); }
+.pase-atajo summary{ cursor: pointer; padding: 14px 18px; font-weight: 500; color: var(--white); }
+.pase-atajo summary:hover{ color: var(--lime); }
+.pase-atajo-body{ padding: 0 18px 16px; color: var(--grey); font-size: 0.94rem; line-height: 1.55; }
+.pase-atajo-body p{ margin: 0 0 8px; }
+.pase-atajo-body strong{ color: var(--white); }
+.pase-stats--comercio{ margin-top: 16px; }
+.prog-card-name{ text-transform: uppercase; }
+.contacto-card .btn[href^="mailto:laplatasube@gmail.com"]:not([href*="?"]){ text-transform: none; font-family: var(--ff-body); letter-spacing: 0; }
+@media (max-width: 480px){
+  /* Cuenta regresiva en un solo renglón: el video queda más arriba */
+  .hero--portada .next-stop-countdown{ flex-wrap: nowrap; gap: 6px; }
+  .hero--portada .cd-unit{ flex: 1 1 0; padding: 8px 4px; }
+  .hero--portada .cd-num{ font-size: 1.25rem; }
+}

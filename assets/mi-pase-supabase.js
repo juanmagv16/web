@@ -168,6 +168,9 @@
       return rpc('verificar_socio', { texto: texto }).then(function (r) { return { resultado: r }; });
     },
 
+    // Cuántas verificaciones hizo este comercio (función de supabase/04-comercio-resumen.sql)
+    resumenComercio: function () { return rpc('mi_resumen_comercio'); },
+
     admin: {
       socios: function () {
         var hoy = new Date(); hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset());

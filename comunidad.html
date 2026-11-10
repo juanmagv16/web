@@ -6,6 +6,9 @@
 <title>Comunidad · SUBE</title>
 <meta name="description" content="La Comunidad de Pasajerxs de SUBE: beneficios en comercios amigos y cómo sumarte con tu aporte.">
 <link rel="icon" href="assets/logo.png">
+<link rel="manifest" href="mi-pase.webmanifest">
+<link rel="apple-touch-icon" href="assets/icono-192.png">
+<meta name="theme-color" content="#0b0b0b">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" href="assets/fonts/Anton-Regular.woff2" as="font" type="font/woff2" crossorigin>
@@ -43,12 +46,26 @@
         <p>Espacios amigos que suman descuentos exclusivos para quienes sostienen a SUBE. Mostrá tu carnet de pasajerx y viajá con beneficios.</p>
       </div>
 
-      <div class="carousel">
-        <button class="carousel-arrow carousel-arrow--prev" type="button" aria-label="Ver beneficios anteriores"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>
+      <ol class="pasos" aria-label="Cómo funciona">
+        <li><span class="paso-num" aria-hidden="true">1</span><span class="paso-text"><strong>Asociate</strong>Elegí tu aporte y sumate a la Comunidad de Pasajerxs. <a href="#asociate">Ver aportes</a></span></li>
+        <li><span class="paso-num" aria-hidden="true">2</span><span class="paso-text"><strong>Activá tu pase</strong>Si aportás a la comunidad, ya estás en la lista: no hace falta registrarte. <a href="mi-pase.html">Ir a Mi pase</a></span></li>
+        <li><span class="paso-num" aria-hidden="true">3</span><span class="paso-text"><strong>Mostralo</strong>Mostrá tu pase en los comercios adheridos y usá el beneficio.</span></li>
+      </ol>
 
-        <div class="benefit-grid" id="benefit-grid" data-fallback="true">
+      <div class="benefit-filters" id="benefit-filters" role="group" aria-label="Filtrar beneficios por rubro">
+        <button type="button" class="news-chip is-active" data-rubro="" aria-pressed="true">Todos <span>17</span></button>
+        <button type="button" class="news-chip" data-rubro="gastronomia" aria-pressed="false">Gastronomía <span>9</span></button>
+        <button type="button" class="news-chip" data-rubro="produccion-cultural" aria-pressed="false">Producción cultural <span>2</span></button>
+        <button type="button" class="news-chip" data-rubro="bazar-deco" aria-pressed="false">Bazar/Deco <span>1</span></button>
+        <button type="button" class="news-chip" data-rubro="gimnasio-deportes" aria-pressed="false">Gimnasio/Deportes <span>1</span></button>
+        <button type="button" class="news-chip" data-rubro="indumentaria" aria-pressed="false">Indumentaria <span>1</span></button>
+        <button type="button" class="news-chip" data-rubro="libreria-editorial" aria-pressed="false">Librería/Editorial <span>1</span></button>
+        <button type="button" class="news-chip" data-rubro="tatuajes" aria-pressed="false">Tatuajes <span>1</span></button>
+        <button type="button" class="news-chip" data-rubro="tecnologia" aria-pressed="false">Tecnología <span>1</span></button>
+      </div>
+      <div class="benefit-grid benefit-grid--lista" id="benefit-grid" data-fallback="true">
 
-        <article class="benefit-card">
+        <article class="benefit-card" data-rubro="tecnologia">
           <div class="benefit-top">
             <div class="benefit-logo"><img src="assets/socios/planilla/puntoexe-informatica.webp?v=6b765e04" alt=".exe informatica" width="68" height="68" loading="lazy" decoding="async"></div>
             <div>
@@ -64,7 +81,7 @@
           </div>
         </article>
 
-        <article class="benefit-card">
+        <article class="benefit-card" data-rubro="bazar-deco">
           <div class="benefit-top">
             <div class="benefit-logo"><img src="assets/socios/planilla/lamparas-aurora.webp?v=b883db91" alt="Aurora" width="68" height="68" loading="lazy" decoding="async"></div>
             <div>
@@ -80,7 +97,7 @@
           </div>
         </article>
 
-        <article class="benefit-card">
+        <article class="benefit-card" data-rubro="indumentaria">
           <div class="benefit-top">
             <div class="benefit-logo"><img src="assets/socios/planilla/carpincho-indumentaria.webp?v=27c005a0" alt="Carpincho" width="68" height="68" loading="lazy" decoding="async"></div>
             <div>
@@ -96,7 +113,7 @@
           </div>
         </article>
 
-        <article class="benefit-card" data-location="33C2+7J La Plata, Provincia de Buenos Aires">
+        <article class="benefit-card" data-rubro="produccion-cultural" data-location="33C2+7J La Plata, Provincia de Buenos Aires">
           <div class="benefit-top">
             <div class="benefit-logo"><img src="assets/socios/planilla/casachicha-lp.webp?v=4fa90d1c" alt="Casa Chicha" width="68" height="68" loading="lazy" decoding="async"></div>
             <div>
@@ -112,7 +129,7 @@
           </div>
         </article>
 
-        <article class="benefit-card">
+        <article class="benefit-card" data-rubro="gastronomia">
           <div class="benefit-top">
             <div class="benefit-logo"><img src="assets/socios/planilla/cuatrogatoslocos.webp?v=3e52ca3b" alt="Cuatro gatos locos" width="68" height="68" loading="lazy" decoding="async"></div>
             <div>
@@ -128,7 +145,7 @@
           </div>
         </article>
 
-        <article class="benefit-card" data-location="33M3+2X La Plata, Provincia de Buenos Aires">
+        <article class="benefit-card" data-rubro="gastronomia" data-location="33M3+2X La Plata, Provincia de Buenos Aires">
           <div class="benefit-top">
             <div class="benefit-logo"><img src="assets/socios/planilla/estacionquenoma.webp?v=a38f561b" alt="Estación Quenoma" width="68" height="68" loading="lazy" decoding="async"></div>
             <div>
@@ -144,7 +161,7 @@
           </div>
         </article>
 
-        <article class="benefit-card" data-location="33H4+8V La Plata, Provincia de Buenos Aires">
+        <article class="benefit-card" data-rubro="gastronomia" data-location="33H4+8V La Plata, Provincia de Buenos Aires">
           <div class="benefit-top">
             <div class="benefit-logo"><img src="assets/socios/planilla/la-compostera.webp?v=3f0db5c8" alt="La compostera" width="68" height="68" loading="lazy" decoding="async"></div>
             <div>
@@ -160,7 +177,7 @@
           </div>
         </article>
 
-        <article class="benefit-card">
+        <article class="benefit-card" data-rubro="produccion-cultural">
           <div class="benefit-top">
             <div class="benefit-logo"><img src="assets/socios/planilla/laola-indie.webp?v=50824210" alt="La Ola Indie" width="68" height="68" loading="lazy" decoding="async"></div>
             <div>
@@ -176,7 +193,7 @@
           </div>
         </article>
 
-        <article class="benefit-card" data-location="33H7+JF La Plata, Provincia de Buenos Aires">
+        <article class="benefit-card" data-rubro="libreria-editorial" data-location="33H7+JF La Plata, Provincia de Buenos Aires">
           <div class="benefit-top">
             <div class="benefit-logo"><img src="assets/socios/planilla/libreriamascaro.webp?v=7897aaae" alt="Mascaró" width="68" height="68" loading="lazy" decoding="async"></div>
             <div>
@@ -192,7 +209,7 @@
           </div>
         </article>
 
-        <article class="benefit-card" data-location="3XXM+3M Gonnet, Provincia de Buenos Aires">
+        <article class="benefit-card" data-rubro="gimnasio-deportes" data-location="3XXM+3M Gonnet, Provincia de Buenos Aires">
           <div class="benefit-top">
             <div class="benefit-logo"><img src="assets/socios/planilla/munayarena.webp?v=50503db6" alt="Munay arena" width="68" height="68" loading="lazy" decoding="async"></div>
             <div>
@@ -208,7 +225,7 @@
           </div>
         </article>
 
-        <article class="benefit-card">
+        <article class="benefit-card" data-rubro="gastronomia">
           <div class="benefit-top">
             <div class="benefit-logo"><img src="assets/socios/planilla/mundo-semilla.webp?v=a30a163c" alt="Mundo Semilla" width="68" height="68" loading="lazy" decoding="async"></div>
             <div>
@@ -224,7 +241,7 @@
           </div>
         </article>
 
-        <article class="benefit-card">
+        <article class="benefit-card" data-rubro="tatuajes">
           <div class="benefit-top">
             <div class="benefit-logo"><img src="assets/socios/planilla/pao-tatt.webp?v=dbdaa6d7" alt="Pao tatt" width="68" height="68" loading="lazy" decoding="async"></div>
             <div>
@@ -240,7 +257,7 @@
           </div>
         </article>
 
-        <article class="benefit-card" data-location="33F5+V2 La Plata, Provincia de Buenos Aires">
+        <article class="benefit-card" data-rubro="gastronomia" data-location="33F5+V2 La Plata, Provincia de Buenos Aires">
           <div class="benefit-top">
             <div class="benefit-logo"><img src="assets/socios/planilla/refugio62.webp?v=b75444ef" alt="Refugio 62" width="68" height="68" loading="lazy" decoding="async"></div>
             <div>
@@ -256,7 +273,7 @@
           </div>
         </article>
 
-        <article class="benefit-card" data-location="33H2+JP La Plata, Provincia de Buenos Aires">
+        <article class="benefit-card" data-rubro="gastronomia" data-location="33H2+JP La Plata, Provincia de Buenos Aires">
           <div class="benefit-top">
             <div class="benefit-logo"><img src="assets/socios/planilla/roots-cooperativa.webp?v=e66c388d" alt="Roots cooperativa" width="68" height="68" loading="lazy" decoding="async"></div>
             <div>
@@ -272,7 +289,7 @@
           </div>
         </article>
 
-        <article class="benefit-card" data-location="33H6+R6 La Plata, Provincia de Buenos Aires">
+        <article class="benefit-card" data-rubro="gastronomia" data-location="33H6+R6 La Plata, Provincia de Buenos Aires">
           <div class="benefit-top">
             <div class="benefit-logo"><img src="assets/socios/planilla/tatana-ar.webp?v=4a9dbbb6" alt="Tatana" width="68" height="68" loading="lazy" decoding="async"></div>
             <div>
@@ -288,7 +305,7 @@
           </div>
         </article>
 
-        <article class="benefit-card" data-location="33C4+XR La Plata, Provincia de Buenos Aires">
+        <article class="benefit-card" data-rubro="gastronomia" data-location="33C4+XR La Plata, Provincia de Buenos Aires">
           <div class="benefit-top">
             <div class="benefit-logo"><img src="assets/socios/planilla/vaga-arg.webp?v=64d57c81" alt="Vaga" width="68" height="68" loading="lazy" decoding="async"></div>
             <div>
@@ -304,7 +321,7 @@
           </div>
         </article>
 
-        <article class="benefit-card">
+        <article class="benefit-card" data-rubro="gastronomia">
           <div class="benefit-top">
             <div class="benefit-logo"><img src="assets/socios/planilla/ve-gui.webp?v=b8f76730" alt="Ve_gui" width="68" height="68" loading="lazy" decoding="async"></div>
             <div>
@@ -320,10 +337,9 @@
           </div>
         </article>
 
-        </div>
-
-        <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Ver más beneficios"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button>
       </div>
+      <p class="benefit-empty" id="benefit-empty" hidden>No hay beneficios en este rubro todavía.</p>
+      <button class="btn btn-ghost benefit-more" id="benefit-more" type="button" hidden>Ver los 17 beneficios</button>
 
       <p class="benefits-note">Los descuentos y condiciones de cada beneficio son definidos por cada espacio adherido y pueden cambiar sin aviso previo.</p>
 
@@ -337,7 +353,7 @@
         <a class="btn btn-ghost raffle-btn" href="https://www.instagram.com/subecanal" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.3" cy="6.7" r="1"></circle></svg> Seguinos en Instagram</a>
       </div>
 
-      <a class="partner-cta" href="mailto:laplatasube@gmail.com?subject=Quiero%20sumar%20mi%20comercio%20a%20SUBE">
+      <a class="partner-cta" href="comercios.html">
         <span class="partner-cta-title">¿Tenés un comercio o espacio en La Plata?</span>
         <span class="partner-cta-desc">Si querés formar parte de esta red, contactate con nosotros y nuestro equipo comercial te estará respondiendo.</span>
       </a>
@@ -376,6 +392,30 @@
           <a class="btn btn-primary" href="https://link.mercadopago.com.ar/subecanal" target="_blank" rel="noopener">Hacer un aporte</a>
         </div>
 
+      </div>
+
+      <div class="faq" id="preguntas">
+        <h3>Preguntas frecuentes</h3>
+        <details class="faq-item">
+          <summary>¿Cómo uso los beneficios?<svg class="chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></summary>
+          <div class="faq-body"><p>Entrá a <a href="mi-pase.html">Mi pase</a> y mostrá esa pantalla en los comercios adheridos. La hora corre en vivo: una captura de pantalla no sirve.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary>¿Tengo que registrarme para tener Mi pase?<svg class="chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></summary>
+          <div class="faq-body"><p>No. Si aportás a la Comunidad de Pasajerxs, ya estás en la lista: activás tu cuenta desde <a href="mi-pase.html">Mi pase</a> con el mail de tu suscripción.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary>¿Puedo cancelar mi aporte mensual?<svg class="chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></summary>
+          <div class="faq-body"><p>Sí. La suscripción mensual es vía Mercado Pago y podés cancelarla cuando quieras.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary>¿Los beneficios son siempre los mismos?<svg class="chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></summary>
+          <div class="faq-body"><p>Los descuentos y condiciones de cada beneficio son definidos por cada espacio adherido y pueden cambiar sin aviso previo.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary>Tengo un comercio, ¿cómo me sumo?<svg class="chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></summary>
+          <div class="faq-body"><p>Mirá cómo funciona y escribinos desde <a href="comercios.html">Sumá tu comercio</a>.</p></div>
+        </details>
       </div>
 
       <details class="email-help">
@@ -428,6 +468,6 @@
 
 <script src="assets/nav.js"></script>
 <script src="assets/weather.js"></script>
-<script src="assets/carousel.js"></script>
+<script src="assets/beneficios.js"></script>
 </body>
 </html>
